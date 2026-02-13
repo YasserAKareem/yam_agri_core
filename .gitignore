@@ -1,0 +1,2 @@
+# Ignore local environment files
+infra/docker/.env

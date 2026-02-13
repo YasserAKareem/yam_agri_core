@@ -1,0 +1,89 @@
+version: '3.7'
+
+services:
+  db:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - frappe-net
+
+  redis-cache:
+    image: redis:alpine
+    restart: always
+    networks:
+      - frappe-net
+
+  redis-queue:
+    image: redis:alpine
+    restart: always
+    networks:
+      - frappe-net
+
+  redis-socketio:
+    image: redis:alpine
+    restart: always
+    networks:
+      - frappe-net
+
+  backend:
+    image: frappe/erpnext-worker:version-14
+    restart: always
+    depends_on:
+      - db
+      - redis-cache
+      - redis-queue
+      - redis-socketio
+    environment:
+      SITE_NAME: ${SITE_NAME}
+      DB_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      INSTALL_APPS: erpnext,agriculture
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+  scheduler:
+    image: frappe/erpnext-worker:version-14
+    restart: always
+    command: schedule
+    depends_on:
+      - backend
+    environment:
+      SITE_NAME: ${SITE_NAME}
+      DB_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      INSTALL_APPS: erpnext,agriculture
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+  nginx:
+    image: frappe/erpnext-nginx:version-14
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:8080"
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+volumes:
+  db_data:
+  sites-vol:
+
+networks:
+  frappe-net:
+    driver: bridge
