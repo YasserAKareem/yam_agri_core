@@ -38,17 +38,16 @@ services:
     networks: [frappe_network]
     entrypoint: ["bash", "-c"]
     command: >
-      wait-for-it -t 120 db:3306;
-      wait-for-it -t 120 redis-cache:6379;
-      wait-for-it -t 120 redis-queue:6379;
-      echo "sites/common_site_config.json found";
-      bench new-site
+      wait-for-it db:3306 -t 120;
+      wait-for-it redis-cache:6379 -t 120;
+      wait-for-it redis-queue:6379 -t 120;
+      bench new-site frontend
       --mariadb-user-host-login-scope='%'
       --admin-password=admin
       --db-root-username=root
       --db-root-password=admin
-      --install-app erpnext
-      --set-default frontend;
+      --install-app erpnext;
+      bench --site frontend clear-cache;
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
