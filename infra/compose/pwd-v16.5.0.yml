@@ -33,23 +33,23 @@ services:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
 
-    create-site:
-      image: frappe/erpnext:v16.5.0
-      networks: [frappe_network]
-      entrypoint: ["/bin/bash", "-c"]
-      command: >
-        sleep 15 &&
-        bench new-site frontend
-        --mariadb-user-host-login-scope='%'
-        --admin-password=admin
-        --db-root-username=root
-        --db-root-password=admin
-        --install-app erpnext &&
-        bench --site frontend clear-cache
-      volumes:
-        - sites:/home/frappe/frappe-bench/sites
-        - logs:/home/frappe/frappe-bench/logs
-
+  create-site:
+    image: frappe/erpnext:v16.5.0
+    networks: [frappe_network]
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      sleep 15 &&
+      bench new-site frontend
+      --mariadb-user-host-login-scope='%'
+      --admin-password=admin
+      --db-root-username=root
+      --db-root-password=admin
+      --install-app erpnext &&
+      bench --site frontend clear-cache
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+ 
   db:
     image: mariadb:10.6
     networks: [frappe_network]
