@@ -14,21 +14,15 @@ services:
   configurator:
     image: frappe/erpnext:v16.5.0
     networks: [frappe_network]
-    entrypoint: ["bash", "-c"]
-    command: >
-      ls -1 apps > sites/apps.txt;
-      bench set-config -g db_host $$DB_HOST;
-      bench set-config -gp db_port $$DB_PORT;
-      bench set-config -g redis_cache "redis://$$REDIS_CACHE";
-      bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
-      bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
-      bench set-config -gp socketio_port $$SOCKETIO_PORT;
-    environment:
-      DB_HOST: db
-      DB_PORT: "3306"
-      REDIS_CACHE: redis-cache:6379
-      REDIS_QUEUE: redis-queue:6379
-      SOCKETIO_PORT: "9000"
+    entrypoint: ["/bin/bash", "-lc"]
+    command: |
+      ls -1 apps > sites/apps.txt
+      bench set-config -g db_host db
+      bench set-config -gp db_port 3306
+      bench set-config -g redis_cache redis-cache:6379
+      bench set-config -g redis_queue redis-queue:6379
+      bench set-config -g redis_socketio redis-queue:6379
+      bench set-config -gp socketio_port 9000
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -36,16 +30,23 @@ services:
   create-site:
     image: frappe/erpnext:v16.5.0
     networks: [frappe_network]
-    entrypoint: ["/bin/bash", "-c"]
-    command: >
-      sleep 15 &&
-      bench new-site frontend
-      --mariadb-user-host-login-scope='%'
-      --admin-password=admin
-      --db-root-username=root
-      --db-root-password=admin
-      --install-app erpnext &&
+    entrypoint: ["/bin/bash", "-lc"]
+    command: |
+      set -e
+
+      echo "Waiting for DB..."
+      until mysqladmin ping -h db -padmin --silent; do sleep 2; done
+
+      echo "Creating site frontend..."
+      bench new-site frontend \
+        --mariadb-user-host-login-scope='%' \
+        --admin-password=admin \
+        --db-root-username=root \
+        --db-root-password=admin \
+        --install-app erpnext
+
       bench --site frontend clear-cache
+      echo "Done."
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
