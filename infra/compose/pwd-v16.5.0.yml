@@ -36,30 +36,33 @@ services:
   create-site:
     image: frappe/erpnext:v16.5.0
     networks: [frappe_network]
-    entrypoint: ["bash", "-c"]
-    command: >
-      set -e;
-      echo "Waiting for MariaDB...";
-      until mysqladmin ping -h db -padmin --silent; do sleep 2; done;
-      echo "Waiting for Redis cache...";
-      until redis-cli -h redis-cache ping | grep -q PONG; do sleep 2; done;
-      echo "Waiting for Redis queue...";
-      until redis-cli -h redis-queue ping | grep -q PONG; do sleep 2; done;
+    entrypoint: ["/bin/bash", "-lc"]
+    command: |
+      set -euo pipefail
 
-      echo "Creating site frontend...";
-      bench new-site frontend
-      --mariadb-user-host-login-scope='%'
-      --admin-password=admin
-      --db-root-username=root
-      --db-root-password=admin
-      --install-app erpnext;
+      echo "Waiting for MariaDB..."
+      until mysqladmin ping -h db -padmin --silent; do sleep 2; done
 
-      bench --site frontend clear-cache;
-      echo "Site frontend created.";
+      echo "Waiting for Redis cache..."
+      until redis-cli -h redis-cache ping | grep -q PONG; do sleep 2; done
+
+      echo "Waiting for Redis queue..."
+      until redis-cli -h redis-queue ping | grep -q PONG; do sleep 2; done
+
+      echo "Creating site frontend..."
+      bench new-site frontend \
+        --mariadb-user-host-login-scope='%' \
+        --admin-password=admin \
+        --db-root-username=root \
+        --db-root-password=admin \
+        --install-app erpnext
+
+      bench --site frontend clear-cache
+      echo "Site frontend created."
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
-
+      
   db:
     image: mariadb:10.6
     networks: [frappe_network]
