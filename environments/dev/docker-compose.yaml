@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  frappe:
+    image: frappe/erpnext
+    ports:
+      - "8000:8000"
+    environment:
+      - SITE_NAME=dev.local
+      - DB_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=root
+      - ADMIN_PASSWORD=admin
+      - INSTALL_APPS=erpnext,agriculture
+    volumes:
+      - ./frappe_sites:/home/frappe/frappe-bench/sites
+    restart: always
+
+  agriculture_app:
+    image: yam_agri_core/agriculture_app:latest
+    depends_on:
+      - frappe
+    environment:
+      - FRAPPE_URL=http://frappe:8000
+    restart: always
+
+  yam_agri_core:
+    image: yam_agri_core/yam_agri_core:latest
+    depends_on:
+      - frappe
+    environment:
+      - FRAPPE_URL=http://frappe:8000
+    restart: always
+
+  # Optional mock IoT/scale services
+  mock_iot:
+    image: yam_agri_core/mock_iot:latest
+    environment:
+      - MOCK_MODE=true
+    restart: always
+
+  mock_scale:
+    image: yam_agri_core/mock_scale:latest
+    environment:
+      - MOCK_MODE=true
+    restart: always
+
+volumes:
+  frappe_sites:

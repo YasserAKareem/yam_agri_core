@@ -1,0 +1,4 @@
+# Staging Environment Configuration
+# Used for UAT and integrations on new machine (K3s), production-like configs
+
+# Add your staging-specific configuration here

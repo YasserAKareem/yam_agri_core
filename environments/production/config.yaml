@@ -1,0 +1,4 @@
+# Production Environment Configuration
+# Not touched until staging acceptance tests pass
+
+# Add your production-specific configuration here

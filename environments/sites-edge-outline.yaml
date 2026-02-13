@@ -1,0 +1,19 @@
+# Sites Edge Deployment Outline
+# For local site deployments (IoT Gateway, Scale Connector)
+
+# Example docker-compose for edge site
+version: '3.8'
+services:
+  iot_gateway:
+    image: yam_agri_core/iot_gateway:latest
+    environment:
+      - STAGING_URL=http://staging.local
+    restart: always
+
+  scale_connector:
+    image: yam_agri_core/scale_connector:latest
+    environment:
+      - STAGING_URL=http://staging.local
+    restart: always
+
+# Goal: edge capture, central control
