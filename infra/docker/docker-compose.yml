@@ -13,21 +13,26 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - frappe-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --password=$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis-cache:
-    image: redis:alpine
+    image: redis:6.2-alpine
     restart: always
     networks:
       - frappe-net
 
   redis-queue:
-    image: redis:alpine
+    image: redis:6.2-alpine
     restart: always
     networks:
       - frappe-net
 
   redis-socketio:
-    image: redis:alpine
+    image: redis:6.2-alpine
     restart: always
     networks:
       - frappe-net
@@ -36,10 +41,14 @@ services:
     image: frappe/erpnext-worker:version-14
     restart: always
     depends_on:
-      - db
-      - redis-cache
-      - redis-queue
-      - redis-socketio
+      db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+      redis-socketio:
+        condition: service_started
     environment:
       SITE_NAME: ${SITE_NAME}
       DB_ROOT_USER: root
@@ -56,7 +65,8 @@ services:
     restart: always
     command: schedule
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     environment:
       SITE_NAME: ${SITE_NAME}
       DB_ROOT_USER: root
@@ -72,7 +82,8 @@ services:
     image: frappe/erpnext-nginx:version-14
     restart: always
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     ports:
       - "80:8080"
     volumes:

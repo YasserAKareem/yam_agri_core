@@ -1,9 +1,27 @@
 version: '3.8'
 services:
+  db:
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: frappe
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - frappe-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --password=root"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   frappe:
     image: frappe/erpnext
     ports:
       - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
       - SITE_NAME=dev.local
       - DB_ROOT_USER=root
@@ -12,6 +30,8 @@ services:
       - INSTALL_APPS=erpnext,agriculture
     volumes:
       - ./frappe_sites:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
     restart: always
 
   agriculture_app:
@@ -20,6 +40,8 @@ services:
       - frappe
     environment:
       - FRAPPE_URL=http://frappe:8000
+    networks:
+      - frappe-net
     restart: always
 
   yam_agri_core:
@@ -28,6 +50,8 @@ services:
       - frappe
     environment:
       - FRAPPE_URL=http://frappe:8000
+    networks:
+      - frappe-net
     restart: always
 
   # Optional mock IoT/scale services
@@ -35,13 +59,22 @@ services:
     image: yam_agri_core/mock_iot:latest
     environment:
       - MOCK_MODE=true
+    networks:
+      - frappe-net
     restart: always
 
   mock_scale:
     image: yam_agri_core/mock_scale:latest
     environment:
       - MOCK_MODE=true
+    networks:
+      - frappe-net
     restart: always
 
 volumes:
   frappe_sites:
+  db_data:
+
+networks:
+  frappe-net:
+    driver: bridge

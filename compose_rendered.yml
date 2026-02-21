@@ -124,7 +124,7 @@ services:
       - bench
       - worker
       - --queue
-      - long,default,short
+      - long
     environment:
       FRAPPE_REDIS_CACHE: redis://redis-cache:6379
       FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
