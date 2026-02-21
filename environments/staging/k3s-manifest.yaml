@@ -101,7 +101,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: postgres:latest
+        image: postgres:15
         env:
         - name: POSTGRES_DB
           value: yam_agri
@@ -116,6 +116,54 @@ spec:
       - name: db-data
         persistentVolumeClaim:
           claimName: db-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frappe
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: frappe
+  ports:
+  - port: 8000
+    targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agriculture-app
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: agriculture-app
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yam-agri-core
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: yam-agri-core
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: db
+  ports:
+  - port: 5432
+    targetPort: 5432
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

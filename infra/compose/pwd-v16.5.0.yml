@@ -91,7 +91,7 @@ services:
   queue-long:
     image: frappe/erpnext:v16.5.0
     networks: [frappe_network]
-    command: ["bench", "worker", "--queue", "long,default,short"]
+    command: ["bench", "worker", "--queue", "long"]
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
