@@ -651,6 +651,247 @@ End.
 
 ---
 
+## 17) Cross-Industry & Supply Chain Integration Reference
+
+This section maps items from `docs/Integration Feature Inventory.csv` that are **directly relevant to YAM Agri**. The inventory covers 480 AI capabilities across 35 industries; three domains are particularly important for the cereal supply chain: **Agriculture**, **Food & Beverage**, and **Logistics & Transportation**.
+
+> **How to use this section:** When a backlog item (Stage A–I) needs an AI capability listed here, reference the Feature no. when creating the GitHub Issue. The "Open-source providers" column in the CSV tells you which OSS tools to evaluate before committing to a commercial option.
+
+---
+
+### 17.1) Agriculture-Specific Integrations (Feature #91–100)
+
+These features extend or complement the YAM Agri backlog items directly.
+
+| Feature # | Sub-domain | Priority | Mandatory | Key OSS tools | Backlog link |
+|-----------|-----------|----------|-----------|---------------|--------------|
+| #91 | Crop disease detection (vision) | P1 | No | Qdrant, FAISS, OpenCV, LlamaIndex | AGR-CEREAL-029 |
+| #92 | Yield forecasting | P2 | No | Ray, Trino, Grafana, Feast, Seldon | AGR-CEREAL-035, 040 |
+| #93 | Precision irrigation control | P1 | No | Qdrant, Argo Workflows, Haystack, Ray | AGR-CEREAL-007, 030 |
+| #94 | Soil health analytics | P2 | No | Rasa, Feast, Trino, PyTorch | AGR-CEREAL-037 |
+| #95 | Farm equipment predictive maintenance | P2 | No | Milvus, Grafana, Prometheus, Haystack | AGR-CEREAL-045, 095 |
+| #96 | Supply planning for agri-inputs | P2 | No | spaCy, Seldon, scikit-learn, Haystack | AGR-CEREAL-011, 096 |
+| #97 | Livestock health monitoring | P2 | No | Weaviate, dbt, Rasa, Qdrant, Haystack | N/A (cereal-crop scope only) |
+| #98 | Commodity price intelligence | P2 | No | Feast, spaCy, PyTorch, OpenTelemetry | AGR-CEREAL-075 |
+| #99 | Traceability & provenance analytics | P2 | No | Ray, MLflow, Feast, Kafka, Kubeflow | AGR-CEREAL-071, 076 |
+| #100 | Weather risk micro-forecasting | P1 | No | LangChain, Weaviate, TensorFlow, Ray | AGR-CEREAL-003, 100 |
+
+**Implementation notes:**
+- Feature #91 (Crop disease vision) and #93 (Precision irrigation) are P1 — implement alongside Stage C/D backlog items
+- Feature #99 (Traceability & provenance analytics) maps directly onto the `EvidencePack` and `Transfer` DocTypes already in V1.1
+- Feature #100 (Weather risk micro-forecasting) feeds the Observation DocType; use the IoT gateway introduced in Phase 5
+
+---
+
+### 17.2) Food & Beverage Integrations (Feature #191–200)
+
+These are relevant because YAM Agri stores, processes, and ships cereal crops — the F&B compliance and quality features apply.
+
+| Feature # | Sub-domain | Priority | Mandatory | Key OSS tools | Backlog link |
+|-----------|-----------|----------|-----------|---------------|--------------|
+| #191 | Demand forecasting | P2 | No | Seldon, FAISS, dbt, MLflow, Milvus | AGR-CEREAL-072 |
+| #192 | Quality inspection (vision) | P1 | No | Argo Workflows, OpenCV, scikit-learn, spaCy | AGR-CEREAL-025, 029 |
+| #193 | Recipe formulation optimization | P2 | No | Milvus, Grafana, Haystack, LlamaIndex | AGR-CEREAL-049, 068 |
+| #194 | Shelf-life prediction | P2 | No | Kafka, Rasa, LlamaIndex, Feast | AGR-CEREAL-074 |
+| **#195** | **Food safety compliance analytics** | **P0** | **Yes (HACCP/ISO 22000 certification requirement)** | Haystack, ONNX, Argo Workflows, spaCy, PyTorch | AGR-CEREAL-066 |
+| #196 | Waste reduction optimization | P1 | No | PostgreSQL, Ray, FAISS, Hugging Face Transformers | AGR-CEREAL-049, 054 |
+| #197 | Supply planning & procurement | P2 | No | Rasa, Milvus, spaCy, PyTorch, MLflow | AGR-CEREAL-011, 073 |
+| #198 | Menu personalization | P1 | No | LangChain, Weaviate, PyTorch, Seldon, Ray | AGR-CEREAL-079 |
+| #199 | Customer feedback sentiment | P1 | No | PostgreSQL, Feast, Ray, Argo Workflows | AGR-CEREAL-076 |
+| #200 | Equipment maintenance prediction | P2 | No | dbt, Prometheus, Airflow, OpenCV | AGR-CEREAL-045, 065 |
+
+**Implementation notes:**
+- Feature **#195 (Food safety compliance analytics)** is P0/Mandatory — this is a direct complement to the HACCP evidence work in Phase 4 and the `EvidencePack` DocType
+- Feature #192 (Quality inspection vision) requires an image ingestion pipeline; plan for V1.3+ using OpenCV
+- Feature #194 (Shelf-life prediction) feeds directly into the Observation + Certificate expiry chain already in V1.1
+
+---
+
+### 17.3) Logistics & Transportation Integrations (Feature #61–70)
+
+Cereal crops must move from farm → silo → store → customer; these features make that movement smarter and more traceable.
+
+| Feature # | Sub-domain | Priority | Mandatory | Key OSS tools | Backlog link |
+|-----------|-----------|----------|-----------|---------------|--------------|
+| #61 | Route optimization | P2 | No | KServe, OpenTelemetry, dbt, PyTorch, scikit-learn | AGR-CEREAL-056 |
+| #62 | ETA prediction | P2 | No | Weaviate, OpenTelemetry, Feast, Airflow, dbt | AGR-CEREAL-059 |
+| #63 | Warehouse picking optimization | P2 | No | MLflow, Airflow, Kubeflow, scikit-learn, Feast | AGR-CEREAL-047, 054 |
+| #64 | Last-mile delivery optimization | P1 | No | MLflow, ONNX, OpenTelemetry, Qdrant | AGR-CEREAL-056 |
+| #65 | Fleet predictive maintenance | P2 | No | Weaviate, spaCy, FAISS, Airflow, PostgreSQL | AGR-CEREAL-045 |
+| #66 | Cargo theft risk analytics | P1 | No | Kubeflow, FAISS, Qdrant, spaCy, Grafana | AGR-CEREAL-060 |
+| #67 | Customs & trade compliance | P1 | No | Weaviate, dbt, PyTorch, Haystack, Argo Workflows | AGR-CEREAL-057, 067 |
+| #68 | Demand forecasting for shipping | P1 | No | Weaviate, Kafka, Haystack, dbt, Trino | AGR-CEREAL-068, 072 |
+| #69 | Document automation (BOL/invoices) | P2 | No | MLflow, Argo Workflows, Haystack, Ray, Prometheus | AGR-CEREAL-057 |
+| #70 | Carbon footprint optimization | P1 | No | Grafana, Kubeflow, Hugging Face Transformers, dbt | AGR-CEREAL-061 |
+
+**Implementation notes:**
+- Feature #67 (Customs & trade compliance) and #69 (Document automation) both feed the `Export Docs Automation` backlog item (AGR-CEREAL-057) — implement together in V2.0
+- Feature #70 (Carbon footprint optimization) supports the `Shipment Carbon Reporting` item (AGR-CEREAL-061); use Grafana for visualisation
+
+---
+
+## 18) Human-AI Interaction & UX Standards
+
+The inventory defines 70 UX patterns (Feature #411–480) that apply to **every** AI-assisted feature in YAM Agri. These must be implemented before any AI feature goes to production, regardless of domain.
+
+> Reference file: `docs/Integration Feature Inventory.csv` — Domain: "Human-AI Interaction & UX"
+
+### 18.1) Mandatory UX patterns (P0 — must implement in every AI screen)
+
+These 5 patterns are marked `Mandatory: Yes` in the inventory. They are non-negotiable for every AI feature deployed on the YAM Agri platform:
+
+| Feature # | UX Pattern | Why it matters for YAM Agri | Key OSS tools |
+|-----------|-----------|------------------------------|---------------|
+| **#413** | **Human-in-the-loop approvals** | Every AI suggestion (lot accept/reject, dispatch, recall) requires a human approval step before any action | OpenTelemetry, LlamaIndex, Ray, Qdrant, Great Expectations |
+| **#421** | **Source citation UX** | Users must see which data (sensor reading, QCTest, certificate) the AI used to make a suggestion | scikit-learn, TensorFlow, Prometheus, OpenCV, Ray |
+| **#438** | **Privacy-first defaults** | PII, pricing, and customer IDs must be redacted before reaching the AI gateway | dbt, LlamaIndex, Rasa, Grafana, Milvus |
+| **#439** | **Audit trail visibility** | All AI interactions must be logged and visible to the QA Manager | Haystack, Milvus, Airflow, PyTorch, scikit-learn |
+| **#467** | **Tool permission consent dialogs** | Operators must explicitly grant permission before any AI tool accesses a DocType or external service | dbt, Feast, Ray, KServe, Milvus |
+
+**Implementation rule:** Before any AI feature is released, all five patterns above must be verified in the acceptance test checklist.
+
+---
+
+### 18.2) High-priority UX patterns (P1 — implement by V1.2)
+
+These patterns are recommended for all AI screens and should be in place before the first AI-enhanced release (V1.2):
+
+| Feature # | UX Pattern | YAM Agri application |
+|-----------|-----------|---------------------|
+| #411 | Explainability panels | Show which sensor/QC data drove a suggestion on the Lot and EvidencePack screens |
+| #423 | Error recovery flows | Graceful fallback when AI gateway is unavailable; system continues without AI |
+| #424 | Bias & fairness disclosures | Visible notice on any screen where AI scores or ranks lots |
+| #426 | Adaptive onboarding | Guide new operators through AI-assisted screens with inline tips |
+| #427 | Guarded autonomy controls | Per-feature toggle to disable AI suggestions (admin/QA Manager only) |
+| #429 | Context boundary indicators | Show clearly what time window and sites the AI analysis covers |
+| #430 | Data sensitivity indicators | Flag when a suggestion was based on incomplete or quarantined Observation data |
+| #440 | Escalation to human expert | One-click escalation to QA Manager when confidence is low |
+| #446 | Domain glossary and term hints | Inline tooltips for agricultural/HACCP terminology in AI-generated text |
+| #447 | Translation and locale switching | Arabic/English toggle for all AI output panels (Middle East operations) |
+| #448 | Action confirmation for high-risk steps | Double-confirmation step before Execute-with-approval actions run |
+| #457 | Personal data redaction previews | Show operator a preview of what will be redacted before sending to AI gateway |
+| #458 | PII detection UX warnings | Visual warning banner if a prompt appears to contain unredacted PII |
+| #473 | Hallucination detection flags | Show confidence score and flag low-confidence AI outputs in a different colour |
+| #474 | Fallback to search/manual mode | Every AI panel must have a "do this manually" link |
+
+---
+
+### 18.3) UX implementation approach in Frappe
+
+Since YAM Agri runs on Frappe, these UX patterns are implemented as:
+
+1. **Frappe Form scripts** — client-side JavaScript that renders AI suggestion panels, approval buttons, and confidence scores on DocType forms
+2. **Frappe Custom Print Formats** — for source citation and audit trail export on EvidencePacks
+3. **Frappe Notification rules** — for PII detection warnings and action confirmation dialogs
+4. **Frappe Workspace dashboards** — for explainability panels and UX telemetry
+5. **AI Gateway middleware** — handles redaction, logging, fallback, and consent checks before any call reaches the LLM
+
+**Design rule:** Every AI-assisted Frappe form must follow this layout:
+```
+[AI Suggestion Panel]
+  ├─ Suggestion text (with confidence score)
+  ├─ Source data citations (links to QCTest / Observation / Certificate records)
+  ├─ Redaction preview (what was hidden from the AI)
+  └─ Action buttons: [Approve] [Reject] [Escalate to QA Manager] [Do manually]
+```
+
+---
+
+## 19) Local AI Marketplace Plan
+
+The inventory defines 60 AI Marketplace & Ecosystem features (Feature #351–410). For YAM Agri, the strategy is to deploy a **private, local AI marketplace** on the existing Frappe stack — not a public cloud marketplace. This keeps data on-premise, within the Middle East data-residency requirements, and under YAM Agri's full control.
+
+> Reference file: `docs/Integration Feature Inventory.csv` — Domain: "AI Marketplace & Ecosystem"
+
+### 19.1) What "local AI marketplace" means for YAM Agri
+
+A local AI marketplace is a **self-hosted catalog** of AI models, prompts, workflows, and data connectors that operators can browse, activate, and configure — without sending data to a third-party cloud.
+
+**Architecture:**
+```
+Frappe (ERPNext + yam_agri_core)
+    └── AI Gateway (local)
+            ├── Model catalog  ←── local marketplace
+            ├── Prompt & asset store
+            ├── Tool/plugin registry
+            ├── Usage metering & cost dashboard
+            └── LLM backend (self-hosted: Ollama / vLLM / local LLaMA)
+                    or redacted-proxy to cloud via AI Gateway middleware (see Section 18.3)
+```
+
+---
+
+### 19.2) Mandatory marketplace features (P0 — must implement before any model goes to production)
+
+| Feature # | Marketplace capability | Why mandatory | Key OSS tools |
+|-----------|----------------------|---------------|---------------|
+| **#361** | **Trust & safety policy engine** | Ensures every model meets YAM Agri's data governance and HACCP safe-use rules before activation | Prometheus, PyTorch, Feast, FAISS, spaCy |
+| **#362** | **Identity & access federation** | Ties marketplace model access to Frappe user roles (QA Manager, Operator, Admin) | LangChain, Great Expectations, Rasa, Airflow, Grafana |
+| **#363** | **Compliance evidence center** | Records which model version produced which AI suggestion, required for HACCP and ISO 22000 audits | Feast, KServe, Hugging Face Transformers, Kafka, Prometheus |
+| **#365** | **Security scanning for assets** | Scans models and prompt packs for malicious content or data leakage risks before deployment | LlamaIndex, Trino, Kafka, Haystack, Weaviate, Milvus |
+
+---
+
+### 19.3) High-priority marketplace features (P1 — implement in V1.2–V2.0)
+
+| Feature # | Marketplace capability | Priority | Key OSS tools |
+|-----------|----------------------|----------|---------------|
+| #353 | Provider onboarding | P1 | FAISS, Milvus, Kafka, dbt, Grafana, LangChain |
+| #354 | Licensing & terms management | P1 | Hugging Face Transformers, Prometheus, MLflow, LangChain |
+| #357 | Prompt & asset store | P1 | Prometheus, LlamaIndex, Qdrant, Airflow, spaCy |
+| #358 | Tool/plugin registry | P1 | FAISS, Great Expectations, Rasa, PostgreSQL, Trino |
+| #369 | Multi-model routing marketplace | P1 | dbt, Rasa, KServe, Great Expectations, Feast, PostgreSQL |
+| #370 | Vector DB & retrieval offerings | P1 | Grafana, Airflow, LlamaIndex, PyTorch, Milvus, TensorFlow |
+| #371 | Enterprise procurement workflows | P1 | PostgreSQL, Prometheus, spaCy, Seldon, Haystack, Feast |
+| #374 | Model lineage & provenance | P1 | Trino, Argo Workflows, Haystack, Great Expectations, Milvus |
+| #375 | AI app packaging & distribution | P1 | scikit-learn, Haystack, TensorFlow, Kafka, spaCy, Trino |
+| #382 | Self-hosted deployment bundles | P2 | Prometheus, spaCy, Grafana, Qdrant, Hugging Face Transformers |
+| #386 | Incident response coordination | P1 | Seldon, Qdrant, KServe, Ray, dbt, Haystack |
+| #387 | Model evaluation attestations | P1 | PostgreSQL, Hugging Face Transformers, LangChain, Trino, Rasa |
+| #389 | Cost benchmarking dashboard | P1 | Grafana, Kubeflow, Argo Workflows, Milvus, KServe, Haystack |
+| #390 | Latency benchmarking dashboard | P1 | Seldon, OpenTelemetry, TensorFlow, Great Expectations, Kafka |
+| #392 | Jurisdictional compliance packs | P1 | Prometheus, LangChain, OpenCV, Rasa, OpenTelemetry, ONNX |
+| #394 | Marketplace API gateway | P1 | spaCy, PostgreSQL, ONNX, Ray, Haystack, OpenCV |
+| #395 | Webhook/event integrations | P1 | Milvus, OpenTelemetry, Trino, KServe, Kafka |
+| #407 | Workflow marketplace | P1 | spaCy, Weaviate, Prometheus, PostgreSQL, Airflow, Ray |
+| #408 | Reference architectures library | P1 | scikit-learn, PyTorch, Prometheus, Seldon, KServe, Haystack |
+| #409 | SDKs and CLI tooling | P1 | FAISS, Prometheus, LangChain, dbt, Milvus, Kubeflow |
+
+---
+
+### 19.4) Local marketplace deployment phases
+
+| Phase | What gets deployed | When |
+|-------|-------------------|------|
+| **M1 — Catalog & Governance** | Model catalog (#351), Trust & safety policy engine (#361), Identity & access federation (#362), Compliance evidence center (#363), Security scanning (#365) | Alongside V1.2 |
+| **M2 — Prompt & Tool Store** | Prompt & asset store (#357), Tool/plugin registry (#358), Licensing & terms mgmt (#354), Model lineage (#374) | V1.2–V1.3 |
+| **M3 — Routing & Evaluation** | Multi-model routing (#369), Vector DB offerings (#370), Model evaluation attestations (#387), Cost & latency benchmarks (#389, #390) | V2.0 |
+| **M4 — Full Self-service** | Workflow marketplace (#407), Agent template marketplace (#406), Blueprints for verticals (#405), SDKs & CLI (#409) | V2.1+ |
+
+**Deployment rule:** The local marketplace **must be self-hosted** (on the same Kubernetes node as Frappe staging/production). No model or prompt data leaves the YAM Agri infrastructure perimeter without explicit operator consent and redaction.
+
+---
+
+### 19.5) Recommended OSS stack for the local AI marketplace
+
+Based on the inventory's open-source provider recommendations across all three domains:
+
+| Layer | Recommended OSS tools | Purpose |
+|-------|----------------------|---------|
+| LLM serving | KServe, Seldon, vLLM / Ollama | Host and serve local models |
+| Vector store | Qdrant, Milvus, FAISS, Weaviate | Semantic search for model catalog and RAG |
+| Workflow orchestration | Argo Workflows, Airflow | Model deployment and evaluation pipelines |
+| Observability | Prometheus, Grafana, OpenTelemetry | Cost, latency, and usage dashboards |
+| Data pipelines | dbt, Feast, Trino | Feature stores and data connectors |
+| Model registry | MLflow | Track model versions, lineage, and evaluations |
+| LLM framework | LangChain, LlamaIndex, Haystack | RAG, chains, agents |
+| Data validation | Great Expectations | Input/output quality guardrails |
+| NLP / embeddings | Hugging Face Transformers, spaCy | Local model inference |
+
+---
+
+---
+
 ## What changed vs the earlier blueprint
 
 - Added **Owner's Vision & Business Purpose** section (Section 0)
@@ -660,6 +901,10 @@ End.
 - Updated **Work queue** to reference specific backlog IDs and release phases (Section 14)
 - Clarified **Frappe+ERPNext as the permanent base layer** for all AI features
 - Reinforced the **safe, assistive-only AI** principle with action-mode detail for every backlog item
+- Added **Cross-Industry & Supply Chain Integration Reference** (Section 17) — Agriculture, Food & Beverage, and Logistics items from the Integration Feature Inventory, mapped to backlog IDs
+- Added **Human-AI Interaction & UX Standards** (Section 18) — 5 mandatory and 15 high-priority UX patterns from the inventory, with Frappe implementation guidance
+- Added **Local AI Marketplace Plan** (Section 19) — 4-phase deployment plan for a private, self-hosted AI marketplace on the Frappe/k3s stack, with mandatory governance features and OSS stack recommendations
+- Committed `docs/Integration Feature Inventory.csv` (480 items) to the repository as the authoritative integration reference
 
 ---
 
@@ -668,5 +913,8 @@ End.
 1. Finish V1.1 foundation (Phases 0–6 above)
 2. Run all 10 acceptance tests in Section 11 in staging
 3. Then pick the first V1.2 items from Stage D/E/F backlog — start with `AGR-CEREAL-038`, `AGR-CEREAL-039`, and `AGR-CEREAL-043`
-4. Create a GitHub Issue for each backlog item as you approach its release phase
-5. The backlog CSV (`docs/20260222 YAM_AGRI_BACKLOG v1.csv`) is the single source of truth for all future AI feature work
+4. Before any AI feature goes live, implement the 5 mandatory UX patterns from Section 18.1 (Features #413, #421, #438, #439, #467)
+5. Deploy the M1 Local AI Marketplace (Section 19.4) alongside V1.2 — this is the governance foundation for all AI models
+6. Use `docs/Integration Feature Inventory.csv` as the reference when selecting OSS tools for each backlog feature
+7. Create a GitHub Issue for each backlog item as you approach its release phase
+8. Both CSVs are the source of truth: `docs/20260222 YAM_AGRI_BACKLOG v1.csv` for what to build, `docs/Integration Feature Inventory.csv` for how to build it with the right tools
