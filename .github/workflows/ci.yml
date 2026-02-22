@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. Detect accidentally committed secret files ──────────────────────
+  secret-scan:
+    name: Secret / credential scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail if any real .env file is committed
+        run: |
+          # Find .env files (but not .env.example templates)
+          if git ls-files | grep -E '(^|/)\.env$' ; then
+            echo "::error::A real .env file was found in the repository. Remove it immediately."
+            exit 1
+          fi
+          echo "No .env files found — OK"
+
+      - name: Check for common secret patterns
+        run: |
+          FAIL=0
+          # Patterns that should never appear in committed files
+          declare -A PATTERNS=(
+            ["hardcoded password"]="password\s*=\s*['\"][^'\"]{4,}"
+            ["AWS access key"]="AKIA[0-9A-Z]{16}"
+            ["generic token"]="(token|secret|api_key)\s*[:=]\s*['\"][a-zA-Z0-9/+]{20,}"
+          )
+          for label in "${!PATTERNS[@]}"; do
+            if git grep -riP "${PATTERNS[$label]}" \
+                --include="*.py" --include="*.js" --include="*.ts" \
+                --include="*.json" --include="*.yaml" --include="*.yml" \
+                --include="*.sh" --include="*.env" 2>/dev/null; then
+              echo "::warning::Possible $label pattern found — review the lines above."
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+  # ── 2. Lint YAML files ─────────────────────────────────────────────────
+  yaml-lint:
+    name: YAML lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint all YAML files
+        run: |
+          yamllint -d "{
+            extends: relaxed,
+            rules: {
+              line-length: {max: 160},
+              truthy: {allowed-values: ['true', 'false', 'yes', 'no', 'on', 'off']}
+            }
+          }" \
+            $(git ls-files '*.yml' '*.yaml')
+
+  # ── 3. Validate Docker Compose files ──────────────────────────────────
+  docker-compose-validate:
+    name: Docker Compose validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate infra/docker/docker-compose.yml
+        run: |
+          # Create a minimal .env so compose does not error on missing vars
+          cat > infra/docker/.env <<'EOF'
+          DB_ROOT_PASSWORD=test
+          DB_NAME=testdb
+          DB_USER=testuser
+          DB_PASSWORD=testpass
+          SITE_NAME=test.local
+          ADMIN_PASSWORD=testadmin
+          EOF
+          docker compose -f infra/docker/docker-compose.yml config --quiet
+          echo "infra/docker/docker-compose.yml — valid"
+
+      - name: Validate compose_rendered.yml (if present)
+        run: |
+          if [ -f compose_rendered.yml ]; then
+            docker compose -f compose_rendered.yml config --quiet
+            echo "compose_rendered.yml — valid"
+          else
+            echo "compose_rendered.yml not found — skipping"
+          fi
+
+  # ── 4. Environments config sanity check ───────────────────────────────
+  env-config-check:
+    name: Environment config sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure no real .env files exist in environments/
+        run: |
+          if find environments/ -name ".env" | grep -q .; then
+            echo "::error::Real .env file found under environments/. Use .env.example only."
+            exit 1
+          fi
+          echo "No real .env files in environments/ — OK"
+
+      - name: Verify .env.example files are present
+        run: |
+          MISSING=0
+          for dir in environments/dev environments/staging environments/production; do
+            if [ -d "$dir" ] && [ ! -f "$dir/.env.example" ]; then
+              echo "::warning::Missing .env.example in $dir"
+              MISSING=1
+            fi
+          done
+          if [ "$MISSING" -eq 1 ]; then
+            echo "Add .env.example templates to each environment directory."
+          fi
+          exit 0

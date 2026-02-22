@@ -1,0 +1,31 @@
+# CODEOWNERS — YAM Agri Core
+#
+# Each line maps a path pattern to the GitHub user(s) or team(s) who must
+# approve pull requests that touch those files.  Patterns are evaluated in
+# order; the LAST matching rule wins.
+#
+# Teams are referenced as @org/team-slug.
+# Replace placeholder handles below with real GitHub usernames / team slugs.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Default: repo owner reviews everything not matched below ──────────────
+*                               @YasserAKareem
+
+# ── Infrastructure / DevOps ───────────────────────────────────────────────
+infra/                          @YasserAKareem
+compose_rendered.yml            @YasserAKareem
+.gitmodules                     @YasserAKareem
+
+# ── Environment configs ───────────────────────────────────────────────────
+environments/dev/               @YasserAKareem
+environments/staging/           @YasserAKareem
+
+# ── Production config — REQUIRES both DevOps lead AND QA Manager ─────────
+environments/production/        @YasserAKareem
+
+# ── GitHub configuration (.github/) ──────────────────────────────────────
+.github/                        @YasserAKareem
+
+# ── Documentation ─────────────────────────────────────────────────────────
+docs/                           @YasserAKareem

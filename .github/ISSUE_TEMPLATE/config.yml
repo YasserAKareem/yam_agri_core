@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Blueprint Playbook
+    url: https://github.com/YasserAKareem/yam_agri_core/blob/main/docs/BLUEPRINT_PLAYBOOK_BEGINNER.md
+    about: Read the full platform blueprint before opening an issue.
+  - name: 📋 Backlog (80 items)
+    url: https://github.com/YasserAKareem/yam_agri_core/blob/main/docs/20260222%20YAM_AGRI_BACKLOG%20v1.csv
+    about: Check the prioritised backlog before requesting a new feature.
