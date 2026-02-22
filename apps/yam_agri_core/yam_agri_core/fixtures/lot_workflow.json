@@ -1,5 +1,6 @@
 {
   "doctype": "Workflow",
+  "name": "Lot QA Approval",
   "workflow_name": "Lot QA Approval",
   "document_type": "Lot",
   "is_active": 1,
@@ -11,8 +12,8 @@
     {"state": "For Dispatch", "style": "Warning", "allow_edit": "System Manager"}
   ],
   "transitions": [
-    {"state": "Draft", "next_state": "Accepted", "allowed": "QA Manager"},
-    {"state": "Draft", "next_state": "Rejected", "allowed": "QA Manager"},
-    {"state": "Accepted", "next_state": "For Dispatch", "allowed": "System Manager"}
+    {"state": "Draft", "action": "Accept", "next_state": "Accepted", "allowed": "QA Manager"},
+    {"state": "Draft", "action": "Reject", "next_state": "Rejected", "allowed": "QA Manager"},
+    {"state": "Accepted", "action": "Mark For Dispatch", "next_state": "For Dispatch", "allowed": "System Manager"}
   ]
 }
