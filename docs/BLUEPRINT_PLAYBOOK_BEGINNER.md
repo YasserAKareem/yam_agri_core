@@ -9,6 +9,7 @@ Below is a beginner-friendly, repo-ready version of the "YAM Agri Platform Bluep
 - Includes your real-world scenario: 5 locations + office + stores + refrigerators
 - Assumes you are using Frappe + ERPNext + Frappe Agriculture app
 - Includes the AI Enhancement Roadmap and integration plan for the 80-item backlog (`docs/20260222 YAM_AGRI_BACKLOG v1.csv`)
+- Includes Yemen-specific design constraints (Section 20) and cross-references the Smart Farm Architecture (`docs/SMART_FARM_ARCHITECTURE.md`)
 
 
 
@@ -892,6 +893,104 @@ Based on the inventory's open-source provider recommendations across all three d
 
 ---
 
+## 20) Yemen Context — Design Constraints & Commitments
+
+> **Full architecture details:** See `docs/SMART_FARM_ARCHITECTURE.md` for the complete 9-layer user stack, technology map, and Yemen adaptation guide.
+
+YAM Agri operates in Yemen — a context with specific constraints that shape every technology and design decision. This section commits the platform to specific choices that address those constraints. These are **not optional**: a solution that works only with good internet and reliable power is not a solution for Yemen.
+
+---
+
+### 20.1) The Five Yemen Constraints
+
+| Constraint | Impact on the platform |
+|-----------|------------------------|
+| **1. Unreliable / absent power** | All field sites run on solar PV + LiFePO₄ battery; low-power edge hardware only |
+| **2. Poor rural connectivity** | 7-day offline operation required; sync-when-available; SMS as primary farmer input channel |
+| **3. Arabic language primary** | All UI, AI output, alerts, and SMS must support Arabic/RTL from day one |
+| **4. Low digital literacy** | PWA with icon-based navigation; AI copilot drafts text; SMS-based workflows for field farmers |
+| **5. Water scarcity** | Irrigation Optimizer and groundwater monitoring are the highest-priority IoT + AI features |
+
+---
+
+### 20.2) Architecture Reference
+
+The complete smart farm stack is documented in `docs/SMART_FARM_ARCHITECTURE.md`. It covers:
+
+- **9 technology layers** from farm-edge sensors (Layer 1) to external integrations (Layer 9)
+- **9 user personas** (Smallholder Farmer → External Auditor/Donor)
+- **Frappe + ERPNext + OpenJiuwen** integration points with OSS alternatives for every component
+- **OpenJiuwen AI Agent SDK** workflows with local Ollama fallback for offline operation
+- **Yemen-specific decisions** for power, connectivity, localisation, data sovereignty, and water
+
+---
+
+### 20.3) Offline-First Rules (mandatory for all features)
+
+1. Every Frappe form that a field user (U2, U3, U4) needs must work **without internet**
+2. The PWA (Progressive Web App) must queue changes in PouchDB and sync when connectivity returns
+3. Every AI feature must have a **"do this manually" fallback** — AI down = system still works
+4. SMS data entry must cover at minimum: Lot creation, weight entry, and basic alerts
+5. All backups must run **locally first**; cloud replication is secondary, not primary
+
+---
+
+### 20.4) Yemen Crop & Site Fixtures
+
+Pre-load these as Frappe fixtures in `yam_agri_core`:
+
+**Crops (Item types):**
+- Sorghum / دُخن
+- Wheat / قمح
+- Millet / ذُرة
+- Barley / شعير
+- Corn / ذرة شامية
+
+**Sites (governorates / typical locations):**
+- Taiz (تعز) — highland farming
+- Lahj (لحج) — coastal plain
+- Abyan (أبين) — wadi agriculture
+- Hodeidah / Hudaydah (الحديدة) — coastal grain hub
+- Hadhramaut (حضرموت) — dryland farming
+
+**Units of measure (add to ERPNext UoM):**
+- Mudd (مُد) ≈ 1.5 kg (traditional)
+- Kayl (كيل) ≈ 7.5 kg (traditional)
+- Thumn (ثُمن) ≈ 60 kg (traditional sack)
+- Quintal = 100 kg (modern standard)
+- Metric Ton = 1,000 kg
+
+---
+
+### 20.5) Water Monitoring (highest-priority Observation type)
+
+Because over 90% of Yemen's water is used in agriculture and groundwater is rapidly depleting, the Observation DocType must include these signal types from V1.1:
+
+| Signal type | Sensor / source | Alert threshold |
+|-------------|----------------|----------------|
+| Soil moisture (%) | Capacitive sensor | < 25% → irrigation alert |
+| Borehole water level (m) | Ultrasonic level sensor | < critical depth → escalate |
+| Irrigation flow rate (L/min) | Flow meter | > expected by 20% → leak alert |
+| Rainfall (mm) | Rain gauge / Open-Meteo | > 20 mm/day → flood risk alert |
+| Reservoir level (%) | Float sensor | < 30% → ration alert |
+
+---
+
+### 20.6) What This Means for the Build Order
+
+Revised build priority for Yemen context:
+
+1. ✅ V1.1 core (as planned) — but **add offline PWA and Arabic fixtures from sprint 1**
+2. ✅ Field Hub deployment guide (`docs/runbooks/field-hub-setup.md`) before any site goes live
+3. ✅ SMS data entry handler (Layer 6) — before any farmer training
+4. ✅ Water Observation alerts (layer 1+5) — first sensor type to go live
+5. ✅ Arabic UI validation by a native Arabic speaker before V1.1 UAT
+6. 🔜 V1.2: Irrigation Optimizer AI (AGR-CEREAL-030) + Mycotoxin Risk Flags (AGR-CEREAL-043)
+
+---
+
+---
+
 ## What changed vs the earlier blueprint
 
 - Added **Owner's Vision & Business Purpose** section (Section 0)
@@ -905,6 +1004,8 @@ Based on the inventory's open-source provider recommendations across all three d
 - Added **Human-AI Interaction & UX Standards** (Section 18) — 5 mandatory and 15 high-priority UX patterns from the inventory, with Frappe implementation guidance
 - Added **Local AI Marketplace Plan** (Section 19) — 4-phase deployment plan for a private, self-hosted AI marketplace on the Frappe/k3s stack, with mandatory governance features and OSS stack recommendations
 - Committed `docs/Integration Feature Inventory.csv` (480 items) to the repository as the authoritative integration reference
+- Added **Yemen Context section** (Section 20) — five design constraints, offline-first rules, Yemen crop/site fixtures, water monitoring priorities, and revised build order
+- Created `docs/SMART_FARM_ARCHITECTURE.md` — complete 9-layer user stack architecture with technology map, OSS alternatives, and Yemen adaptation guide for Frappe + ERPNext + OpenJiuwen
 
 ---
 
@@ -918,3 +1019,4 @@ Based on the inventory's open-source provider recommendations across all three d
 6. Use `docs/Integration Feature Inventory.csv` as the reference when selecting OSS tools for each backlog feature
 7. Create a GitHub Issue for each backlog item as you approach its release phase
 8. Both CSVs are the source of truth: `docs/20260222 YAM_AGRI_BACKLOG v1.csv` for what to build, `docs/Integration Feature Inventory.csv` for how to build it with the right tools
+9. Read `docs/SMART_FARM_ARCHITECTURE.md` before designing any new Layer 1–3 component — it defines the Yemen-specific hardware, power, and connectivity decisions that cannot be changed later
