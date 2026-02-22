@@ -1,4 +1,4 @@
-version: '3.7'
+# version: '3.7'
 
 services:
   db:
@@ -6,6 +6,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_ROOT_HOST: "%"
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
@@ -14,7 +15,7 @@ services:
     networks:
       - frappe-net
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost --password=$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --password=$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -38,7 +39,7 @@ services:
       - frappe-net
 
   backend:
-    image: frappe/erpnext-worker:version-14
+    image: frappe/erpnext:v16.5.0
     restart: always
     depends_on:
       db:
@@ -60,12 +61,100 @@ services:
     networks:
       - frappe-net
 
-  scheduler:
-    image: frappe/erpnext-worker:version-14
+  frontend:
+    image: frappe/erpnext:v16.5.0
     restart: always
-    command: schedule
     depends_on:
       backend:
+        condition: service_started
+      websocket:
+        condition: service_started
+    command: nginx-entrypoint.sh
+    environment:
+      BACKEND: backend:8000
+      SOCKETIO: websocket:9000
+      FRAPPE_SITE_NAME_HEADER: ${FRAPPE_SITE_NAME_HEADER:-$$host}
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 50m
+    ports:
+      - "${HTTP_PUBLISH_PORT:-8000}:8080"
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+  websocket:
+    image: frappe/erpnext:v16.5.0
+    restart: always
+    depends_on:
+      backend:
+        condition: service_started
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
+    environment:
+      FRAPPE_REDIS_CACHE: redis://redis-cache:6379
+      FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+  queue-short:
+    image: frappe/erpnext:v16.5.0
+    restart: always
+    depends_on:
+      backend:
+        condition: service_started
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+    command: bench worker --queue short,default
+    environment:
+      FRAPPE_REDIS_CACHE: redis://redis-cache:6379
+      FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+  queue-long:
+    image: frappe/erpnext:v16.5.0
+    restart: always
+    depends_on:
+      backend:
+        condition: service_started
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+    command: bench worker --queue long,default,short
+    environment:
+      FRAPPE_REDIS_CACHE: redis://redis-cache:6379
+      FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+    networks:
+      - frappe-net
+
+  scheduler:
+    image: frappe/erpnext:v16.5.0
+    restart: always
+    command: bench schedule
+    depends_on:
+      backend:
+        condition: service_started
+      redis-cache:
+        condition: service_started
+      redis-queue:
         condition: service_started
     environment:
       SITE_NAME: ${SITE_NAME}
@@ -73,19 +162,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       INSTALL_APPS: erpnext,agriculture
-    volumes:
-      - sites-vol:/home/frappe/frappe-bench/sites
-    networks:
-      - frappe-net
-
-  nginx:
-    image: frappe/erpnext-nginx:version-14
-    restart: always
-    depends_on:
-      backend:
-        condition: service_started
-    ports:
-      - "80:8080"
     volumes:
       - sites-vol:/home/frappe/frappe-bench/sites
     networks:

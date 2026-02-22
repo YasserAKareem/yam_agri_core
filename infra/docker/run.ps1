@@ -7,17 +7,23 @@ param(
   $Args
 )
 
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
 function Run-InWSL {
   if (Get-Command wsl -ErrorAction SilentlyContinue) {
-    $joined = $Args -join ' '
-    wsl bash -lc "./infra/docker/run.sh $joined"
+    $joined = ($Args | ForEach-Object {
+      # Wrap args containing spaces/quotes for bash
+      if ($_ -match '[\\s"'']') { "'" + ($_ -replace "'", "'\\''") + "'" } else { $_ }
+    }) -join ' '
+    $wslDir = (wsl wslpath -a "$ScriptDir").Trim()
+    wsl bash -lc "cd '$wslDir' && bash ./run.sh $joined"
     return $true
   }
   return $false
 }
 
-if (-not (Test-Path ./infra/docker/run.sh)) {
-  Write-Error "infra/docker/run.sh not found. Run from repo root."
+if (-not (Test-Path (Join-Path $ScriptDir 'run.sh'))) {
+  Write-Error "run.sh not found next to run.ps1. Expected: $ScriptDir\\run.sh"
   exit 1
 }
 

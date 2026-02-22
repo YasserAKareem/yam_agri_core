@@ -285,7 +285,7 @@ Ask them to run through the **"Starting fresh (with internet)"** steps in
 Section 3 of this document, and confirm:
 - [ ] `bash run.sh up` succeeds
 - [ ] `bash run.sh init` succeeds
-- [ ] They can log in to the Frappe desk at `http://localhost:8000`
+- [ ] They can log in to the Frappe desk at `http://localhost:8000/desk`
 - [ ] `bash run.sh backup` produces a file in `./backups/`
 
 ---

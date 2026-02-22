@@ -20,9 +20,12 @@ if [ -f "$DOTENV_CONFIG_FILE" ]; then
   set -a; source "$DOTENV_CONFIG_FILE"; set +a
 fi
 
-# Canonicalize site/env names: prefer FRAPPE_SITE but accept SITE_NAME
+# Canonicalize site/env names: accept either FRAPPE_SITE or SITE_NAME
 if [ -z "$FRAPPE_SITE" ] && [ -n "$SITE_NAME" ]; then
   FRAPPE_SITE="$SITE_NAME"
+fi
+if [ -z "$SITE_NAME" ] && [ -n "$FRAPPE_SITE" ]; then
+  SITE_NAME="$FRAPPE_SITE"
 fi
 
 # Default service name; allow override via env (FRAPPE_SERVICE)
@@ -39,12 +42,11 @@ else
   exit 1
 fi
 
+if [ ! -f "$DOTENV_CONFIG_FILE" ]; then
+  echo "WARNING: $DOTENV_CONFIG_FILE not found. Create it from .env.example." >&2
+fi
+
 function start_services() {
-  # Run preflight checks if present
-  if [ -f "./preflight.sh" ]; then
-    echo "Running infra preflight checks..."
-    bash ./preflight.sh || echo "preflight returned warnings or errors (continuing)"
-  fi
   $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" up -d
 }
 
@@ -60,12 +62,57 @@ function open_frappe_shell() {
   $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" bash
 }
 
+function run_bench_command() {
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec -T "$FRAPPE_SERVICE" bench "$@"
+}
+
 function initialize_frappe_site() {
   echo "Initializing site and installing apps..."
+
+  # Configure bench to use the docker-compose services (mirrors frappe_docker configurator)
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -g db_host db
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -gp db_port 3306
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -g redis_cache "redis://redis-cache:6379"
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -g redis_queue "redis://redis-queue:6379"
+  # Backward compatibility key used by some configs
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -g redis_socketio "redis://redis-queue:6379"
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -gp socketio_port 9000
+
   $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" bench new-site "$FRAPPE_SITE" \
     --mariadb-root-password "${DB_ROOT_PASSWORD:-$MYSQL_ROOT_PASSWORD}" \
+    --db-root-username "${DB_ROOT_USER:-root}" \
     --admin-password "$ADMIN_PASSWORD"
-  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" bench install-app erpnext agriculture
+
+  # Make the site resolvable on localhost without host file edits
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench set-config -g default_site "$FRAPPE_SITE"
+
+  # Install apps onto the newly created site
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+    bench --site "$FRAPPE_SITE" install-app erpnext
+
+  # Install optional apps if they exist in this image
+  if [ -n "$INSTALL_APPS" ]; then
+    IFS=',' read -r -a apps_to_install <<<"$INSTALL_APPS"
+    for app in "${apps_to_install[@]}"; do
+      app_trimmed="$(echo "$app" | xargs)"
+      if [ -z "$app_trimmed" ] || [ "$app_trimmed" = "erpnext" ]; then
+        continue
+      fi
+      if $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec -T "$FRAPPE_SERVICE" bash -lc "test -d apps/$app_trimmed"; then
+        $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
+          bench --site "$FRAPPE_SITE" install-app "$app_trimmed"
+      else
+        echo "NOTE: app '$app_trimmed' not found in image (apps/$app_trimmed). Skipping."
+      fi
+    done
+  fi
 }
 
 function reset_and_rebuild() {
@@ -171,15 +218,17 @@ case "$1" in
   offline-init) offline_init ;;
   backup)       backup_site ;;
   restore)      restore_site "$@" ;;
+  bench)        shift; run_bench_command "$@" ;;
   status)       show_status ;;
   *)
-    echo "Usage: $0 {up|down|logs|shell|init|reset|prefetch|offline-init|backup|restore|status}"
+    echo "Usage: $0 {up|down|logs|shell|bench|init|reset|prefetch|offline-init|backup|restore|status}"
     echo ""
     echo "  Standard:"
     echo "    up            Start the Docker Compose stack"
     echo "    down          Stop the stack"
     echo "    logs          Stream logs from all services"
     echo "    shell         Open a bash shell inside the frappe container"
+    echo "    bench         Run bench commands (e.g., bench migrate)"
     echo "    init          Create Frappe site and install apps (run after 'up')"
     echo "    reset         Wipe all volumes and rebuild from scratch"
     echo ""
