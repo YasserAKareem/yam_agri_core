@@ -962,6 +962,56 @@ Pre-load these as Frappe fixtures in `yam_agri_core`:
 - Quintal = 100 kg (modern standard)
 - Metric Ton = 1,000 kg
 
+#### Frappe fixture snippets (example)
+
+Add these fixtures to your app so they are created on site install or when you reload fixtures.
+Place the file at `apps/yam_agri_core/yam_agri_core/fixtures/yemen_fixtures.json` and commit it to the repo.
+
+Example content (minimal fields shown — adapt to your DocType field names):
+
+```json
+{
+  "Item": [
+    {"item_code": "SORGHUM", "item_name": "Sorghum / دُخن", "item_group": "Products"},
+    {"item_code": "WHEAT", "item_name": "Wheat / قمح", "item_group": "Products"},
+    {"item_code": "MILLET", "item_name": "Millet / ذُرة", "item_group": "Products"},
+    {"item_code": "BARLEY", "item_name": "Barley / شعير", "item_group": "Products"},
+    {"item_code": "CORN", "item_name": "Corn / ذرة شامية", "item_group": "Products"}
+  ],
+
+  "Site": [
+    {"site_name": "Taiz", "description": "Taiz (تعز) — highland farming"},
+    {"site_name": "Lahj", "description": "Lahj (لحج) — coastal plain"},
+    {"site_name": "Abyan", "description": "Abyan (أبين) — wadi agriculture"},
+    {"site_name": "Hodeidah", "description": "Hodeidah (الحديدة) — coastal grain hub"},
+    {"site_name": "Hadhramaut", "description": "Hadhramaut (حضرموت) — dryland farming"}
+  ],
+
+  "UOM": [
+    {"uom_name": "Mudd", "symbol": "مُد", "conversion_factor_to_kg": 1.5},
+    {"uom_name": "Kayl", "symbol": "كيل", "conversion_factor_to_kg": 7.5},
+    {"uom_name": "Thumn", "symbol": "ثُمن", "conversion_factor_to_kg": 60},
+    {"uom_name": "Quintal", "symbol": "Quintal", "conversion_factor_to_kg": 100},
+    {"uom_name": "Metric Ton", "symbol": "t", "conversion_factor_to_kg": 1000}
+  ]
+}
+```
+
+How to import these fixtures (dev / bench container):
+
+```bash
+# copy the fixture into the app (host) and commit
+# then, inside the bench/frappe container run one of:
+# reload the app's doc definitions (will pick up fixtures defined in the app)
+bench --site site1.local reload-doc yam_agri_core
+
+# or use the UI: Setup → Data Import (import the JSON as needed)
+```
+
+Notes:
+- Adjust the fixture keys/field names to match your custom DocTypes if you use custom fields.
+- You can also export fixtures from a configured site using `bench export-fixtures` and then commit the generated JSON.
+
 ---
 
 ### 20.5) Water Monitoring (highest-priority Observation type)

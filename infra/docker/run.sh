@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+# Default compose filename (prefer .yaml but fallback to .yml)
 DOCKER_COMPOSE_FILE="docker-compose.yaml"
 # Backwards-compatible fallback: some checkouts use .yml
 if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
@@ -19,28 +20,52 @@ if [ -f "$DOTENV_CONFIG_FILE" ]; then
   set -a; source "$DOTENV_CONFIG_FILE"; set +a
 fi
 
+# Canonicalize site/env names: prefer FRAPPE_SITE but accept SITE_NAME
+if [ -z "$FRAPPE_SITE" ] && [ -n "$SITE_NAME" ]; then
+  FRAPPE_SITE="$SITE_NAME"
+fi
+
+# Default service name; allow override via env (FRAPPE_SERVICE)
+FRAPPE_SERVICE="${FRAPPE_SERVICE:-backend}"
+
+# Detect whether host has 'docker compose' (v2) or legacy 'docker-compose'
+COMPOSE_CMD=""
+if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+  COMPOSE_CMD="docker compose"
+elif command -v docker-compose >/dev/null 2>&1; then
+  COMPOSE_CMD="docker-compose"
+else
+  echo "Error: neither 'docker compose' nor 'docker-compose' found on PATH. Install Docker Desktop or the Compose plugin." >&2
+  exit 1
+fi
+
 function start_services() {
-  docker compose -f "$DOCKER_COMPOSE_FILE" up -d
+  # Run preflight checks if present
+  if [ -f "./preflight.sh" ]; then
+    echo "Running infra preflight checks..."
+    bash ./preflight.sh || echo "preflight returned warnings or errors (continuing)"
+  fi
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" up -d
 }
 
 function stop_services() {
-  docker compose -f "$DOCKER_COMPOSE_FILE" down
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" down
 }
 
 function stream_service_logs() {
-  docker compose -f "$DOCKER_COMPOSE_FILE" logs -f
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" logs -f
 }
 
 function open_frappe_shell() {
-  docker compose -f "$DOCKER_COMPOSE_FILE" exec frappe bash
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" bash
 }
 
 function initialize_frappe_site() {
   echo "Initializing site and installing apps..."
-  docker compose -f "$DOCKER_COMPOSE_FILE" exec frappe bench new-site "$FRAPPE_SITE" \
-    --mariadb-root-password "$MYSQL_ROOT_PASSWORD" \
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" bench new-site "$FRAPPE_SITE" \
+    --mariadb-root-password "${DB_ROOT_PASSWORD:-$MYSQL_ROOT_PASSWORD}" \
     --admin-password "$ADMIN_PASSWORD"
-  docker compose -f "$DOCKER_COMPOSE_FILE" exec frappe bench install-app erpnext agriculture
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" bench install-app erpnext agriculture
 }
 
 function reset_and_rebuild() {
@@ -56,10 +81,10 @@ function reset_and_rebuild() {
 # Usage: bash run.sh prefetch
 function prefetch_images() {
   echo "Pulling all images defined in $DOCKER_COMPOSE_FILE ..."
-  docker compose -f "$DOCKER_COMPOSE_FILE" pull
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" pull
   echo "Saving images to $OFFLINE_IMAGES_ARCHIVE (this may take a few minutes)..."
   # Extract image names into an array and save them all in one archive
-  mapfile -t images < <(docker compose -f "$DOCKER_COMPOSE_FILE" config --images)
+  mapfile -t images < <($COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" config --images)
   docker save "${images[@]}" -o "$OFFLINE_IMAGES_ARCHIVE"
   echo "Done. Transfer $OFFLINE_IMAGES_ARCHIVE to the target machine."
 }
@@ -76,7 +101,7 @@ function offline_init() {
   echo "Loading images from $OFFLINE_IMAGES_ARCHIVE ..."
   docker load -i "$OFFLINE_IMAGES_ARCHIVE"
   echo "Starting services (no pull) ..."
-  docker compose -f "$DOCKER_COMPOSE_FILE" up -d --no-build
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" up -d --no-build
   echo "Services started. Now run: bash run.sh init"
 }
 
@@ -89,11 +114,11 @@ function backup_site() {
   DEST="$BACKUP_DIR/$TIMESTAMP"
   mkdir -p "$DEST"
   echo "Backing up site database ..."
-  docker compose -f "$DOCKER_COMPOSE_FILE" exec frappe \
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
     bench --site "$FRAPPE_SITE" backup --with-files
   echo "Copying backup files to $DEST ..."
-  docker compose -f "$DOCKER_COMPOSE_FILE" cp \
-    "frappe:/home/frappe/frappe-bench/sites/$FRAPPE_SITE/private/backups/." \
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" cp \
+    "$FRAPPE_SERVICE:/home/frappe/frappe-bench/sites/$FRAPPE_SITE/private/backups/." \
     "$DEST/"
   echo "Backup complete: $DEST"
   ls -lh "$DEST"
@@ -109,9 +134,9 @@ function restore_site() {
   fi
   echo "Restoring from $RESTORE_DIR ..."
   # Copy backup files into the container
-  docker compose -f "$DOCKER_COMPOSE_FILE" cp \
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" cp \
     "$RESTORE_DIR/." \
-    "frappe:/home/frappe/frappe-bench/sites/$FRAPPE_SITE/private/backups/"
+    "$FRAPPE_SERVICE:/home/frappe/frappe-bench/sites/$FRAPPE_SITE/private/backups/"
   # Identify the SQL file and restore
   SQL_FILE=$(ls "$RESTORE_DIR"/*.sql.gz 2>/dev/null | head -1)
   if [ -z "$SQL_FILE" ]; then
@@ -119,7 +144,7 @@ function restore_site() {
     exit 1
   fi
   SQL_BASENAME=$(basename "$SQL_FILE")
-  docker compose -f "$DOCKER_COMPOSE_FILE" exec frappe \
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" exec "$FRAPPE_SERVICE" \
     bench --site "$FRAPPE_SITE" restore \
     "/home/frappe/frappe-bench/sites/$FRAPPE_SITE/private/backups/$SQL_BASENAME"
   echo "Restore complete."
@@ -129,10 +154,10 @@ function restore_site() {
 # Usage: bash run.sh status
 function show_status() {
   echo "=== Container status ==="
-  docker compose -f "$DOCKER_COMPOSE_FILE" ps
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" ps
   echo ""
   echo "=== Recent logs (last 20 lines per service) ==="
-  docker compose -f "$DOCKER_COMPOSE_FILE" logs --tail=20
+  $COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" logs --tail=20
 }
 
 case "$1" in
