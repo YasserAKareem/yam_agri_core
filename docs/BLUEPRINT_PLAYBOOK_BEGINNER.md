@@ -111,6 +111,29 @@ You can run Frappe + ERPNext + Agriculture app on Dev reliably.
 - Docker Desktop
 - Git
 - VS Code
+- GitHub Copilot (VS Code extension — see steps below)
+
+### How to add GitHub Copilot to VS Code
+
+1. **Install VS Code** from https://code.visualstudio.com if you have not already.
+2. **Sign in to GitHub** inside VS Code:
+   - Click the **Accounts** icon (bottom-left of the VS Code window) → **Sign in with GitHub**.
+   - A browser window opens — authorise VS Code.
+3. **Install the GitHub Copilot extension**:
+   - Open the **Extensions** panel (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+   - Search for **GitHub Copilot** and click **Install**.
+   - Also install **GitHub Copilot Chat** (companion extension for the chat panel).
+   - *Shortcut*: when you open this repository in VS Code, a pop-up will appear asking you to install **Recommended Extensions** — click **Install All** and both extensions are added automatically (they are listed in `.vscode/extensions.json`).
+4. **Verify Copilot is active**:
+   - The Copilot icon (a small circle/dot) appears in the VS Code status bar at the bottom.
+   - Open a file and start typing — Copilot inline suggestions appear in grey.
+5. **Open Copilot Chat** (`Ctrl+Alt+I` / `Cmd+Opt+I`) to ask questions or use Agent mode.
+6. **Switch to Agent mode** for MCP tool access:
+   - In the Chat panel, click the agent/sparkle icon to switch to **Agent** mode.
+   - The MCP servers configured in `.vscode/mcp.json` (GitHub API, filesystem, Frappe REST API) activate automatically.
+   - See `docs/AGENTS_AND_MCP_BLUEPRINT.md` for the full MCP and agent setup guide.
+
+> **Note**: GitHub Copilot requires a GitHub account with an active Copilot subscription (free tier available for individuals). Visit https://github.com/features/copilot to sign up.
 
 ### Steps
 1) Create these files:
