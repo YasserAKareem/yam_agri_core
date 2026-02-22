@@ -7,3 +7,13 @@ infra/docker/backups/
 # Offline Docker image archives (created by bash run.sh prefetch)
 infra/docker/offline-images.tar
 *.tar
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Copied apps for local dev/migration (do not commit vendor copies by accident)
+apps/agriculture/
+apps/yam_agri_qms_trace/

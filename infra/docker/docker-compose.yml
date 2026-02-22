@@ -55,9 +55,14 @@ services:
       DB_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      INSTALL_APPS: erpnext,agriculture
+      INSTALL_APPS: erpnext,agriculture,yam_agri_core,yam_agri_qms_trace
+      PYTHONPATH: /home/frappe/frappe-bench/apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/agriculture
+    command: bash -lc "cd /home/frappe/frappe-bench && bench pip install -e apps/agriculture -e apps/yam_agri_qms_trace -e apps/yam_agri_core && exec /home/frappe/frappe-bench/env/bin/gunicorn --chdir=/home/frappe/frappe-bench/sites --bind=0.0.0.0:8000 --threads=4 --workers=2 --worker-class=gthread --worker-tmp-dir=/dev/shm --timeout=120 --preload frappe.app:application"
     volumes:
       - sites-vol:/home/frappe/frappe-bench/sites
+      - ../../apps/agriculture:/home/frappe/frappe-bench/apps/agriculture
+      - ../../apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_core
+      - ../../apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/yam_agri_qms_trace
     networks:
       - frappe-net
 
@@ -104,6 +109,9 @@ services:
       FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
     volumes:
       - sites-vol:/home/frappe/frappe-bench/sites
+      - ../../apps/agriculture:/home/frappe/frappe-bench/apps/agriculture
+      - ../../apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_core
+      - ../../apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/yam_agri_qms_trace
     networks:
       - frappe-net
 
@@ -117,12 +125,16 @@ services:
         condition: service_started
       redis-queue:
         condition: service_started
-    command: bench worker --queue short,default
+    command: bash -lc "cd /home/frappe/frappe-bench && bench pip install -e apps/agriculture -e apps/yam_agri_qms_trace -e apps/yam_agri_core && bench worker --queue short,default"
     environment:
       FRAPPE_REDIS_CACHE: redis://redis-cache:6379
       FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
+      PYTHONPATH: /home/frappe/frappe-bench/apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/agriculture
     volumes:
       - sites-vol:/home/frappe/frappe-bench/sites
+      - ../../apps/agriculture:/home/frappe/frappe-bench/apps/agriculture
+      - ../../apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_core
+      - ../../apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/yam_agri_qms_trace
     networks:
       - frappe-net
 
@@ -136,19 +148,23 @@ services:
         condition: service_started
       redis-queue:
         condition: service_started
-    command: bench worker --queue long,default,short
+    command: bash -lc "cd /home/frappe/frappe-bench && bench pip install -e apps/agriculture -e apps/yam_agri_qms_trace -e apps/yam_agri_core && bench worker --queue long,default,short"
     environment:
       FRAPPE_REDIS_CACHE: redis://redis-cache:6379
       FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
+      PYTHONPATH: /home/frappe/frappe-bench/apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/agriculture
     volumes:
       - sites-vol:/home/frappe/frappe-bench/sites
+      - ../../apps/agriculture:/home/frappe/frappe-bench/apps/agriculture
+      - ../../apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_core
+      - ../../apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/yam_agri_qms_trace
     networks:
       - frappe-net
 
   scheduler:
     image: frappe/erpnext:v16.5.0
     restart: always
-    command: bench schedule
+    command: bash -lc "cd /home/frappe/frappe-bench && bench pip install -e apps/agriculture -e apps/yam_agri_qms_trace -e apps/yam_agri_core && bench schedule"
     depends_on:
       backend:
         condition: service_started
@@ -161,9 +177,13 @@ services:
       DB_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      INSTALL_APPS: erpnext,agriculture
+      INSTALL_APPS: erpnext,agriculture,yam_agri_core,yam_agri_qms_trace
+      PYTHONPATH: /home/frappe/frappe-bench/apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/agriculture
     volumes:
       - sites-vol:/home/frappe/frappe-bench/sites
+      - ../../apps/agriculture:/home/frappe/frappe-bench/apps/agriculture
+      - ../../apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_core
+      - ../../apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/yam_agri_qms_trace
     networks:
       - frappe-net
 
