@@ -1,15 +1,8 @@
 # hooks for yam_agri_core
-doc_events = {
-    "Lot": {
-        "validate": "yam_agri_core.doctype.lot.lot.Lot.validate",
-    },
-    "Certificate": {
-        "validate": "yam_agri_core.doctype.certificate.certificate.Certificate.validate",
-    },
-    "QCTest": {
-        "validate": "yam_agri_core.doctype.qc_test.qc_test.QCTest.validate",
-    },
-    "Nonconformance": {
-        "validate": "yam_agri_core.doctype.nonconformance.nonconformance.Nonconformance.validate",
-    },
-}
+
+app_name = "yam_agri_core"
+app_title = "YAM Agri Core"
+app_publisher = "YAM Agri Co."
+app_description = "YAM Agri Core app (skeleton for tests and controllers)"
+app_email = ""
+app_license = "MIT"
