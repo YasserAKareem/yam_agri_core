@@ -10,6 +10,8 @@ Below is a beginner-friendly, repo-ready version of the "YAM Agri Platform Bluep
 - Assumes you are using Frappe + ERPNext + Frappe Agriculture app
 - Includes the AI Enhancement Roadmap and integration plan for the 80-item backlog (`docs/20260222 YAM_AGRI_BACKLOG v1.csv`)
 - Includes Yemen-specific design constraints (Section 20) and cross-references the Smart Farm Architecture (`docs/SMART_FARM_ARCHITECTURE.md`)
+- Touchpoint apps blueprint: `docs/TOUCHPOINT_APP_BLUEPRINT.md` (9 apps, screen inventories, offline rules, build checklists)
+- Deep persona profiles and customer journey maps: `docs/PERSONA_JOURNEY_MAP.md` (9 personas, 44 acceptance test scenarios)
 
 
 
@@ -991,6 +993,59 @@ Revised build priority for Yemen context:
 
 ---
 
+## 21) Touchpoints & Persona Reference Map
+
+This section connects every user to their app, their journey, and their test scenarios. It is the single-table entry point to navigate the three companion documents.
+
+| # | Persona | Touchpoint app | App blueprint | Journey map | Test scenarios |
+|---|---------|---------------|--------------|-------------|---------------|
+| U1 | Smallholder Farmer | TP-01 FarmerSMS | §2 TOUCHPOINT_APP_BLUEPRINT | §U1 PERSONA_JOURNEY_MAP | U1-T01 → T06 |
+| U2 | Farm Supervisor | TP-02 FieldPWA | §3 TOUCHPOINT_APP_BLUEPRINT | §U2 PERSONA_JOURNEY_MAP | U2-T01 → T05 |
+| U3 | QA Inspector | TP-03 InspectorApp | §4 TOUCHPOINT_APP_BLUEPRINT | §U3 PERSONA_JOURNEY_MAP | U3-T01 → T05 |
+| U4 | Silo Operator | TP-04 SiloDashboard | §5 TOUCHPOINT_APP_BLUEPRINT | §U4 PERSONA_JOURNEY_MAP | U4-T01 → T05 |
+| U5 | Logistics Coordinator | TP-05 LogisticsApp | §6 TOUCHPOINT_APP_BLUEPRINT | §U5 PERSONA_JOURNEY_MAP | U5-T01 → T05 |
+| U6 | Agri-Business Owner | TP-06 OwnerPortal | §7 TOUCHPOINT_APP_BLUEPRINT | §U6 PERSONA_JOURNEY_MAP | U6-T01 → T04 |
+| U7 | System Admin | TP-07 AdminPanel | §8 TOUCHPOINT_APP_BLUEPRINT | §U7 PERSONA_JOURNEY_MAP | U7-T01 → T04 |
+| U8 | External Auditor/Donor | TP-08 AuditorPortal | §9 TOUCHPOINT_APP_BLUEPRINT | §U8 PERSONA_JOURNEY_MAP | U8-T01 → T04 |
+| U9 | AI Copilot | TP-09 AICopilotPanel | §10 TOUCHPOINT_APP_BLUEPRINT | §U9 PERSONA_JOURNEY_MAP | U9-T01 → T07 |
+
+### How the three companion documents relate
+
+```
+BLUEPRINT_PLAYBOOK_BEGINNER.md    ←  master playbook (this file)
+    │
+    ├── SMART_FARM_ARCHITECTURE.md  ← 11-layer technology stack
+    │       ├── Layer 10: Touchpoints summary table
+    │       └── Layer 11: Persona summary table
+    │
+    ├── TOUCHPOINT_APP_BLUEPRINT.md ← build blueprint per app
+    │       ├── Screen inventories
+    │       ├── Technology choices + OSS alternatives
+    │       ├── Offline rules
+    │       ├── Build checklists (GitHub Issues)
+    │       └── Acceptance tests per app
+    │
+    └── PERSONA_JOURNEY_MAP.md     ← deep persona profiles
+            ├── Profile cards (9 personas)
+            ├── Customer journey maps (6 stages each)
+            ├── Pain points & delight moments
+            ├── Yemen-specific context
+            ├── Acceptance test scenarios (44 total)
+            └── Cross-persona journey: a grain lot through all 9 personas
+```
+
+### Master acceptance test count
+
+| Priority | Tests | When they must pass |
+|----------|-------|-------------------|
+| P0 | U1-T01–T06, U2-T01–T05, U3-T01–T05, U9-T01–T07 (23 tests) | Before V1.1 release |
+| P1 | U4-T01–T05, U5-T01–T05, U6-T01–T04, U7-T01–T04 (18 tests) | Before V1.2 release |
+| P2 | U8-T01–T04 (4 tests) | Before V2.0 release |
+
+---
+
+---
+
 ## What changed vs the earlier blueprint
 
 - Added **Owner's Vision & Business Purpose** section (Section 0)
@@ -1005,7 +1060,10 @@ Revised build priority for Yemen context:
 - Added **Local AI Marketplace Plan** (Section 19) — 4-phase deployment plan for a private, self-hosted AI marketplace on the Frappe/k3s stack, with mandatory governance features and OSS stack recommendations
 - Committed `docs/Integration Feature Inventory.csv` (480 items) to the repository as the authoritative integration reference
 - Added **Yemen Context section** (Section 20) — five design constraints, offline-first rules, Yemen crop/site fixtures, water monitoring priorities, and revised build order
-- Created `docs/SMART_FARM_ARCHITECTURE.md` — complete 9-layer user stack architecture with technology map, OSS alternatives, and Yemen adaptation guide for Frappe + ERPNext + OpenJiuwen
+- Created `docs/SMART_FARM_ARCHITECTURE.md` — 11-layer user stack architecture (added Layer 10: Touchpoints and Layer 11: Persona/Journey Map to the previous 9 layers)
+- Created `docs/TOUCHPOINT_APP_BLUEPRINT.md` — build blueprint for all 9 touchpoint apps with screen inventories, offline rules, and build checklists
+- Created `docs/PERSONA_JOURNEY_MAP.md` — deep persona profiles and customer journey maps for all 9 personas with 44 acceptance test scenarios
+- Added Section 21 — Touchpoints & Persona Reference Map with master test count and doc relationship diagram
 
 ---
 
@@ -1020,3 +1078,5 @@ Revised build priority for Yemen context:
 7. Create a GitHub Issue for each backlog item as you approach its release phase
 8. Both CSVs are the source of truth: `docs/20260222 YAM_AGRI_BACKLOG v1.csv` for what to build, `docs/Integration Feature Inventory.csv` for how to build it with the right tools
 9. Read `docs/SMART_FARM_ARCHITECTURE.md` before designing any new Layer 1–3 component — it defines the Yemen-specific hardware, power, and connectivity decisions that cannot be changed later
+10. Use `docs/TOUCHPOINT_APP_BLUEPRINT.md` as the build reference for any touchpoint app — all screens, build checklists, and per-app acceptance tests are there
+11. Use `docs/PERSONA_JOURNEY_MAP.md` as the test reference — run U1-T01 through U9-T07 to validate every release; P0 tests must pass before V1.1 ships

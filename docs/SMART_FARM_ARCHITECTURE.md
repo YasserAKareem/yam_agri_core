@@ -8,6 +8,8 @@
 
 ## 1) User Personas & Their Needs
 
+> **Deep profiles and journey maps:** `docs/PERSONA_JOURNEY_MAP.md` — Layer 11 of this stack
+
 | # | Persona | Where they work | Key need | Device / Connectivity |
 |---|---------|----------------|----------|----------------------|
 | U1 | **Smallholder Farmer** | Field / remote farm | Simple task input, weather & irrigation alerts | Feature phone + SMS; occasional 2G/3G |
@@ -24,10 +26,18 @@
 
 ## 2) Full Stack Architecture
 
-The stack has **9 layers**. Each layer is designed to degrade gracefully when connectivity or power fails.
+The stack has **11 layers**. Each layer is designed to degrade gracefully when connectivity or power fails.
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════╗
+║  LAYER 11 — User Persona & Customer Journey Map                         ║
+║  (9 personas: Farmer, Supervisor, Inspector, Operator, Logistics,       ║
+║   Owner, Admin, Auditor, AI Copilot — full journey maps + test refs)    ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  LAYER 10 — Touchpoints                                                 ║
+║  (FarmerSMS · FieldPWA · InspectorApp · SiloDashboard · LogisticsApp   ║
+║   · OwnerPortal · AdminPanel · AuditorPortal · AICopilotPanel)          ║
+╠══════════════════════════════════════════════════════════════════════════╣
 ║  LAYER 9 — External Integrations & Ecosystem                            ║
 ║  (Weather APIs, FAO databases, commodity prices, donor/NGO portals)     ║
 ╠══════════════════════════════════════════════════════════════════════════╣
@@ -264,6 +274,48 @@ A **private, self-hosted** catalog of models, prompts, and tools — no external
 | Payments | ERPNext built-in | Frappe Payments app | Bank transfer / hawala-compatible records |
 | Carbon reporting | OpenGHG (OSS) | Scope 3 spreadsheet | Shipment carbon for donor requirements |
 | Export compliance | UN Comtrade API (free) | WTO tariff docs PDF + RAG | Yemen export regulations via RAG agent |
+
+---
+
+### Layer 10 — Touchpoints
+
+The **9 touchpoint apps** are the UI surfaces through which users interact with the platform. Each app is built for one primary persona and uses the Frappe REST API as its data backbone.
+
+| App | Persona | Channel | Offline | Details |
+|-----|---------|---------|---------|---------|
+| **TP-01 FarmerSMS** | U1 Smallholder Farmer | SMS / USSD (Africa's Talking) | ✅ 100% | Structured Arabic SMS commands; no smartphone required |
+| **TP-02 FieldPWA** | U2 Farm Supervisor | Mobile PWA (Android tablet) | ✅ 7-day | PouchDB offline queue; OSM offline map; GPS lot capture |
+| **TP-03 InspectorApp** | U3 QA Inspector | Tablet PWA + Frappe Desk | ⚠️ Wi-Fi | HACCP checklist, QCTest, certificate, evidence pack |
+| **TP-04 SiloDashboard** | U4 Silo Operator | Desktop Frappe Desk | ⚠️ LAN | Bin SVG map, CSV scale import, alert triage |
+| **TP-05 LogisticsApp** | U5 Logistics Coordinator | Mobile PWA + map | ⚠️ 4G | Shipment, BOL/document generation, GPS tracking |
+| **TP-06 OwnerPortal** | U6 Agri-Business Owner | Web dashboard | ❌ Broadband | KPI dashboard, margin copilot, compliance status |
+| **TP-07 AdminPanel** | U7 System Admin | Frappe Desk + CLI | ❌ Server | System health, backups, user management, model registry |
+| **TP-08 AuditorPortal** | U8 External Auditor/Donor | Read-only web | ❌ Internet | Evidence packs, compliance summary, IATI export |
+| **TP-09 AICopilotPanel** | U9 AI Copilot (embedded) | Embedded component | ✅ Local Ollama | Standard AI suggestion panel embedded in all apps |
+
+> **Full blueprint:** `docs/TOUCHPOINT_APP_BLUEPRINT.md`
+
+---
+
+### Layer 11 — User Persona & Customer Journey Map
+
+The **9 user personas** are the human (and AI) actors who use the platform. Each persona has a full customer journey map, pain points, delight moments, Yemen-specific context, and acceptance test scenarios.
+
+| Persona | Role | Primary touchpoint | Key journey stages |
+|---------|------|-------------------|--------------------|
+| **U1 Smallholder Farmer** | Grain supplier | TP-01 FarmerSMS | Awareness → First SMS → Regular lot reporting |
+| **U2 Farm Supervisor** | Field operations | TP-02 FieldPWA | Onboarding → Daily routine → Offline resilience |
+| **U3 QA Inspector** | Food safety | TP-03 InspectorApp | Receiving inspection → HACCP audit → Evidence pack |
+| **U4 Silo Operator** | Storage management | TP-04 SiloDashboard | Morning check → Alert triage → Reconciliation |
+| **U5 Logistics Coordinator** | Shipment management | TP-05 LogisticsApp | Planning → Document generation → In-transit tracking |
+| **U6 Agri-Business Owner** | Strategic oversight | TP-06 OwnerPortal | Daily review → Margin analysis → Donor preparation |
+| **U7 System Admin** | Platform operations | TP-07 AdminPanel | Health check → Backup verification → User management |
+| **U8 External Auditor/Donor** | Compliance verification | TP-08 AuditorPortal | Portal access → Evidence review → IATI export |
+| **U9 AI Copilot** | Assistive intelligence | TP-09 AICopilotPanel | Model activation → Invocation → Suggestion → Fallback |
+
+> **Full journey maps:** `docs/PERSONA_JOURNEY_MAP.md`  
+> **Master test reference:** See `PERSONA_JOURNEY_MAP.md` — Test Reference Matrix (U1-T01 through U9-T07)
+
 
 ---
 
@@ -557,3 +609,5 @@ os.environ["MODEL_NAME"] = os.getenv("LLM_MODEL", "llama3.2:3b-instruct-q4_0")
 - [CAMeL-Tools — Arabic NLP OSS](https://github.com/CAMeL-Lab/camel_tools)
 - [FAO GIEWS — food price data](https://www.fao.org/giews/)
 - [CARPO Yemen climate-smart agriculture report (2025)](https://carpo-bonn.org/en/publications/carpo-reports/climate-smart-agriculture-in-yemen)
+- `docs/TOUCHPOINT_APP_BLUEPRINT.md` — Build blueprint for all 9 touchpoint apps (Layer 10)
+- `docs/PERSONA_JOURNEY_MAP.md` — Deep persona profiles and customer journey maps (Layer 11)
