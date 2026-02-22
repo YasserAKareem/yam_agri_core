@@ -1,0 +1,16 @@
+{
+  "doctype": "DocType",
+  "name": "Nonconformance",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "capa_description", "fieldtype": "Small Text", "label": "CAPA Description"},
+    {"fieldname": "status", "fieldtype": "Select", "options": "Open\nUnder Review\nClosed", "label": "Status"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1},
+    {"role": "QA Manager", "read": 1, "write": 1, "create": 1}
+  ]
+}

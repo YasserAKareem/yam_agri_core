@@ -2,6 +2,12 @@
 set -e
 
 DOCKER_COMPOSE_FILE="docker-compose.yaml"
+# Backwards-compatible fallback: some checkouts use .yml
+if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
+  if [ -f "docker-compose.yml" ]; then
+    DOCKER_COMPOSE_FILE="docker-compose.yml"
+  fi
+fi
 DOTENV_CONFIG_FILE=".env"
 BACKUP_DIR="./backups"
 # Archive of pre-pulled images for offline delivery (Yemen use-case)

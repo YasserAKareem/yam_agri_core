@@ -1,0 +1,18 @@
+{
+  "doctype": "Workflow",
+  "workflow_name": "Lot QA Approval",
+  "document_type": "Lot",
+  "is_active": 1,
+  "workflow_state_field": "status",
+  "states": [
+    {"state": "Draft", "style": "Default", "allow_edit": "System Manager,QA Manager"},
+    {"state": "Accepted", "style": "Success", "allow_edit": "QA Manager"},
+    {"state": "Rejected", "style": "Danger", "allow_edit": "QA Manager"},
+    {"state": "For Dispatch", "style": "Warning", "allow_edit": "System Manager"}
+  ],
+  "transitions": [
+    {"state": "Draft", "next_state": "Accepted", "allowed": "QA Manager"},
+    {"state": "Draft", "next_state": "Rejected", "allowed": "QA Manager"},
+    {"state": "Accepted", "next_state": "For Dispatch", "allowed": "System Manager"}
+  ]
+}
