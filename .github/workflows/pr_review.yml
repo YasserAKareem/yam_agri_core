@@ -1,0 +1,65 @@
+name: PR Review Checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ── 1. Enforce PR title convention ────────────────────────────────────
+  pr-title:
+    name: PR title format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check title follows Conventional Commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          # Allowed types: feat, fix, docs, style, refactor, test, chore, ci, infra, perf, revert
+          PATTERN='^(feat|fix|docs|style|refactor|test|chore|ci|infra|perf|revert)(\([a-z0-9/_-]+\))?: .{10,}'
+          if echo "$TITLE" | grep -qP "$PATTERN"; then
+            echo "PR title OK: $TITLE"
+          else
+            echo "::error::PR title does not follow Conventional Commits format."
+            echo "Expected: <type>(<scope>): <description>"
+            echo "Example:  feat(lot): add split workflow"
+            echo "Allowed types: feat fix docs style refactor test chore ci infra perf revert"
+            exit 1
+          fi
+
+  # ── 2. Warn on large PRs ──────────────────────────────────────────────
+  pr-size:
+    name: PR size check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Count changed lines
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          LINES=$(git diff --shortstat "$BASE_SHA" "$HEAD_SHA" | \
+                  grep -oP '\d+ insertion' | grep -oP '\d+' || echo 0)
+          echo "Changed lines: $LINES"
+          if [ "$LINES" -gt 600 ]; then
+            echo "::warning::This PR changes $LINES lines (> 600). Consider splitting it into smaller PRs for easier review."
+          else
+            echo "PR size is acceptable ($LINES lines changed)."
+          fi
+
+  # ── 3. Auto-label based on changed paths ─────────────────────────────
+  auto-label:
+    name: Auto-label PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: false

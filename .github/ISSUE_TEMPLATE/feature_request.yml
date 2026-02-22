@@ -1,0 +1,90 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for the YAM Agri platform
+title: "feat: "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - YasserAKareem
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to propose a new feature or enhancement. Link it to the backlog (`docs/20260222 YAM_AGRI_BACKLOG v1.csv`) item if one exists.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Platform area
+      options:
+        - Lot / Traceability
+        - QCTest / Certificate
+        - ScaleTicket / Weight
+        - Transfer (split/merge/blend)
+        - Observation / Sensor
+        - EvidencePack / Audit
+        - Nonconformance / CAPA
+        - Complaint
+        - Site / StorageBin / Device
+        - AI Gateway / Hybrid Assistance
+        - Infrastructure / DevOps
+        - Reporting / Analytics
+        - Mobile / Touchpoint App
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Supply chain stage (if applicable)
+      description: Which stage of the cereal supply chain does this relate to?
+      options:
+        - A — Seed & Input Procurement
+        - B — Land Prep & Planting
+        - C — Crop Management & Monitoring
+        - D — Harvest & Post-Harvest
+        - E — Storage & Quality
+        - F — Processing & Milling
+        - G — Packaging & Labelling
+        - H — Transport & Logistics
+        - I — Sales & Customer
+        - N/A — Cross-cutting / Infrastructure
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What problem does this solve, or what opportunity does it create?
+      placeholder: "Currently, operators cannot... This causes..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature you'd like.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How will we know this feature is working correctly?
+      placeholder: |
+        - [ ] Given ... When ... Then ...
+        - [ ] ...
+
+  - type: textarea
+    id: backlog_ref
+    attributes:
+      label: Backlog reference
+      description: Paste the backlog ID / row from `docs/20260222 YAM_AGRI_BACKLOG v1.csv` if applicable.
+
+  - type: checkboxes
+    id: ai_safety
+    attributes:
+      label: AI safety check (if this involves AI assistance)
+      options:
+        - label: AI will only SUGGEST actions — a human must approve before anything is executed.
+        - label: No PII, pricing, or customer IDs will be sent to an external LLM without redaction.

@@ -1,0 +1,30 @@
+# Label mapping for actions/labeler@v5
+# Docs: https://github.com/actions/labeler
+
+infra:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "infra/**"
+          - "compose_rendered.yml"
+          - ".gitmodules"
+
+environments:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "environments/**"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "*.md"
+
+github-config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+production:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "environments/production/**"
