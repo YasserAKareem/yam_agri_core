@@ -57,7 +57,25 @@ jobs:
   auto-label:
     name: Auto-label PR
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
+      - name: Ensure required labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          create_label() {
+            gh label create "$1" --color "$2" --description "$3" --repo "$REPO" --force 2>/dev/null || true
+          }
+          create_label "infra"         "e4e669" "Infrastructure / DevOps"
+          create_label "environments"  "bfd4f2" "Environment config changes"
+          create_label "documentation" "0075ca" "Docs only"
+          create_label "github-config" "c5def5" ".github/ changes"
+          create_label "production"    "e11d48" "Touches production configs"
+
       - uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

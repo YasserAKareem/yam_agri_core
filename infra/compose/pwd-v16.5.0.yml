@@ -49,7 +49,7 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
- 
+
   db:
     image: mariadb:10.6
     networks: [frappe_network]
