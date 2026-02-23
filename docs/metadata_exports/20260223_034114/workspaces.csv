@@ -1,0 +1,21 @@
+name,label,title,module,public,parent_page,restrict_to_domain,for_user,sequence_id,icon,modified
+Home,Home,Home,Setup,1,,,,1.0,home,2025-07-02 14:12:28.407612
+Build,Build,Build,Core,1,,,,1.0,hammer,2024-09-30 17:39:36.060170
+Invoicing,Invoicing,Invoicing,Accounts,1,,,,2.0,accounting,2026-01-23 11:05:47.246213
+Agriculture,Agriculture,Agriculture,Agriculture,1,,,,3.0,agriculture,2026-02-13 13:12:31.955725
+Buying,Buying,Buying,Buying,1,,,,5.0,buying,2026-01-02 14:55:59.078773
+Financial Reports,Financial Reports,Financial Reports,Accounts,1,Accounting,,,5.0,table,2025-12-24 12:49:25.266357
+Selling,Selling,Selling,Selling,1,,,,6.0,sell,2026-01-02 17:42:20.131214
+Stock,Stock,Stock,Stock,1,,,,7.0,stock,2026-01-02 12:38:50.043198
+Assets,Assets,Assets,Assets,1,,,,7.0,assets,2025-12-31 16:22:38.132729
+Manufacturing,Manufacturing,Manufacturing,Manufacturing,1,,,,8.0,organization,2026-01-02 15:07:36.968043
+Subcontracting,Subcontracting,Subcontracting,Subcontracting,1,,,,8.0,organization,2025-12-19 16:50:25.976741
+Quality,Quality,Quality,Quality Management,1,,,,9.0,quality,2026-01-02 17:32:47.522875
+Projects,Projects,Projects,Projects,1,,,,11.0,project,2026-01-02 17:26:44.644507
+Support,Support,Support,Support,1,,,,12.0,support,2026-01-02 17:45:04.203273
+Users,Users,Users,Core,1,,,,13.0,users,2026-01-11 23:30:10.696298
+Website,Website,Website,Website,1,,,,14.0,website,2026-01-11 23:42:31.758169
+CRM,CRM,CRM,CRM,1,,,,17.0,crm,2026-01-03 15:05:23.983099
+ERPNext Settings,ERPNext Settings,ERPNext Settings,Setup,1,,,,19.0,setting,2026-01-09 13:05:08.007297
+Integrations,Integrations,Integrations,Integrations,1,,,,20.0,integration,2025-07-14 10:35:20.131242
+Welcome Workspace,Welcome Workspace,Welcome Workspace,Core,1,,,,22.0,image-view,2023-07-28 20:15:32.222029

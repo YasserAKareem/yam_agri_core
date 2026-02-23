@@ -1,0 +1,194 @@
+name,report_name,ref_doctype,report_type,module,is_standard,disabled,prepared_report,modified
+Account Balance,Account Balance,Bank Account,Script Report,Accounts,Yes,0,0,2019-01-02 18:01:46.691685
+Accounts Payable,Accounts Payable,Purchase Invoice,Script Report,Accounts,Yes,0,0,2017-02-24 20:09:46.150861
+Accounts Payable Summary,Accounts Payable Summary,Purchase Invoice,Script Report,Accounts,Yes,0,0,2017-02-24 20:11:35.655834
+Accounts Receivable,Accounts Receivable,Sales Invoice,Script Report,Accounts,Yes,0,0,2017-03-06 05:52:06.235584
+Accounts Receivable Summary,Accounts Receivable Summary,Sales Invoice,Script Report,Accounts,Yes,0,0,2017-03-06 05:52:23.751082
+Address And Contacts,Address And Contacts,Address,Script Report,Selling,Yes,0,0,2018-06-01 09:39:39.604944
+Addresses And Contacts,Addresses And Contacts,Address,Script Report,Contacts,Yes,0,0,2017-04-10 15:04:12.498920
+Asset Activity,Asset Activity,Asset Activity,Report Builder,Assets,Yes,0,0,2023-08-01 11:14:46.581234
+Asset Depreciation Ledger,Asset Depreciation Ledger,Asset,Script Report,Accounts,Yes,0,0,2023-11-08 20:17:05.774211
+Asset Depreciations and Balances,Asset Depreciations and Balances,Asset,Script Report,Accounts,Yes,0,0,2023-07-26 21:04:54.751077
+Asset Maintenance,Asset Maintenance,Asset Maintenance,Report Builder,Assets,Yes,0,0,2017-10-27 22:49:56.286781
+Audit System Hooks,Audit System Hooks,Property Setter,Script Report,Custom,Yes,0,0,2023-01-31 14:53:37.778576
+Available Batch Report,Available Batch Report,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2024-04-23 17:18:19.779036
+Available Serial No,Available Serial No,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2025-03-07 10:54:09.429215
+Available Stock for Packing Items,Available Stock for Packing Items,Product Bundle,Script Report,Selling,Yes,0,0,2017-02-24 20:09:56.200184
+Balance Sheet,Balance Sheet,GL Entry,Script Report,Accounts,Yes,0,0,2018-09-07 12:18:21.850851
+Bank Clearance Summary,Bank Clearance Summary,Journal Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:19:26.257552
+Bank Reconciliation Statement,Bank Reconciliation Statement,Journal Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:19:19.231541
+Batch Item Expiry Status,Batch Item Expiry Status,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2017-02-24 20:00:30.392287
+Batch-Wise Balance History,Batch-Wise Balance History,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2018-09-20 18:20:49.229153
+Billed Items To Be Received,Billed Items To Be Received,Purchase Invoice,Script Report,Accounts,Yes,0,0,2021-03-31 08:48:30.944429
+BOM Explorer,BOM Explorer,BOM,Script Report,Manufacturing,Yes,0,0,2019-06-06 15:42:53.021714
+BOM Operations Time,BOM Operations Time,BOM,Script Report,Manufacturing,Yes,0,0,2022-01-20 14:21:47.771591
+BOM Search,BOM Search,BOM,Script Report,Stock,Yes,0,0,2017-02-24 20:19:57.286857
+BOM Stock Calculated,BOM Stock Calculated,BOM,Script Report,Manufacturing,Yes,0,0,2018-06-18 13:33:18.103220
+BOM Stock Report,BOM Stock Report,BOM,Script Report,Manufacturing,Yes,0,0,2017-06-23 04:46:43.209008
+BOM Variance Report,BOM Variance Report,Stock Entry,Script Report,Manufacturing,Yes,0,0,2018-06-28 16:22:24.040106
+Budget Variance Report,Budget Variance Report,Cost Center,Script Report,Accounts,Yes,0,0,2025-12-30 14:51:02.061226
+Calculated Discount Mismatch,Calculated Discount Mismatch,Version,Script Report,Accounts,Yes,0,0,2025-06-06 18:09:18.221911
+Campaign Efficiency,Campaign Efficiency,Lead,Script Report,CRM,Yes,0,0,2019-04-17 00:20:27.248275
+Cash Flow,Cash Flow,GL Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:09:19.748690
+Cheques and Deposits Incorrectly cleared,Cheques and Deposits Incorrectly cleared,Payment Entry,Script Report,Accounts,Yes,0,0,2024-07-30 17:20:07.570971
+COGS By Item Group,COGS By Item Group,GL Entry,Script Report,Stock,Yes,0,0,2021-06-02 18:59:55.470621
+Completed Work Orders,Completed Work Orders,Work Order,Query Report,Manufacturing,Yes,0,0,2024-02-21 14:35:14.301848
+Consolidated Financial Statement,Consolidated Financial Statement,Account,Script Report,Accounts,Yes,0,0,2018-04-14 16:01:07.919565
+Consolidated Trial Balance,Consolidated Trial Balance,GL Entry,Script Report,Accounts,Yes,0,0,2025-09-03 00:53:22.230646
+Cost of Poor Quality Report,Cost of Poor Quality Report,Job Card,Script Report,Manufacturing,Yes,0,0,2021-01-11 11:11:03.594242
+Custom Financial Statement,Custom Financial Statement,GL Entry,Script Report,Accounts,Yes,0,0,2025-10-03 01:21:24.043064
+Customer Acquisition and Loyalty,Customer Acquisition and Loyalty,Customer,Script Report,Selling,Yes,0,0,2017-02-24 20:18:54.950255
+Customer Credit Balance,Customer Credit Balance,Customer,Script Report,Selling,Yes,0,0,2017-02-24 20:12:08.631210
+Customer Ledger Summary,Customer Ledger Summary,Sales Invoice,Script Report,Accounts,Yes,0,0,2018-12-11 00:59:21.708343
+Customer-wise Item Price,Customer-wise Item Price,Customer,Script Report,Selling,Yes,0,0,2019-06-14 03:25:36.263179
+Customers Without Any Sales Transactions,Customers Without Any Sales Transactions,Sales Invoice,Query Report,Selling,Yes,0,0,2018-05-21 11:06:11.920622
+Daily Timesheet Summary,Daily Timesheet Summary,Timesheet,Script Report,Projects,Yes,0,0,2017-02-24 20:05:46.782115
+Database Storage Usage By Tables,Database Storage Usage By Tables,Error Log,Script Report,Core,Yes,0,0,2022-10-19 02:59:00.365307
+Deferred Revenue and Expense,Deferred Revenue and Expense,GL Entry,Script Report,Accounts,Yes,0,0,2021-12-10 19:27:14.654220
+Delayed Item Report,Delayed Item Report,Delivery Note,Script Report,Stock,Yes,0,0,2019-06-17 12:45:07.324014
+Delayed Order Report,Delayed Order Report,Delivery Note,Script Report,Stock,Yes,0,0,2019-06-17 12:45:56.359322
+Delayed Tasks Summary,Delayed Tasks Summary,Task,Script Report,Projects,Yes,0,0,2021-04-15 15:49:35.432486
+Delivered Items To Be Billed,Delivered Items To Be Billed,Sales Invoice,Script Report,Accounts,Yes,0,0,2017-11-06 13:04:36.338268
+Delivery Note Trends,Delivery Note Trends,Delivery Note,Script Report,Stock,Yes,0,0,2025-11-05 11:55:50.114173
+Dimension-wise Accounts Balance Report,Dimension-wise Accounts Balance Report,GL Entry,Script Report,Accounts,Yes,0,0,2021-04-09 16:48:59.548018
+Document Share Report,Document Share Report,DocShare,Report Builder,Core,Yes,0,0,2017-02-24 20:01:16.232286
+Downtime Analysis,Downtime Analysis,Downtime Entry,Script Report,Manufacturing,Yes,0,0,2020-04-20 18:26:04.345289
+Electronic Invoice Register,Electronic Invoice Register,Sales Invoice,Script Report,Regional,Yes,1,0,2019-01-13 19:03:56.187748
+Exponential Smoothing Forecasting,Exponential Smoothing Forecasting,Sales Order,Script Report,Manufacturing,Yes,0,0,2020-05-15 05:18:55.838030
+FIFO Queue vs Qty After Transaction Comparison,FIFO Queue vs Qty After Transaction Comparison,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2022-05-11 04:09:20.232177
+Financial Ratios,Financial Ratios,Account,Script Report,Accounts,Yes,0,0,2023-07-13 16:11:11.925096
+First Response Time for Issues,First Response Time for Issues,Issue,Script Report,Support,Yes,0,0,2020-08-10 18:12:42.391224
+First Response Time for Opportunity,First Response Time for Opportunity,Opportunity,Script Report,CRM,Yes,0,0,2020-08-10 18:34:19.083872
+Fixed Asset Register,Fixed Asset Register,Asset,Script Report,Assets,Yes,0,0,2023-07-26 21:03:20.722628
+General and Payment Ledger Comparison,General and Payment Ledger Comparison,GL Entry,Script Report,Accounts,Yes,0,0,2023-08-02 17:30:29.494907
+General Ledger,General Ledger,GL Entry,Script Report,Accounts,Yes,0,0,2025-11-05 15:47:59.597853
+Gross and Net Profit Report,Gross and Net Profit Report,GL Entry,Script Report,Accounts,Yes,0,0,2019-02-08 10:58:55.763090
+Gross Profit,Gross Profit,Sales Invoice,Script Report,Accounts,Yes,0,0,2025-01-27 18:40:24.493829
+Inactive Customers,Inactive Customers,Sales Order,Script Report,Selling,Yes,0,0,2017-02-24 20:09:10.287960
+Inactive Sales Items,Inactive Sales Items,Sales Invoice,Script Report,Accounts,Yes,0,0,2019-05-01 13:00:26.545278
+Incorrect Balance Qty After Transaction,Incorrect Balance Qty After Transaction,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2021-05-12 16:48:28.347575
+Incorrect Serial and Batch Bundle,Incorrect Serial and Batch Bundle,Serial and Batch Bundle,Script Report,Stock,Yes,0,0,2025-02-03 15:39:47.613040
+Incorrect Serial No Valuation,Incorrect Serial No Valuation,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2021-05-13 13:07:00.767845
+Incorrect Stock Value Report,Incorrect Stock Value Report,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2021-06-22 15:35:05.148177
+Invalid Ledger Entries,Invalid Ledger Entries,GL Entry,Script Report,Accounts,Yes,0,0,2024-09-09 12:31:25.295976
+IRS 1099,IRS 1099,Supplier,Script Report,Regional,Yes,0,0,2019-01-17 08:30:41.863572
+Issue Analytics,Issue Analytics,Issue,Script Report,Support,Yes,0,0,2020-10-11 19:43:19.358625
+Issue Summary,Issue Summary,Issue,Script Report,Support,Yes,0,0,2020-10-12 14:54:55.655920
+Issued Items Against Work Order,Issued Items Against Work Order,Work Order,Query Report,Manufacturing,Yes,0,0,2018-02-13 04:56:57.040163
+Item Balance (Simple),Item Balance (Simple),Bin,Query Report,Stock,Yes,0,0,2018-02-19 12:03:53.902167
+Item Price Stock,Item Price Stock,Item,Script Report,Stock,Yes,0,0,2017-12-06 17:01:48.727970
+Item Prices,Item Prices,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2017-02-24 20:17:45.178533
+Item Shortage Report,Item Shortage Report,Bin,Script Report,Stock,Yes,0,0,2020-05-14 12:32:07.158991
+Item Variant Details,Item Variant Details,Item,Script Report,Stock,Yes,0,0,2017-11-16 06:24:10.818276
+Item-wise Price List Rate,Item-wise Price List Rate,Item Price,Report Builder,Stock,Yes,0,0,2018-05-03 12:48:39.802088
+Item-wise Purchase History,Item-wise Purchase History,Purchase Order,Script Report,Buying,Yes,0,0,2024-06-19 12:12:15.418799
+Item-wise Purchase Register,Item-wise Purchase Register,Purchase Invoice,Script Report,Accounts,Yes,0,0,2017-02-24 20:17:31.238117
+Item-wise Sales History,Item-wise Sales History,Sales Order,Script Report,Selling,Yes,0,0,2019-11-04 16:28:14.608904
+Item-wise Sales Register,Item-wise Sales Register,Sales Invoice,Script Report,Accounts,Yes,0,0,2017-02-24 20:17:17.638545
+Items To Be Requested,Items To Be Requested,Material Request,Query Report,Stock,Yes,0,0,2017-02-24 20:06:00.761719
+Itemwise Recommended Reorder Level,Itemwise Recommended Reorder Level,Item,Script Report,Stock,Yes,0,0,2017-02-24 20:17:06.151929
+Job Card Summary,Job Card Summary,Job Card,Script Report,Manufacturing,Yes,0,0,2020-12-30 11:49:21.713561
+Landed Cost Report,Landed Cost Report,Landed Cost Voucher,Script Report,Stock,Yes,0,0,2025-07-31 14:37:37.141783
+Lead Conversion Time,Lead Conversion Time,Communication,Script Report,CRM,Yes,0,0,2019-09-19 14:40:52.035394
+Lead Details,Lead Details,Lead,Script Report,CRM,Yes,0,0,2020-07-26 23:59:49.897577
+Lead Owner Efficiency,Lead Owner Efficiency,Lead,Script Report,CRM,Yes,0,0,2017-04-17 00:45:10.139004
+Lost Opportunity,Lost Opportunity,Opportunity,Script Report,CRM,Yes,0,0,2022-06-04 15:49:02.848845
+Lost Quotations,Lost Quotations,Quotation,Script Report,Selling,Yes,0,0,2023-11-23 19:27:28.854108
+Maintenance Schedules,Maintenance Schedules,Maintenance Schedule,Query Report,Maintenance,Yes,0,0,2025-12-08 13:54:02.576673
+Material Requests for which Supplier Quotations are not created,Material Requests for which Supplier Quotations are not created,Material Request,Query Report,Stock,Yes,0,0,2017-02-24 20:05:31.066151
+Material Requirements Planning Report,Material Requirements Planning Report,Master Production Schedule,Script Report,Manufacturing,Yes,0,0,2025-08-22 17:55:48.952251
+Open Work Orders,Open Work Orders,Work Order,Query Report,Manufacturing,Yes,0,0,2018-02-13 04:58:29.780472
+Opportunity Summary by Sales Stage,Opportunity Summary by Sales Stage,Opportunity,Script Report,CRM,Yes,0,0,2021-07-28 12:18:24.028737
+Payment Ledger,Payment Ledger,Payment Ledger Entry,Script Report,Accounts,Yes,0,0,2022-06-06 08:50:43.933708
+Payment Period Based On Invoice Date,Payment Period Based On Invoice Date,Journal Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:16:43.005325
+Payment Terms Status for Sales Order,Payment Terms Status for Sales Order,Sales Order,Script Report,Selling,Yes,0,0,2021-12-30 10:42:06.058457
+Pending SO Items For Purchase Request,Pending SO Items For Purchase Request,Sales Order,Script Report,Selling,Yes,0,0,2018-11-12 14:08:27.241332
+Permitted Documents For User,Permitted Documents For User,User,Script Report,Core,Yes,0,0,2018-06-29 15:46:42.805039
+POS Register,POS Register,POS Invoice,Script Report,Accounts,Yes,0,0,2020-09-10 19:25:15.851331
+Prepared Report Analytics,Prepared Report Analytics,Prepared Report,Script Report,Core,Yes,0,0,2025-02-07 17:27:53.441631
+Process Loss Report,Process Loss Report,Work Order,Script Report,Manufacturing,Yes,0,0,2021-10-20 22:03:57.606612
+Procurement Tracker,Procurement Tracker,Purchase Order,Script Report,Buying,Yes,0,0,2019-07-21 23:24:21.094269
+Product Bundle Balance,Product Bundle Balance,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2019-03-06 01:40:35.418304
+Production Analytics,Production Analytics,Work Order,Script Report,Manufacturing,Yes,0,0,2019-02-12 14:32:16.392521
+Production Plan Summary,Production Plan Summary,Production Plan,Script Report,Manufacturing,Yes,0,0,2020-12-27 11:43:42.677584
+Production Planning Report,Production Planning Report,Work Order,Script Report,Manufacturing,Yes,0,0,2020-03-06 11:38:05.789851
+Profit and Loss Statement,Profit and Loss Statement,GL Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:12:40.282376
+Profitability Analysis,Profitability Analysis,GL Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:03:58.156580
+Project Summary,Project Summary,Project,Script Report,Projects,Yes,0,0,2020-05-04 19:32:53.177213
+Project wise Stock Tracking,Project wise Stock Tracking,Project,Script Report,Projects,Yes,0,0,2017-02-24 20:20:07.593667
+Prospects Engaged But Not Converted,Prospects Engaged But Not Converted,Lead,Script Report,CRM,Yes,0,0,2017-04-04 10:00:10.253224
+Purchase Analytics,Purchase Analytics,Purchase Order,Script Report,Buying,Yes,0,0,2019-02-12 14:32:29.107109
+Purchase Invoice Trends,Purchase Invoice Trends,Purchase Invoice,Script Report,Accounts,Yes,0,0,2025-11-05 11:55:49.950442
+Purchase Order Analysis,Purchase Order Analysis,Purchase Order,Script Report,Buying,Yes,0,0,2020-05-15 20:57:52.623455
+Purchase Order Trends,Purchase Order Trends,Purchase Order,Script Report,Buying,Yes,0,0,2025-11-05 11:55:50.058154
+Purchase Receipt Trends,Purchase Receipt Trends,Purchase Receipt,Script Report,Stock,Yes,0,0,2025-11-05 11:55:49.983683
+Purchase Register,Purchase Register,Purchase Invoice,Script Report,Accounts,Yes,0,0,2017-02-24 20:15:45.590238
+Quality Inspection Summary,Quality Inspection Summary,Quality Inspection,Script Report,Manufacturing,Yes,0,0,2020-04-26 18:24:50.529940
+Quotation Trends,Quotation Trends,Quotation,Script Report,Selling,Yes,0,0,2025-11-05 11:55:50.127020
+Received Items To Be Billed,Received Items To Be Billed,Purchase Invoice,Script Report,Accounts,Yes,0,0,2017-11-06 13:04:26.094432
+Requested Items To Be Transferred,Requested Items To Be Transferred,Stock Entry,Query Report,Stock,Yes,0,0,2017-02-24 20:07:57.880462
+Requested Items to Order and Receive,Requested Items to Order and Receive,Material Request,Script Report,Buying,Yes,0,0,2020-07-10 14:28:21.041310
+Reserved Stock,Reserved Stock,Stock Reservation Entry,Script Report,Stock,Yes,0,0,2023-08-03 12:46:33.780222
+Review,Review,Quality Action,Query Report,Quality Management,Yes,0,0,2020-02-01 11:03:23.816448
+Sales Analytics,Sales Analytics,Sales Order,Script Report,Selling,Yes,0,0,2020-06-19 17:41:03.132101
+Sales Invoice Trends,Sales Invoice Trends,Sales Invoice,Script Report,Accounts,Yes,0,0,2025-11-05 11:55:50.070651
+Sales Order Analysis,Sales Order Analysis,Sales Order,Script Report,Selling,Yes,0,0,2020-05-29 14:54:53.591445
+Sales Order Trends,Sales Order Trends,Sales Order,Script Report,Selling,Yes,0,0,2025-11-05 11:55:50.096303
+Sales Partner Commission Summary,Sales Partner Commission Summary,Sales Order,Script Report,Selling,Yes,0,0,2019-04-15 15:22:15.012318
+Sales Partner Target Variance based on Item Group,Sales Partner Target Variance based on Item Group,Sales Order,Script Report,Selling,Yes,0,0,2019-04-25 18:22:37.323995
+Sales Partner Transaction Summary,Sales Partner Transaction Summary,Sales Order,Script Report,Selling,Yes,0,0,2019-04-25 18:15:09.920739
+Sales Partners Commission,Sales Partners Commission,Sales Invoice,Query Report,Accounts,Yes,0,0,2025-07-17 23:16:19.892044
+Sales Payment Summary,Sales Payment Summary,Sales Invoice,Script Report,Accounts,Yes,0,0,2017-11-04 05:15:35.892659
+Sales Person Commission Summary,Sales Person Commission Summary,Sales Order,Script Report,Selling,Yes,0,0,2018-09-11 17:49:27.256304
+Sales Person Target Variance Based On Item Group,Sales Person Target Variance Based On Item Group,Sales Order,Script Report,Selling,Yes,0,0,2019-04-25 22:16:49.040998
+Sales Person-wise Transaction Summary,Sales Person-wise Transaction Summary,Sales Order,Script Report,Selling,Yes,0,0,2017-02-24 20:03:47.710828
+Sales Pipeline Analytics,Sales Pipeline Analytics,Opportunity,Script Report,CRM,Yes,0,0,2021-07-01 17:45:17.612861
+Sales Register,Sales Register,Sales Invoice,Script Report,Accounts,Yes,0,0,2017-02-24 20:14:35.208989
+Serial and Batch Summary,Serial and Batch Summary,Serial and Batch Bundle,Script Report,Stock,Yes,0,0,2023-07-13 16:53:33.204591
+Serial No and Batch Traceability,Serial No and Batch Traceability,Serial and Batch Bundle,Script Report,Stock,Yes,0,0,2025-08-05 13:41:28.654684
+Serial No Ledger,Serial No Ledger,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2021-04-20 13:33:19.015829
+Serial No Service Contract Expiry,Serial No Service Contract Expiry,Serial No,Report Builder,Stock,Yes,0,0,2024-09-26 13:07:23.451182
+Serial No Status,Serial No Status,Serial No,Report Builder,Stock,Yes,0,0,2024-09-26 13:10:52.693648
+Serial No Warranty Expiry,Serial No Warranty Expiry,Serial No,Report Builder,Stock,Yes,0,0,2025-04-24 13:07:23.451182
+Share Balance,Share Balance,Share Transfer,Script Report,Accounts,Yes,0,0,2017-12-28 16:12:37.155649
+Share Ledger,Share Ledger,Share Transfer,Script Report,Accounts,Yes,0,0,2019-04-19 10:50:36.061588
+Stock Ageing,Stock Ageing,Item,Script Report,Stock,Yes,0,0,2017-02-24 20:14:20.184693
+Stock Analytics,Stock Analytics,Stock Entry,Script Report,Stock,Yes,0,0,2019-02-12 14:32:22.874082
+Stock and Account Value Comparison,Stock and Account Value Comparison,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2020-01-09 14:42:45.254751
+Stock Balance,Stock Balance,Stock Ledger Entry,Script Report,Stock,Yes,0,1,2020-04-30 13:46:14.680354
+Stock Ledger,Stock Ledger,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2017-02-24 20:14:07.626391
+Stock Ledger Invariant Check,Stock Ledger Invariant Check,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2021-12-16 09:55:58.341764
+Stock Ledger Variance,Stock Ledger Variance,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2023-09-20 10:44:19.414449
+Stock Projected Qty,Stock Projected Qty,Item,Script Report,Stock,Yes,0,0,2017-02-24 20:14:00.850349
+Stock Qty vs Batch Qty,Stock Qty vs Batch Qty,Item,Script Report,Stock,Yes,0,0,2025-11-18 11:35:04.615085
+Stock Qty vs Serial No Count,Stock Qty vs Serial No Count,Item,Script Report,Stock,Yes,0,0,2020-07-23 19:32:02.168185
+Subcontract Order Summary,Subcontract Order Summary,Subcontracting Order,Script Report,Buying,Yes,0,0,2021-05-31 14:43:32.417694
+Subcontracted Item To Be Received,Subcontracted Item To Be Received,Subcontracting Order,Script Report,Buying,Yes,0,0,2019-05-03 11:25:03.685247
+Subcontracted Raw Materials To Be Transferred,Subcontracted Raw Materials To Be Transferred,Subcontracting Order,Script Report,Buying,Yes,0,0,2019-05-03 12:04:24.203721
+Supplier Ledger Summary,Supplier Ledger Summary,Purchase Invoice,Script Report,Accounts,Yes,0,0,2019-02-12 05:10:02.987274
+Supplier Quotation Comparison,Supplier Quotation Comparison,Supplier Quotation,Script Report,Buying,Yes,0,0,2017-02-24 20:04:58.784351
+Supplier-Wise Sales Analytics,Supplier-Wise Sales Analytics,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2017-02-24 20:13:38.914651
+Support Hour Distribution,Support Hour Distribution,Issue,Script Report,Support,Yes,0,0,2017-07-13 17:14:40.408706
+Tax Withholding Details,Tax Withholding Details,Purchase Invoice,Script Report,Accounts,Yes,0,0,2021-09-20 12:05:50.387572
+TDS Computation Summary,TDS Computation Summary,Purchase Invoice,Script Report,Accounts,Yes,0,0,2021-09-20 17:43:39.518851
+Territory Target Variance Based On Item Group,Territory Target Variance Based On Item Group,Sales Order,Script Report,Selling,Yes,0,0,2019-04-25 22:20:59.033199
+Territory-wise Sales,Territory-wise Sales,Opportunity,Script Report,Selling,Yes,0,0,2020-01-31 10:34:33.319047
+Timesheet Billing Summary,Timesheet Billing Summary,Timesheet,Script Report,Projects,Yes,0,0,2023-10-11 00:58:30.639078
+ToDo,ToDo,ToDo,Script Report,Desk,Yes,0,0,2017-06-21 18:18:50.748793
+Total Stock Summary,Total Stock Summary,Stock Entry,Script Report,Stock,Yes,0,0,2017-06-26 14:05:50.256693
+Trial Balance,Trial Balance,GL Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:12:33.520866
+Trial Balance (Simple),Trial Balance (Simple),GL Entry,Query Report,Accounts,Yes,0,0,2025-08-28 19:06:54.273322
+Trial Balance for Party,Trial Balance for Party,GL Entry,Script Report,Accounts,Yes,0,0,2017-02-24 20:09:30.979664
+UAE VAT 201,UAE VAT 201,GL Entry,Script Report,Regional,Yes,0,0,2020-09-10 08:51:02.298482
+User Doctype Permissions,User Doctype Permissions,User,Script Report,Core,Yes,0,0,2024-07-08 15:56:56.975098
+VAT Audit Report,VAT Audit Report,GL Entry,Script Report,Regional,Yes,0,0,2021-07-09 11:07:43.473518
+Voucher-wise Balance,Voucher-wise Balance,GL Entry,Script Report,Accounts,Yes,0,0,2023-06-27 16:40:32.493725
+Warehouse wise Item Balance Age and Value,Warehouse wise Item Balance Age and Value,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2018-02-12 17:45:04.627654
+Warehouse Wise Stock Balance,Warehouse Wise Stock Balance,Stock Ledger Entry,Script Report,Stock,Yes,0,0,2022-12-06 14:16:55.969214
+Website Analytics,Website Analytics,Web Page View,Script Report,Website,Yes,0,0,2020-04-17 16:10:30.168312
+Work Order Consumed Materials,Work Order Consumed Materials,Work Order,Script Report,Manufacturing,Yes,0,0,2021-11-22 17:36:14.999091
+Work Order Stock Report,Work Order Stock Report,Work Order,Script Report,Manufacturing,Yes,0,0,2018-02-13 04:47:04.158213
+Work Order Summary,Work Order Summary,Work Order,Script Report,Manufacturing,Yes,0,0,2020-04-19 16:59:47.979278
+Work Orders in Progress,Work Orders in Progress,Work Order,Query Report,Manufacturing,Yes,0,0,2018-09-18 12:24:38.684995
+YAM Crop Variety Recommendations,YAM Crop Variety Recommendations,,Script Report,Yam Agri Core,Yes,0,0,2026-02-22 00:00:00
+YouTube Interactions,YouTube Interactions,Video,Script Report,Utilities,Yes,0,0,2020-08-02 05:05:00.457093

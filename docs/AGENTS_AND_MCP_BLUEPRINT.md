@@ -15,6 +15,10 @@
 
 ## 1. Which Roles Get a Copilot Agent?
 
+> Note: these are **GitHub/dev contributor roles** for Copilot usage. Platform access control for ERPNext/Frappe uses the **standard ERPNext roles** (segregation-of-duties aware) and org-chart job functions are modeled as **Role Profiles**.
+>
+> See: `docs/planning/RBAC_AND_ORG_CHART.md`
+
 ### What is a Copilot Agent (`.github/agents/*.md`)?
 
 A Copilot Agent is a **role-specific instruction file** that tells GitHub

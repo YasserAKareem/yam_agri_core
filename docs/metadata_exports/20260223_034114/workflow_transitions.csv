@@ -1,0 +1,4 @@
+parent,state,action,next_state,allowed,condition,idx,modified
+Lot QA Approval,Draft,Accept,Accepted,QA Manager,,1,2026-02-23 17:37:51.608029
+Lot QA Approval,Draft,Reject,Rejected,QA Manager,,2,2026-02-23 17:37:51.608312
+Lot QA Approval,Accepted,Mark For Dispatch,For Dispatch,System Manager,,3,2026-02-23 17:37:51.608761

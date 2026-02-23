@@ -1,0 +1,2 @@
+name,workflow_name,document_type,is_active,workflow_state_field,send_email_alert,modified
+Lot QA Approval,Lot QA Approval,Lot,1,status,0,2026-02-23 17:37:51.606355

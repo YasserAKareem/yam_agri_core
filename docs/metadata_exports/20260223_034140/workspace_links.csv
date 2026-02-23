@@ -1,0 +1,489 @@
+parent,type,label,link_type,link_to,onboard,hidden,dependencies,is_query_report,idx
+Agriculture,Card Break,Crops & Lands,,,0,0,,0,1
+Agriculture,Link,Crop,DocType,Crop,1,0,,0,2
+Agriculture,Link,Crop Cycle,DocType,Crop Cycle,1,0,,0,3
+Agriculture,Link,Location,DocType,Location,1,0,,0,4
+Agriculture,Card Break,Analytics,,,0,0,,0,5
+Agriculture,Link,Plant Analysis,DocType,Plant Analysis,0,0,,0,6
+Agriculture,Link,Soil Analysis,DocType,Soil Analysis,0,0,,0,7
+Agriculture,Link,Water Analysis,DocType,Water Analysis,0,0,,0,8
+Agriculture,Link,Soil Texture,DocType,Soil Texture,0,0,,0,9
+Agriculture,Link,Weather,DocType,Weather,0,0,,0,10
+Agriculture,Link,Agriculture Analysis Criteria,DocType,Agriculture Analysis Criteria,0,0,,0,11
+Agriculture,Card Break,Diseases & Fertilizers,,,0,0,,0,12
+Agriculture,Link,Disease,DocType,Disease,1,0,,0,13
+Agriculture,Link,Fertilizer,DocType,Fertilizer,1,0,,0,14
+Assets,Card Break,Assets,,,0,0,,0,1
+Assets,Link,Asset,DocType,Asset,1,0,,0,2
+Assets,Link,Location,DocType,Location,1,0,,0,3
+Assets,Link,Asset Category,DocType,Asset Category,1,0,,0,4
+Assets,Link,Asset Movement,DocType,Asset Movement,0,0,,0,5
+Assets,Card Break,Maintenance,,,0,0,,0,6
+Assets,Link,Asset Maintenance Team,DocType,Asset Maintenance Team,1,0,,0,7
+Assets,Link,Asset Maintenance,DocType,Asset Maintenance,1,0,Asset Maintenance Team,0,8
+Assets,Link,Asset Maintenance Log,DocType,Asset Maintenance Log,0,0,Asset Maintenance,0,9
+Assets,Link,Asset Value Adjustment,DocType,Asset Value Adjustment,0,0,Asset,0,10
+Assets,Link,Asset Repair,DocType,Asset Repair,0,0,Asset,0,11
+Assets,Link,Asset Capitalization,DocType,Asset Capitalization,0,0,Asset,0,12
+Assets,Card Break,Reports,,,0,0,,0,13
+Assets,Link,Asset Depreciation Ledger,Report,Asset Depreciation Ledger,0,0,Asset,1,14
+Assets,Link,Asset Depreciations and Balances,Report,Asset Depreciations and Balances,0,0,Asset,1,15
+Assets,Link,Asset Maintenance,Report,Asset Maintenance,0,0,Asset Maintenance,0,16
+Assets,Link,Asset Activity,Report,Asset Activity,0,0,Asset Activity,0,17
+Build,Card Break,Customization,DocType,,0,0,,0,1
+Build,Link,Customize Form,DocType,Customize Form,0,0,,0,2
+Build,Link,Custom Field,DocType,Custom Field,0,0,,0,3
+Build,Link,Custom Translation,DocType,Translation,0,0,,0,4
+Build,Link,Navbar Settings,DocType,Navbar Settings,0,0,,0,5
+Build,Card Break,Modules,DocType,,0,0,,0,6
+Build,Link,Module Def,DocType,Module Def,0,0,,0,7
+Build,Link,Module Onboarding,DocType,Module Onboarding,0,0,,0,8
+Build,Card Break,Packages,DocType,,0,0,,0,9
+Build,Link,Package,DocType,Package,0,0,,0,10
+Build,Link,Package Import,DocType,Package Import,0,0,,0,11
+Build,Card Break,Scripting,DocType,,0,0,,0,12
+Build,Link,Server Script,DocType,Server Script,0,0,,0,13
+Build,Link,Client Script,DocType,Client Script,0,0,,0,14
+Build,Link,Scheduled Job Type,DocType,Scheduled Job Type,0,0,,0,15
+Build,Card Break,Views,DocType,,0,0,,0,16
+Build,Link,Report,DocType,Report,0,0,,0,17
+Build,Link,Dashboard,DocType,Dashboard,0,0,,0,18
+Build,Link,Print Format,DocType,Print Format,0,0,,0,19
+Build,Link,Page,DocType,Page,0,0,,0,20
+Build,Link,Workspace,DocType,Workspace,0,0,,0,21
+Build,Link,Dashboard Chart,DocType,Dashboard Chart,0,0,,0,22
+Build,Card Break,System Logs,DocType,,0,0,,0,23
+Build,Link,Background Jobs,DocType,RQ Job,0,0,,0,24
+Build,Link,Scheduled Jobs Logs,DocType,Scheduled Job Log,0,0,,0,25
+Build,Link,Error Logs,DocType,Error Log,0,0,,0,26
+Build,Link,Activity Log,DocType,Activity Log,0,0,,0,27
+Build,Link,Communication Logs,DocType,Communication,0,0,,0,28
+Build,Link,Webhook Request Log,DocType,Webhook Request Log,0,0,,0,29
+Buying,Card Break,Buying,,,0,0,,0,1
+Buying,Link,Material Request,DocType,Material Request,1,0,Item,0,2
+Buying,Link,Purchase Order,DocType,Purchase Order,1,0,"Item, Supplier",0,3
+Buying,Link,Purchase Invoice,DocType,Purchase Invoice,1,0,"Item, Supplier",0,4
+Buying,Link,Request for Quotation,DocType,Request for Quotation,1,0,"Item, Supplier",0,5
+Buying,Link,Supplier Quotation,DocType,Supplier Quotation,0,0,"Item, Supplier",0,6
+Buying,Card Break,Items & Pricing,,,0,0,,0,7
+Buying,Link,Item,DocType,Item,1,0,,0,8
+Buying,Link,Item Price,DocType,Item Price,1,0,,0,9
+Buying,Link,Price List,DocType,Price List,1,0,,0,10
+Buying,Link,Product Bundle,DocType,Product Bundle,0,0,,0,11
+Buying,Link,Item Group,DocType,Item Group,0,0,,0,12
+Buying,Link,Promotional Scheme,DocType,Promotional Scheme,0,0,,0,13
+Buying,Link,Pricing Rule,DocType,Pricing Rule,0,0,,0,14
+Buying,Card Break,Settings,,,0,0,,0,15
+Buying,Link,Buying Settings,DocType,Buying Settings,0,0,,0,16
+Buying,Link,Purchase Taxes and Charges Template,DocType,Purchase Taxes and Charges Template,0,0,,0,17
+Buying,Link,Terms and Conditions Template,DocType,Terms and Conditions,0,0,,0,18
+Buying,Card Break,Supplier,,,0,0,,0,19
+Buying,Link,Supplier,DocType,Supplier,1,0,,0,20
+Buying,Link,Supplier Group,DocType,Supplier Group,0,0,,0,21
+Buying,Link,Contact,DocType,Contact,0,0,,0,22
+Buying,Link,Address,DocType,Address,0,0,,0,23
+Buying,Card Break,Supplier Scorecard,,,0,0,,0,24
+Buying,Link,Supplier Scorecard,DocType,Supplier Scorecard,0,0,,0,25
+Buying,Link,Supplier Scorecard Variable,DocType,Supplier Scorecard Variable,0,0,,0,26
+Buying,Link,Supplier Scorecard Criteria,DocType,Supplier Scorecard Criteria,0,0,,0,27
+Buying,Link,Supplier Scorecard Standing,DocType,Supplier Scorecard Standing,0,0,,0,28
+Buying,Card Break,Key Reports,,,0,0,,0,29
+Buying,Link,Purchase Analytics,Report,Purchase Analytics,1,0,,1,30
+Buying,Link,Purchase Order Analysis,Report,Purchase Order Analysis,1,0,,1,31
+Buying,Link,Supplier-Wise Sales Analytics,Report,Supplier-Wise Sales Analytics,1,0,,1,32
+Buying,Link,Items to Order and Receive,Report,Requested Items to Order and Receive,1,0,,1,33
+Buying,Link,Purchase Order Trends,Report,Purchase Order Trends,1,0,,1,34
+Buying,Link,Procurement Tracker,Report,Procurement Tracker,1,0,,1,35
+Buying,Card Break,Other Reports,,,0,0,,0,36
+Buying,Link,Items To Be Requested,Report,Items To Be Requested,1,0,,1,37
+Buying,Link,Item-wise Purchase History,Report,Item-wise Purchase History,1,0,,1,38
+Buying,Link,Purchase Receipt Trends,Report,Purchase Receipt Trends,0,0,,1,39
+Buying,Link,Purchase Invoice Trends,Report,Purchase Invoice Trends,0,0,,1,40
+Buying,Link,Subcontracted Raw Materials To Be Transferred,Report,Subcontracted Raw Materials To Be Transferred,0,0,,1,41
+Buying,Link,Subcontracted Item To Be Received,Report,Subcontracted Item To Be Received,0,0,,1,42
+Buying,Link,Supplier Quotation Comparison,Report,Supplier Quotation Comparison,1,0,,1,43
+Buying,Link,Material Requests for which Supplier Quotations are not created,Report,Material Requests for which Supplier Quotations are not created,0,0,,1,44
+Buying,Link,Supplier Addresses And Contacts,Report,Address And Contacts,0,0,,1,45
+Buying,Card Break,Regional,,,0,0,,0,46
+Buying,Link,Import Supplier Invoice,DocType,Import Supplier Invoice,0,0,,0,47
+CRM,Link,Lead Details,Report,Lead Details,1,0,Lead,1,1
+CRM,Link,Sales Pipeline Analytics,Report,Sales Pipeline Analytics,0,0,,1,2
+CRM,Link,Opportunity Summary by Sales Stage,Report,Opportunity Summary by Sales Stage,0,0,,1,3
+CRM,Link,Sales Funnel,Page,sales-funnel,1,0,,0,4
+CRM,Link,Prospects Engaged But Not Converted,Report,Prospects Engaged But Not Converted,1,0,Lead,1,5
+CRM,Link,First Response Time for Opportunity,Report,First Response Time for Opportunity,0,0,Opportunity,1,6
+CRM,Link,Inactive Customers,Report,Inactive Customers,0,0,Sales Order,1,7
+CRM,Link,Campaign Efficiency,Report,Campaign Efficiency,0,0,Lead,1,8
+CRM,Link,Lead Owner Efficiency,Report,Lead Owner Efficiency,0,0,Lead,1,9
+CRM,Link,Maintenance Schedule,DocType,Maintenance Schedule,1,0,,0,10
+CRM,Link,Maintenance Visit,DocType,Maintenance Visit,0,0,,0,11
+CRM,Link,Warranty Claim,DocType,Warranty Claim,0,0,,0,12
+CRM,Card Break,Masters,DocType,,0,0,,0,13
+CRM,Link,Territory,DocType,Territory,0,0,,0,14
+CRM,Link,Customer Group,DocType,Customer Group,0,0,,0,15
+CRM,Link,Contact,DocType,Contact,0,0,,0,16
+CRM,Link,Prospect,DocType,Prospect,0,0,,0,17
+CRM,Link,Sales Person,DocType,Sales Person,0,0,,0,18
+CRM,Link,Sales Stage,DocType,Sales Stage,0,0,,0,19
+CRM,Link,Lead Source,DocType,UTM Source,0,0,,0,20
+ERPNext Settings,Link,Import Data,DocType,Data Import,0,0,,0,1
+ERPNext Settings,Link,Export Data,DocType,Data Export,0,0,,0,2
+ERPNext Settings,Link,Bulk Update,DocType,Bulk Update,0,0,,0,3
+ERPNext Settings,Link,Download Backups,Page,backups,0,0,,0,4
+ERPNext Settings,Link,Deleted Documents,DocType,Deleted Document,0,0,,0,5
+Financial Reports,Card Break,Profitability,DocType,,0,0,,0,1
+Financial Reports,Link,Gross Profit,Report,Gross Profit,0,0,Sales Invoice,1,2
+Financial Reports,Link,Profitability Analysis,Report,Profitability Analysis,0,0,GL Entry,1,3
+Financial Reports,Link,Sales Invoice Trends,Report,Sales Invoice Trends,0,0,Sales Invoice,1,4
+Financial Reports,Link,Purchase Invoice Trends,Report,Purchase Invoice Trends,0,0,Purchase Invoice,1,5
+Financial Reports,Card Break,Financial Statements,DocType,,0,0,,0,6
+Financial Reports,Link,Trial Balance,Report,Trial Balance,0,0,GL Entry,1,7
+Financial Reports,Link,Profit and Loss Statement,Report,Profit and Loss Statement,0,0,GL Entry,1,8
+Financial Reports,Link,Balance Sheet,Report,Balance Sheet,0,0,GL Entry,1,9
+Financial Reports,Link,Cash Flow,Report,Cash Flow,0,0,GL Entry,1,10
+Financial Reports,Link,Consolidated Financial Statement,Report,Consolidated Financial Statement,0,0,GL Entry,1,11
+Financial Reports,Card Break,Ledgers,DocType,,0,0,,0,12
+Financial Reports,Link,General Ledger,Report,General Ledger,0,0,GL Entry,1,13
+Financial Reports,Link,Customer Ledger Summary,Report,Customer Ledger Summary,0,0,Sales Invoice,1,14
+Financial Reports,Link,Supplier Ledger Summary,Report,Supplier Ledger Summary,0,0,Sales Invoice,1,15
+Financial Reports,Card Break,Other Reports,DocType,,0,0,,0,16
+Financial Reports,Link,Trial Balance for Party,Report,Trial Balance for Party,0,0,GL Entry,1,17
+Financial Reports,Link,Payment Period Based On Invoice Date,Report,Payment Period Based On Invoice Date,0,0,Journal Entry,1,18
+Financial Reports,Link,Sales Partners Commission,Report,Sales Partners Commission,0,0,Sales Invoice,1,19
+Financial Reports,Link,Customer Credit Balance,Report,Customer Credit Balance,0,0,Customer,1,20
+Financial Reports,Link,Sales Payment Summary,Report,Sales Payment Summary,0,0,Sales Invoice,1,21
+Financial Reports,Link,Address And Contacts,Report,Address And Contacts,0,0,Address,1,22
+Financial Reports,Link,UAE VAT 201,Report,UAE VAT 201,0,0,GL Entry,1,23
+Home,Card Break,Accounting,,,0,0,,0,1
+Home,Link,Chart of Accounts,DocType,Account,1,0,,0,2
+Home,Link,Company,DocType,Company,1,0,,0,3
+Home,Link,Customer,DocType,Customer,1,0,,0,4
+Home,Link,Supplier,DocType,Supplier,1,0,,0,5
+Home,Card Break,Stock,,,0,0,,0,6
+Home,Link,Item,DocType,Item,1,0,,0,7
+Home,Link,Warehouse,DocType,Warehouse,1,0,,0,8
+Home,Link,Brand,DocType,Brand,1,0,,0,9
+Home,Link,Unit of Measure (UOM),DocType,UOM,1,0,,0,10
+Home,Link,Stock Reconciliation,DocType,Stock Reconciliation,1,0,,0,11
+Home,Card Break,CRM,,,0,0,,0,12
+Home,Link,Lead,DocType,Lead,1,0,,0,13
+Home,Link,Customer Group,DocType,Customer Group,1,0,,0,14
+Home,Link,Territory,DocType,Territory,1,0,,0,15
+Home,Card Break,Data Import and Settings,,,0,0,,0,16
+Home,Link,Import Data,DocType,Data Import,1,0,,0,17
+Home,Link,Opening Invoice Creation Tool,DocType,Opening Invoice Creation Tool,1,0,,0,18
+Home,Link,Chart of Accounts Importer,DocType,Chart of Accounts Importer,1,0,,0,19
+Home,Link,Letter Head,DocType,Letter Head,1,0,,0,20
+Home,Link,Email Account,DocType,Email Account,1,0,,0,21
+Integrations,Card Break,Google Services,,,0,0,,0,1
+Integrations,Link,Google Settings,DocType,Google Settings,0,0,,0,2
+Integrations,Link,Google Contacts,DocType,Google Contacts,0,0,,0,3
+Integrations,Link,Google Calendar,DocType,Google Calendar,0,0,,0,4
+Integrations,Card Break,Settings,,,0,0,,0,5
+Integrations,Link,Webhook,DocType,Webhook,0,0,,0,6
+Integrations,Link,Slack Webhook URL,DocType,Slack Webhook URL,0,0,,0,7
+Integrations,Link,SMS Settings,DocType,SMS Settings,0,0,,0,8
+Integrations,Card Break,Authentication,,,0,0,,0,9
+Integrations,Link,Social Login Key,DocType,Social Login Key,0,0,,0,10
+Integrations,Link,LDAP Settings,DocType,LDAP Settings,0,0,,0,11
+Integrations,Link,OAuth Client,DocType,OAuth Client,0,0,,0,12
+Integrations,Link,OAuth Provider Settings,DocType,OAuth Provider Settings,0,0,,0,13
+Integrations,Card Break,Push Notifications,DocType,,0,0,,0,14
+Integrations,Link,Push Notification Settings,DocType,Push Notification Settings,0,0,,0,15
+Invoicing,Card Break,Multi Currency,,,0,0,,0,1
+Invoicing,Link,Currency,DocType,Currency,0,0,,0,2
+Invoicing,Link,Currency Exchange,DocType,Currency Exchange,0,0,,0,3
+Invoicing,Link,Exchange Rate Revaluation,DocType,Exchange Rate Revaluation,0,0,,0,4
+Invoicing,Card Break,Subscription Management,,,0,0,,0,5
+Invoicing,Link,Subscription Plan,DocType,Subscription Plan,0,0,,0,6
+Invoicing,Link,Subscription,DocType,Subscription,0,0,,0,7
+Invoicing,Link,Subscription Settings,DocType,Subscription Settings,0,0,,0,8
+Invoicing,Card Break,Share Management,,,0,0,,0,9
+Invoicing,Link,Shareholder,DocType,Shareholder,0,0,,0,10
+Invoicing,Link,Share Transfer,DocType,Share Transfer,0,0,,0,11
+Invoicing,Link,Share Ledger,Report,Share Ledger,0,0,Share Transfer,1,12
+Invoicing,Link,Share Balance,Report,Share Balance,0,0,Share Transfer,1,13
+Invoicing,Card Break,Cost Center and Budgeting,,,0,0,,0,14
+Invoicing,Link,Chart of Cost Centers,DocType,Cost Center,0,0,,0,15
+Invoicing,Link,Budget,DocType,Budget,0,0,,0,16
+Invoicing,Link,Accounting Dimension,DocType,Accounting Dimension,0,0,,0,17
+Invoicing,Link,Cost Center Allocation,DocType,Cost Center Allocation,0,0,Cost Center,0,18
+Invoicing,Link,Budget Variance Report,Report,Budget Variance Report,0,0,Cost Center,1,19
+Invoicing,Link,Monthly Distribution,DocType,Monthly Distribution,0,0,,0,20
+Invoicing,Card Break,Opening and Closing,,,0,0,,0,21
+Invoicing,Link,Opening Invoice Creation Tool,DocType,Opening Invoice Creation Tool,0,0,,0,22
+Invoicing,Link,Chart of Accounts Importer,DocType,Chart of Accounts Importer,0,0,,0,23
+Invoicing,Link,Period Closing Voucher,DocType,Period Closing Voucher,0,0,,0,24
+Invoicing,Card Break,Banking,DocType,,0,0,,0,25
+Invoicing,Link,Bank,DocType,Bank,0,0,,0,26
+Invoicing,Link,Bank Account,DocType,Bank Account,0,0,,0,27
+Invoicing,Link,Bank Clearance,DocType,Bank Clearance,0,0,,0,28
+Invoicing,Link,Bank Reconciliation Tool,DocType,Bank Reconciliation Tool,0,0,,0,29
+Invoicing,Link,Bank Reconciliation Statement,Report,Bank Reconciliation Statement,0,0,GL Entry,1,30
+Invoicing,Link,Plaid Settings,DocType,Plaid Settings,0,0,,0,31
+Invoicing,Card Break,Tax Masters,DocType,,0,0,,0,32
+Invoicing,Link,Sales Taxes and Charges Template,DocType,Sales Taxes and Charges Template,0,0,,0,33
+Invoicing,Link,Purchase Taxes and Charges Template,DocType,Purchase Taxes and Charges Template,0,0,,0,34
+Invoicing,Link,Item Tax Template,DocType,Item Tax Template,0,0,,0,35
+Invoicing,Link,Tax Category,DocType,Tax Category,0,0,,0,36
+Invoicing,Link,Tax Rule,DocType,Tax Rule,0,0,,0,37
+Invoicing,Link,Tax Withholding Category,DocType,Tax Withholding Category,0,0,,0,38
+Invoicing,Link,Lower Deduction Certificate,DocType,Lower Deduction Certificate,0,0,,0,39
+Invoicing,Card Break,Accounting Masters,DocType,,0,0,,0,40
+Invoicing,Link,Company,DocType,Company,1,0,,0,41
+Invoicing,Link,Chart of Accounts,DocType,Account,1,0,,0,42
+Invoicing,Link,Accounts Settings,DocType,Accounts Settings,0,0,,0,43
+Invoicing,Link,Fiscal Year,DocType,Fiscal Year,0,0,,0,44
+Invoicing,Link,Accounting Dimension,DocType,Accounting Dimension,0,0,,0,45
+Invoicing,Link,Finance Book,DocType,Finance Book,0,0,,0,46
+Invoicing,Link,Accounting Period,DocType,Accounting Period,0,0,,0,47
+Invoicing,Link,Payment Term,DocType,Payment Term,0,0,,0,48
+Invoicing,Card Break,Payments,DocType,,0,0,,0,49
+Invoicing,Link,Payment Entry,DocType,Payment Entry,0,0,,0,50
+Invoicing,Link,Journal Entry,DocType,Journal Entry,0,0,,0,51
+Invoicing,Link,Journal Entry Template,DocType,Journal Entry Template,0,0,,0,52
+Invoicing,Link,Terms and Conditions,DocType,Terms and Conditions,0,0,,0,53
+Invoicing,Link,Mode of Payment,DocType,Mode of Payment,0,0,,0,54
+Manufacturing,Card Break,Tools,,,0,0,,0,1
+Manufacturing,Link,BOM Update Tool,DocType,BOM Update Tool,0,0,,0,2
+Manufacturing,Link,BOM Comparison Tool,Page,bom-comparison-tool,0,0,,0,3
+Manufacturing,Card Break,Settings,,,0,0,,0,4
+Manufacturing,Link,Manufacturing Settings,DocType,Manufacturing Settings,0,0,,0,5
+Manufacturing,Card Break,Bill of Materials,,,0,0,,0,6
+Manufacturing,Link,Item,DocType,Item,1,0,,0,7
+Manufacturing,Link,Bill of Materials,DocType,BOM,1,0,Item,0,8
+Manufacturing,Link,Workstation Type,DocType,Workstation Type,0,0,,0,9
+Manufacturing,Link,Workstation,DocType,Workstation,0,0,,0,10
+Manufacturing,Link,Operation,DocType,Operation,0,0,,0,11
+Manufacturing,Link,Routing,DocType,Routing,0,0,Work Order,1,12
+Manufacturing,Card Break,Subcontracting,DocType,,0,0,,0,13
+Manufacturing,Link,BOM,DocType,BOM,0,0,,0,14
+Manufacturing,Link,Subcontracting BOM,DocType,Subcontracting BOM,0,0,,0,15
+Manufacturing,Link,Subcontracting Order,DocType,Subcontracting Order,0,0,,0,16
+Manufacturing,Link,Subcontracting Receipt,DocType,Subcontracting Receipt,0,0,,0,17
+Manufacturing,Link,Subcontract Order Summary,Report,Subcontract Order Summary,0,0,,1,18
+Manufacturing,Link,Subcontracted Raw Materials To Be Transferred,Report,Subcontracted Raw Materials To Be Transferred,0,0,,1,19
+Manufacturing,Link,Subcontracted Item To Be Received,Report,Subcontracted Item To Be Received,0,0,,1,20
+Manufacturing,Card Break,Reports,DocType,,0,0,,0,21
+Manufacturing,Link,Production Planning Report,Report,Production Planning Report,0,0,Work Order,1,22
+Manufacturing,Link,Material Requirements Planning,Report,Material Requirements Planning Report,0,0,,1,23
+Manufacturing,Link,Work Order Summary,Report,Work Order Summary,0,0,Work Order,1,24
+Manufacturing,Link,Quality Inspection Summary,Report,Quality Inspection Summary,0,0,Quality Inspection,1,25
+Manufacturing,Link,Downtime Analysis,Report,Downtime Analysis,0,0,Downtime Entry,1,26
+Manufacturing,Link,Job Card Summary,Report,Job Card Summary,0,0,Job Card,1,27
+Manufacturing,Link,BOM Search,Report,BOM Search,0,0,BOM,1,28
+Manufacturing,Link,BOM Stock Report,Report,BOM Stock Report,0,0,BOM,1,29
+Manufacturing,Link,Production Analytics,Report,Production Analytics,0,0,Work Order,1,30
+Manufacturing,Link,BOM Operations Time,Report,BOM Operations Time,0,0,BOM,1,31
+Manufacturing,Link,Work Order Consumed Materials,Report,Work Order Consumed Materials,0,0,,1,32
+Manufacturing,Card Break,Production,DocType,,0,0,,0,33
+Manufacturing,Link,Work Order,DocType,Work Order,1,0,"Item, BOM",0,34
+Manufacturing,Link,Production Plan,DocType,Production Plan,1,0,"Item, BOM",0,35
+Manufacturing,Link,Stock Entry,DocType,Stock Entry,1,0,Item,0,36
+Manufacturing,Link,Job Card,DocType,Job Card,0,0,,0,37
+Manufacturing,Link,Item Lead Time,DocType,Item Lead Time,0,0,,0,38
+Manufacturing,Link,Master Production Schedule,DocType,Master Production Schedule,0,0,,0,39
+Manufacturing,Link,Downtime Entry,DocType,Downtime Entry,0,0,,0,40
+Manufacturing,Link,Sales Forecast,DocType,Sales Forecast,0,0,,0,41
+Projects,Card Break,Projects,,,0,0,,0,1
+Projects,Link,Project,DocType,Project,1,0,,0,2
+Projects,Link,Task,DocType,Task,1,0,,0,3
+Projects,Link,Project Template,DocType,Project Template,0,0,,0,4
+Projects,Link,Project Type,DocType,Project Type,0,0,,0,5
+Projects,Link,Project Update,DocType,Project Update,0,0,Project,0,6
+Projects,Card Break,Time Tracking,,,0,0,,0,7
+Projects,Link,Timesheet,DocType,Timesheet,1,0,,0,8
+Projects,Link,Activity Type,DocType,Activity Type,1,0,,0,9
+Projects,Link,Activity Cost,DocType,Activity Cost,0,0,Activity Type,0,10
+Projects,Card Break,Reports,,,0,0,,0,11
+Projects,Link,Daily Timesheet Summary,Report,Daily Timesheet Summary,1,0,Timesheet,1,12
+Projects,Link,Project wise Stock Tracking,Report,Project wise Stock Tracking,0,0,Project,1,13
+Projects,Link,Timesheet Billing Summary,Report,Timesheet Billing Summary,0,0,Project,1,14
+Projects,Link,Delayed Tasks Summary,Report,Delayed Tasks Summary,0,0,Task,1,15
+Projects,Card Break,Settings,,,0,0,,0,16
+Projects,Link,Projects Settings,DocType,Projects Settings,0,0,,0,17
+Quality,Card Break,Feedback,,,0,0,,0,1
+Quality,Link,Quality Feedback,DocType,Quality Feedback,1,0,,0,2
+Quality,Link,Quality Feedback Template,DocType,Quality Feedback Template,0,0,,0,3
+Quality,Card Break,Meeting,,,0,0,,0,4
+Quality,Link,Quality Meeting,DocType,Quality Meeting,0,0,,0,5
+Quality,Card Break,Review and Action,,,0,0,,0,6
+Quality,Link,Non Conformance,DocType,Non Conformance,0,0,,0,7
+Quality,Link,Quality Review,DocType,Quality Review,0,0,,0,8
+Quality,Link,Quality Action,DocType,Quality Action,0,0,,0,9
+Quality,Card Break,Goal and Procedure,DocType,,0,0,,0,10
+Quality,Link,Quality Goal,DocType,Quality Goal,1,0,,0,11
+Quality,Link,Quality Procedure,DocType,Quality Procedure,1,0,,0,12
+Quality,Link,Tree of Procedures,DocType,Quality Procedure,0,0,,0,13
+Quality,Link,Quality Inspection,DocType,Quality Inspection,0,0,,0,14
+Selling,Card Break,Selling,,,0,0,,0,1
+Selling,Link,Customer,DocType,Customer,1,0,,0,2
+Selling,Link,Quotation,DocType,Quotation,1,0,"Item, Customer",0,3
+Selling,Link,Sales Order,DocType,Sales Order,1,0,"Item, Customer",0,4
+Selling,Link,Sales Invoice,DocType,Sales Invoice,1,0,"Item, Customer",0,5
+Selling,Link,Blanket Order,DocType,Blanket Order,1,0,"Item, Customer",0,6
+Selling,Link,Sales Partner,DocType,Sales Partner,0,0,Item,0,7
+Selling,Link,Sales Person,DocType,Sales Person,0,0,"Item, Customer",0,8
+Selling,Card Break,Items and Pricing,,,0,0,,0,9
+Selling,Link,Item,DocType,Item,1,0,,0,10
+Selling,Link,Item Price,DocType,Item Price,1,0,"Item, Price List",0,11
+Selling,Link,Price List,DocType,Price List,1,0,,0,12
+Selling,Link,Item Group,DocType,Item Group,1,0,,0,13
+Selling,Link,Product Bundle,DocType,Product Bundle,0,0,Item,0,14
+Selling,Link,Promotional Scheme,DocType,Promotional Scheme,0,0,,0,15
+Selling,Link,Pricing Rule,DocType,Pricing Rule,0,0,Item,0,16
+Selling,Link,Shipping Rule,DocType,Shipping Rule,0,0,,0,17
+Selling,Link,Coupon Code,DocType,Coupon Code,0,0,,0,18
+Selling,Card Break,Settings,,,0,0,,0,19
+Selling,Link,Selling Settings,DocType,Selling Settings,0,0,,0,20
+Selling,Link,Terms and Conditions Template,DocType,Terms and Conditions,1,0,,0,21
+Selling,Link,Sales Taxes and Charges Template,DocType,Sales Taxes and Charges Template,1,0,,0,22
+Selling,Link,UTM Source,DocType,UTM Source,0,0,,0,23
+Selling,Link,Customer Group,DocType,Customer Group,0,0,,0,24
+Selling,Link,Contact,DocType,Contact,0,0,,0,25
+Selling,Link,Address,DocType,Address,0,0,,0,26
+Selling,Link,Territory,DocType,Territory,0,0,,0,27
+Selling,Link,Campaign,DocType,Campaign,0,0,,0,28
+Selling,Card Break,Point of Sale,,,0,0,,0,29
+Selling,Link,Point-of-Sale Profile,DocType,POS Profile,0,0,,0,30
+Selling,Link,POS Settings,DocType,POS Settings,0,0,,0,31
+Selling,Link,POS Opening Entry,DocType,POS Opening Entry,0,0,,0,32
+Selling,Link,POS Closing Entry,DocType,POS Closing Entry,0,0,,0,33
+Selling,Link,Loyalty Program,DocType,Loyalty Program,0,0,,0,34
+Selling,Link,Loyalty Point Entry,DocType,Loyalty Point Entry,0,0,,0,35
+Selling,Card Break,Key Reports,,,0,0,,0,36
+Selling,Link,Sales Analytics,Report,Sales Analytics,1,0,,1,37
+Selling,Link,Sales Order Analysis,Report,Sales Order Analysis,1,0,Sales Order,1,38
+Selling,Link,Sales Funnel,Page,sales-funnel,1,0,,0,39
+Selling,Link,Sales Order Trends,Report,Sales Order Trends,0,0,Sales Order,1,40
+Selling,Link,Quotation Trends,Report,Quotation Trends,0,0,Quotation,1,41
+Selling,Link,Customer Acquisition and Loyalty,Report,Customer Acquisition and Loyalty,0,0,Customer,1,42
+Selling,Link,Inactive Customers,Report,Inactive Customers,0,0,Sales Order,1,43
+Selling,Link,Sales Person-wise Transaction Summary,Report,Sales Person-wise Transaction Summary,0,0,Sales Order,1,44
+Selling,Link,Item-wise Sales History,Report,Item-wise Sales History,0,0,Item,1,45
+Selling,Card Break,Other Reports,,,0,0,,0,46
+Selling,Link,Customer Addresses And Contacts,Report,Address And Contacts,0,0,Address,1,47
+Selling,Link,Available Stock for Packing Items,Report,Available Stock for Packing Items,0,0,Item,1,48
+Selling,Link,Pending SO Items For Purchase Request,Report,Pending SO Items For Purchase Request,0,0,Sales Order,1,49
+Selling,Link,Delivery Note Trends,Report,Delivery Note Trends,0,0,Delivery Note,1,50
+Selling,Link,Sales Invoice Trends,Report,Sales Invoice Trends,0,0,Sales Invoice,1,51
+Selling,Link,Customer Credit Balance,Report,Customer Credit Balance,0,0,Customer,1,52
+Selling,Link,Customers Without Any Sales Transactions,Report,Customers Without Any Sales Transactions,0,0,Customer,1,53
+Selling,Link,Sales Partners Commission,Report,Sales Partners Commission,0,0,Customer,1,54
+Selling,Link,Territory Target Variance Based On Item Group,Report,Territory Target Variance Based On Item Group,0,0,Sales Order,1,55
+Selling,Link,Sales Person Target Variance Based On Item Group,Report,Sales Person Target Variance Based On Item Group,0,0,Sales Order,1,56
+Selling,Link,Sales Partner Target Variance Based On Item Group,Report,Sales Partner Target Variance based on Item Group,0,0,Sales Order,1,57
+Stock,Link,Item,DocType,Item,1,0,,0,1
+Stock,Link,Item Group,DocType,Item Group,1,0,,0,2
+Stock,Link,Product Bundle,DocType,Product Bundle,1,0,,0,3
+Stock,Link,Price List,DocType,Price List,0,0,,0,4
+Stock,Link,Item Price,DocType,Item Price,0,0,,0,5
+Stock,Link,Shipping Rule,DocType,Shipping Rule,0,0,,0,6
+Stock,Link,Pricing Rule,DocType,Pricing Rule,0,0,,0,7
+Stock,Link,Item Alternative,DocType,Item Alternative,0,0,,0,8
+Stock,Link,Item Manufacturer,DocType,Item Manufacturer,0,0,,0,9
+Stock,Link,Customs Tariff Number,DocType,Customs Tariff Number,0,0,,0,10
+Stock,Card Break,Stock Transactions,,,0,0,,0,11
+Stock,Link,Material Request,DocType,Material Request,1,0,Item,0,12
+Stock,Link,Stock Entry,DocType,Stock Entry,1,0,Item,0,13
+Stock,Link,Delivery Note,DocType,Delivery Note,1,0,"Item, Customer",0,14
+Stock,Link,Purchase Receipt,DocType,Purchase Receipt,1,0,"Item, Supplier",0,15
+Stock,Link,Pick List,DocType,Pick List,1,0,Item,0,16
+Stock,Link,Delivery Trip,DocType,Delivery Trip,0,0,,0,17
+Stock,Card Break,Settings,,,0,0,,0,18
+Stock,Link,Stock Settings,DocType,Stock Settings,1,0,,0,19
+Stock,Link,Warehouse,DocType,Warehouse,1,0,,0,20
+Stock,Link,Unit of Measure (UOM),DocType,UOM,1,0,,0,21
+Stock,Link,Item Variant Settings,DocType,Item Variant Settings,1,0,,0,22
+Stock,Link,Brand,DocType,Brand,1,0,,0,23
+Stock,Link,Item Attribute,DocType,Item Attribute,0,0,,0,24
+Stock,Link,UOM Conversion Factor,DocType,UOM Conversion Factor,0,0,,0,25
+Stock,Card Break,Tools,,,0,0,,0,26
+Stock,Link,Stock Reconciliation,DocType,Stock Reconciliation,1,0,,0,27
+Stock,Link,Landed Cost Voucher,DocType,Landed Cost Voucher,1,0,,0,28
+Stock,Link,Packing Slip,DocType,Packing Slip,1,0,,0,29
+Stock,Link,Quality Inspection,DocType,Quality Inspection,0,0,,0,30
+Stock,Link,Quality Inspection Template,DocType,Quality Inspection Template,0,0,,0,31
+Stock,Link,Quick Stock Balance,DocType,Quick Stock Balance,0,0,,0,32
+Stock,Card Break,Other Reports,,,0,0,,0,33
+Stock,Link,Requested Items To Be Transferred,Report,Requested Items To Be Transferred,0,0,Material Request,1,34
+Stock,Link,Batch Item Expiry Status,Report,Batch Item Expiry Status,0,0,Stock Ledger Entry,1,35
+Stock,Link,Item Prices,Report,Item Prices,0,0,Price List,1,36
+Stock,Link,Itemwise Recommended Reorder Level,Report,Itemwise Recommended Reorder Level,0,0,Item,1,37
+Stock,Link,Item Variant Details,Report,Item Variant Details,0,0,Item,1,38
+Stock,Link,Subcontracted Raw Materials To Be Transferred,Report,Subcontracted Raw Materials To Be Transferred,0,0,Purchase Order,1,39
+Stock,Link,Subcontracted Item To Be Received,Report,Subcontracted Item To Be Received,0,0,Purchase Order,1,40
+Stock,Card Break,Stock Reports,,,0,0,,0,41
+Stock,Link,Stock Ledger,Report,Stock Ledger,1,0,Item,1,42
+Stock,Link,Stock Balance,Report,Stock Balance,1,0,Item,1,43
+Stock,Link,Stock Projected Qty,Report,Stock Projected Qty,1,0,Item,1,44
+Stock,Link,Stock Summary,Page,stock-balance,0,0,Item,0,45
+Stock,Link,Stock Ageing,Report,Stock Ageing,0,0,Item,1,46
+Stock,Link,Item Price Stock,Report,Item Price Stock,0,0,Item,1,47
+Stock,Link,Warehouse Wise Stock Balance,Report,Warehouse Wise Stock Balance,0,0,,0,48
+Stock,Card Break,Items Catalogue,,,0,0,,0,49
+Stock,Link,Item,DocType,Item,1,0,,0,50
+Stock,Link,Item Group,DocType,Item Group,1,0,,0,51
+Stock,Link,Product Bundle,DocType,Product Bundle,1,0,,0,52
+Stock,Link,Shipping Rule,DocType,Shipping Rule,0,0,,0,53
+Stock,Link,Item Alternative,DocType,Item Alternative,0,0,,0,54
+Stock,Link,Item Manufacturer,DocType,Item Manufacturer,0,0,,0,55
+Stock,Card Break,Key Reports,,,0,0,,0,56
+Stock,Link,Stock Analytics,Report,Stock Analytics,1,0,Stock Entry,1,57
+Stock,Link,Delivery Note Trends,Report,Delivery Note Trends,0,0,Delivery Note,1,58
+Stock,Link,Purchase Receipt Trends,Report,Purchase Receipt Trends,0,0,Purchase Receipt,1,59
+Stock,Link,Sales Order Analysis,Report,Sales Order Analysis,0,0,Sales Order,1,60
+Stock,Link,Purchase Order Analysis,Report,Purchase Order Analysis,0,0,Purchase Order,1,61
+Stock,Link,Item Shortage Report,Report,Item Shortage Report,0,0,Bin,1,62
+Stock,Link,Batch-Wise Balance History,Report,Batch-Wise Balance History,0,0,Batch,1,63
+Stock,Card Break,Serial No and Batch,DocType,,0,0,,0,64
+Stock,Link,Serial No,DocType,Serial No,1,0,Item,0,65
+Stock,Link,Batch,DocType,Batch,1,0,Item,0,66
+Stock,Link,Serial No and Batch Traceability,Report,Serial No and Batch Traceability,0,0,,1,67
+Stock,Link,Serial No Ledger,Report,Serial No Ledger,0,0,,1,68
+Stock,Link,Installation Note,DocType,Installation Note,0,0,Item,0,69
+Stock,Link,Serial No Service Contract Expiry,Report,Serial No Service Contract Expiry,0,0,Serial No,0,70
+Stock,Link,Serial No Status,Report,Serial No Status,0,0,Serial No,0,71
+Stock,Link,Serial No Warranty Expiry,Report,Serial No Warranty Expiry,0,0,Serial No,0,72
+Subcontracting,Card Break,Reports,DocType,,0,0,,0,1
+Subcontracting,Link,Subcontract Order Summary,Report,Subcontract Order Summary,0,0,,1,2
+Subcontracting,Link,Subcontracted Item To Be Received,Report,Subcontracted Item To Be Received,0,0,,1,3
+Subcontracting,Link,Subcontracted Raw Materials To Be Transferred,Report,Subcontracted Raw Materials To Be Transferred,0,0,,1,4
+Subcontracting,Card Break,Subcontracting Inward Order,DocType,,0,0,,0,5
+Subcontracting,Link,Sales Order,DocType,Sales Order,0,0,,0,6
+Subcontracting,Link,Subcontracting Inward Order,DocType,Subcontracting Inward Order,0,0,,0,7
+Subcontracting,Link,Subcontracting Delivery,DocType,Stock Entry,0,0,,0,8
+Subcontracting,Card Break,Subcontracting Outward Order,DocType,,0,0,,0,9
+Subcontracting,Link,Purchase Order,DocType,Purchase Order,0,0,,0,10
+Subcontracting,Link,Subcontracting Outward Order,DocType,Subcontracting Order,0,0,,0,11
+Subcontracting,Link,Subcontracting Receipt,DocType,Subcontracting Receipt,0,0,,0,12
+Support,Card Break,Issues,,,0,0,,0,1
+Support,Link,Issue,DocType,Issue,1,0,,0,2
+Support,Link,Issue Type,DocType,Issue Type,0,0,,0,3
+Support,Link,Issue Priority,DocType,Issue Priority,0,0,,0,4
+Support,Card Break,Maintenance,,,0,0,,0,5
+Support,Link,Maintenance Schedule,DocType,Maintenance Schedule,0,0,,0,6
+Support,Link,Maintenance Visit,DocType,Maintenance Visit,0,0,,0,7
+Support,Card Break,Service Level Agreement,,,0,0,,0,8
+Support,Link,Service Level Agreement,DocType,Service Level Agreement,0,0,,0,9
+Support,Card Break,Warranty,,,0,0,,0,10
+Support,Link,Warranty Claim,DocType,Warranty Claim,0,0,,0,11
+Support,Link,Serial No,DocType,Serial No,0,0,,0,12
+Support,Card Break,Settings,,,0,0,,0,13
+Support,Link,Support Settings,DocType,Support Settings,0,0,,0,14
+Support,Card Break,Reports,,,0,0,,0,15
+Support,Link,First Response Time for Issues,Report,First Response Time for Issues,0,0,Issue,1,16
+Users,Link,Activity Log,DocType,Activity Log,0,0,,0,1
+Users,Link,Access Log,DocType,Access Log,0,0,,0,2
+Users,Link,Role Permissions Manager,Page,permission-manager,0,0,,0,3
+Users,Link,User Permissions,DocType,User Permission,0,0,,0,4
+Users,Link,Role Permission for Page and Report,DocType,Role Permission for Page and Report,0,0,,0,5
+Users,Link,Permitted Documents For User,Report,Permitted Documents For User,0,0,User,1,6
+Users,Link,Document Share Report,Report,Document Share Report,0,0,DocShare,0,7
+Website,Link,Website Settings,DocType,Website Settings,1,0,,0,1
+Website,Link,Website Theme,DocType,Website Theme,1,0,,0,2
+Website,Link,Website Script,DocType,Website Script,0,0,,0,3
+Website,Link,About Us Settings,DocType,About Us Settings,0,0,,0,4
+Website,Link,Contact Us Settings,DocType,Contact Us Settings,0,0,,0,5
+Website,Link,Help Category,DocType,Help Category,0,0,,0,6
+Website,Link,Help Article,DocType,Help Article,0,0,,0,7

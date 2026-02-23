@@ -63,6 +63,7 @@ services:
       - ../../apps/agriculture:/home/frappe/frappe-bench/apps/agriculture
       - ../../apps/yam_agri_core:/home/frappe/frappe-bench/apps/yam_agri_core
       - ../../apps/yam_agri_qms_trace:/home/frappe/frappe-bench/apps/yam_agri_qms_trace
+      - ../../docs:/home/frappe/frappe-bench/docs
     networks:
       - frappe-net
 

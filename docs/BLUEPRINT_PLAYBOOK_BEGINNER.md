@@ -52,6 +52,11 @@ The product helps YAM Agri manage cereal-crop supply chain quality from storage 
 - Keep operations safe: approvals + audit logs
 - AI is **assistive** (hybrid) and never executes risky actions automatically
 
+### Access control baseline (RBAC)
+We will use ERPNext/Frappe's **standard roles** (segregation-of-duties aware) as the baseline, and model your org chart job functions as **Role Profiles** (subsets of standard roles), plus **Site isolation** via User Permissions.
+
+See: `docs/planning/RBAC_AND_ORG_CHART.md`
+
 ### Standards (baseline)
 - **FAO GAP (Middle East)** baseline checklist for good practice controls
 - HACCP-style control points and ISO 22000 thinking for hazard control

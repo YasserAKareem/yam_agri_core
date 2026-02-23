@@ -1,0 +1,13 @@
+name,dt,fieldname,label,fieldtype,options,insert_after,reqd,read_only,hidden,in_list_view,modified
+Communication-company,Communication,company,Company,Link,Company,email_account,0,1,0,0,2026-02-13 14:08:38.940215
+Email Account-company,Email Account,company,Company,Link,Company,email_id,0,0,0,0,2026-02-13 14:08:38.911589
+UTM Campaign-crm_campaign,UTM Campaign,crm_campaign,Messaging CRM Campagin,Link,Campaign,campaign_decription,0,0,0,0,2026-02-13 14:08:38.721138
+Print Settings-print_taxes_with_zero_amount,Print Settings,print_taxes_with_zero_amount,Print taxes with zero amount,Check,,allow_print_for_cancelled,0,0,0,0,2026-02-13 14:08:38.703193
+Print Settings-print_uom_after_quantity,Print Settings,print_uom_after_quantity,Print UOM after Quantity,Check,,compact_item_print,0,0,0,0,2026-02-13 14:08:38.686565
+Print Settings-compact_item_print,Print Settings,compact_item_print,Compact Item Print,Check,,with_letterhead,0,0,0,0,2026-02-13 14:08:38.667897
+DocShare-impersonate,DocShare,impersonate,Impersonate,Check,,notify_by_email,0,0,0,0,2026-02-13 14:07:46.312206
+DocPerm-impersonate,DocPerm,impersonate,Impersonate,Check,,email,0,0,0,0,2026-02-13 14:07:46.258664
+Custom DocPerm-impersonate,Custom DocPerm,impersonate,Impersonate,Check,,email,0,0,0,0,2026-02-13 14:07:46.218019
+Address-is_your_company_address,Address,is_your_company_address,Is Your Company Address,Check,,linked_with,0,0,0,0,2020-10-14 17:41:40.878179
+Contact-is_billing_contact,Contact,is_billing_contact,Is Billing Contact,Check,,is_primary_contact,0,0,0,0,2019-12-02 11:00:03.432994
+Address-tax_category,Address,tax_category,Tax Category,Link,Tax Category,fax,0,0,0,0,2018-12-28 22:29:21.828090

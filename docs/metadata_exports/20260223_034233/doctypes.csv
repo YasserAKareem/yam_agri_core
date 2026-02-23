@@ -1,0 +1,808 @@
+name,module,custom,issingle,istable,is_submittable,autoname,naming_rule,title_field,search_fields,sort_field,sort_order,quick_entry,allow_rename,allow_copy,allow_import,allow_guest_to_view,restrict_to_domain,editable_grid,track_changes,read_only,in_create,is_tree,show_name_in_global_search,beta,modified
+About Us Settings,Website,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2025-08-22 15:56:33.957707
+About Us Team Member,Website,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:26.563628
+Access Log,Core,0,0,0,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:26.702078
+Account,Accounts,0,0,0,0,,,,account_number,creation,ASC,0,0,1,1,0,,0,1,0,0,1,1,0,2025-08-02 06:26:44.657146
+Account Category,Accounts,0,0,0,0,field:account_category_name,By fieldname,,"account_category_name, description",creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-10-15 03:19:47.171349
+Account Closing Balance,Accounts,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,1,0,0,0,2025-08-22 19:13:50.400404
+Accounting Dimension,Accounts,0,0,0,0,field:label,,,,creation,ASC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-27 13:05:56.890002
+Accounting Dimension Detail,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:05:57.056874
+Accounting Dimension Filter,Accounts,0,0,0,0,format:{accounting_dimension}-{#####},Expression,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-08-08 14:13:22.203011
+Accounting Period,Accounts,0,0,0,0,field:period_name,By fieldname,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-12-01 16:53:44.631299
+Accounts Settings,Accounts,0,1,0,0,,,,,creation,ASC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-11 18:30:45.968531
+Activity Cost,Projects,0,0,0,0,PROJ-ACC-.#####,,title,,creation,DESC,0,1,0,1,0,,0,0,0,0,0,0,0,2024-03-27 13:05:57.800347
+Activity Log,Core,0,0,0,0,,,subject,subject,creation,DESC,0,0,0,1,0,,0,0,0,0,0,0,0,2024-03-23 16:01:26.898094
+Activity Type,Projects,0,0,0,0,field:activity_type,,,,creation,ASC,1,1,0,1,0,,0,0,0,0,0,0,0,2024-08-16 19:22:57.706521
+Address,Contacts,0,0,0,0,,,,"country, state",creation,DESC,0,1,0,1,0,,0,0,0,0,0,0,0,2024-03-23 16:01:27.068028
+Address Template,Contacts,0,0,0,0,field:country,,,,creation,DESC,1,1,0,0,0,,0,0,0,0,0,0,0,2024-03-23 16:01:27.242795
+Advance Payment Ledger Entry,Accounts,0,0,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,1,0,0,0,2025-11-13 12:45:03.014555
+Advance Taxes and Charges,Accounts,0,0,1,0,,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-12-15 06:42:18.707671
+Allowed Dimension,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:05:58.587487
+Allowed To Transact With,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:05:58.698893
+Amended Document Naming Settings,Core,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:27.410335
+API Request Log,Core,0,0,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,1,0,0,0,2025-10-29 11:26:28.177653
+Applicable On Account,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:05:59.168897
+Appointment,CRM,0,0,0,0,format:APMT-{customer_name}-{####},,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:05:59.300573
+Appointment Booking Settings,CRM,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:18:46.617101
+Appointment Booking Slots,CRM,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:05:59.620479
+Asset,Assets,0,0,0,1,naming_series:,"By ""Naming Series"" field",asset_name,,modified,DESC,0,1,0,1,0,,0,1,0,0,0,1,0,2025-12-18 16:36:40.904246
+Asset Activity,Assets,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2024-03-27 13:06:32.933603
+Asset Capitalization,Assets,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-05-20 15:15:12.110035
+Asset Capitalization Asset Item,Assets,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:33.350191
+Asset Capitalization Service Item,Assets,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:33.503815
+Asset Capitalization Stock Item,Assets,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-03-05 12:46:01.074742
+Asset Category,Assets,0,0,0,0,field:asset_category_name,,,,creation,DESC,0,1,0,1,0,,0,1,0,0,0,1,0,2025-05-13 15:33:03.791814
+Asset Category Account,Assets,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:34.012854
+Asset Depreciation Schedule,Assets,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-05-23 01:17:16.708004
+Asset Finance Book,Assets,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-01-06 17:14:51.836803
+Asset Maintenance,Assets,0,0,0,0,field:asset_name,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:34.491299
+Asset Maintenance Log,Assets,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-09-24 15:12:37.497853
+Asset Maintenance Task,Assets,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:34.835687
+Asset Maintenance Team,Assets,0,0,0,0,field:maintenance_team_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:34.976117
+Asset Movement,Assets,0,0,0,1,format:ACC-ASM-{YYYY}-{#####},Expression,,,creation,DESC,0,0,0,1,0,,0,0,0,0,0,0,0,2025-05-30 17:01:55.864353
+Asset Movement Item,Assets,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:35.272015
+Asset Repair,Assets,0,0,0,1,naming_series:,"By ""Naming Series"" field",asset_name,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2026-01-06 15:48:13.862505
+Asset Repair Consumed Item,Assets,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-06-27 14:52:56.311166
+Asset Repair Purchase Invoice,Assets,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-08-16 16:40:32.000006
+Asset Shift Allocation,Assets,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2025-01-10 16:25:31.397325
+Asset Shift Factor,Assets,0,0,0,0,field:shift_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:06:35.869900
+Asset Value Adjustment,Assets,0,0,0,1,,,asset,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-12-18 15:04:18.726505
+Assignment Rule,Automation,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2025-08-25 17:09:11.644603
+Assignment Rule Day,Automation,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:27.759155
+Assignment Rule User,Automation,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:27.847608
+Audit Trail,Core,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:28.029916
+Authorization Control,Setup,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:06:36.513715
+Authorization Rule,Setup,0,0,0,0,HR-ARU-.#####,Expression (old style),,"transaction,based_on,system_user,system_role,approving_user,approving_role",creation,DESC,0,0,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:06:36.613880
+Auto Email Report,Email,0,0,0,0,,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2025-07-04 17:33:36.750217
+Auto Repeat,Automation,0,0,0,0,format:AUT-AR-{#####},Expression,reference_document,reference_document,creation,DESC,0,1,0,1,0,,1,1,0,0,0,0,0,2025-06-09 18:20:23.775881
+Auto Repeat Day,Automation,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:28.738641
+Auto Repeat User,Automation,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-06-09 18:19:41.543336
+Availability Of Slots,CRM,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:36.777002
+Bank,Accounts,0,0,0,0,field:bank_name,,,,creation,DESC,1,1,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:06:36.896195
+Bank Account,Accounts,0,0,0,0,,,,"bank,account",creation,DESC,0,1,0,1,0,,0,1,0,0,0,0,0,2026-01-20 00:46:16.633364
+Bank Account Subtype,Accounts,0,0,0,0,field:account_subtype,,,,creation,DESC,1,1,0,1,0,,1,0,0,0,0,0,0,2024-03-27 13:06:37.221876
+Bank Account Type,Accounts,0,0,0,0,field:account_type,,,,creation,DESC,1,1,0,1,0,,1,0,0,0,0,0,0,2024-03-27 13:06:37.347035
+Bank Clearance,Accounts,0,1,0,0,,,,,creation,ASC,1,0,1,0,0,,0,0,1,0,0,0,0,2024-03-27 13:06:37.477927
+Bank Clearance Detail,Accounts,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-12-17 14:33:45.913311
+Bank Guarantee,Accounts,0,0,0,1,ACC-BG-.YYYY.-.#####,,customer,customer,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-08-29 11:52:33.550847
+Bank Reconciliation Tool,Accounts,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-04-28 14:40:50.910884
+Bank Statement Import,Accounts,0,0,0,0,format:Bank Statement Import on {creation},Expression,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,1,2025-06-11 02:23:22.159961
+Bank Transaction,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",bank_account,,date,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2025-12-07 20:49:18.600757
+Bank Transaction Mapping,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:38.436517
+Bank Transaction Payments,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:38.549438
+Batch,Stock,0,0,0,0,field:batch_id,By fieldname,batch_id,,creation,DESC,1,0,0,1,0,,0,1,0,0,0,0,0,2024-03-27 13:06:38.677265
+Bin,Stock,0,0,0,0,hash,Random,,"item_code,warehouse",creation,ASC,1,0,0,0,0,,0,0,0,1,0,0,0,2026-02-01 08:11:46.824913
+Bisect Accounting Statements,Accounts,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,1,0,1,0,0,0,0,2024-03-27 13:06:39.619458
+Bisect Nodes,Accounts,0,0,0,0,autoincrement,Autoincrement,,,creation,DESC,0,0,0,0,0,,1,0,1,0,0,0,0,2024-03-27 13:06:39.766063
+Blanket Order,Manufacturing,0,0,0,1,naming_series:,"By ""Naming Series"" field",,"blanket_order_type, to_date",creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-12-05 15:44:21.520093
+Blanket Order Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:40.083042
+Block Module,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:28.830117
+BOM,Manufacturing,0,0,0,1,,,,"item, item_name",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2025-11-19 16:17:15.925156
+BOM Creator,Manufacturing,0,0,0,1,prompt,Set by user,,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2024-11-25 16:41:03.047835
+BOM Creator Item,Manufacturing,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-11-05 21:15:55.187671
+BOM Explosion Item,Manufacturing,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-08-12 20:02:32.694836
+BOM Item,Manufacturing,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-11-05 19:00:38.646539
+BOM Operation,Manufacturing,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2026-01-01 17:15:59.806874
+BOM Scrap Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-07-31 16:21:44.047007
+BOM Update Batch,Manufacturing,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:06:41.529935
+BOM Update Log,Manufacturing,0,0,0,1,BOM-UPDT-LOG-.#####,Expression,,,creation,DESC,0,0,0,0,0,,1,1,0,1,0,0,0,2025-12-24 12:27:06.478893
+BOM Update Tool,Manufacturing,0,1,0,0,,,,,creation,DESC,0,0,1,0,0,,0,0,1,1,0,0,0,2024-03-27 13:06:41.828828
+BOM Website Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:41.946700
+BOM Website Operation,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:42.076959
+Branch,Setup,0,0,0,0,field:branch,,,,creation,DESC,1,1,0,1,0,,0,0,0,0,0,0,0,2024-03-27 13:06:42.370664
+Brand,Setup,0,0,0,0,field:brand,By fieldname,,,creation,ASC,1,1,0,1,0,,0,0,0,0,0,1,0,2024-08-20 14:10:21.377962
+Budget,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2025-12-10 02:35:01.197613
+Budget Account,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:42.854458
+Budget Distribution,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-11-03 13:18:28.398198
+Bulk Transaction Log,Bulk Transaction,0,0,0,0,,,date,,creation,DESC,0,0,1,0,0,,0,0,0,1,0,0,0,2024-03-27 13:06:43.111628
+Bulk Transaction Log Detail,Bulk Transaction,0,0,0,0,,,,,creation,DESC,0,1,0,0,0,,1,1,0,1,0,0,0,2024-03-27 13:06:43.240040
+Bulk Update,Desk,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:29.575802
+Buying Settings,Buying,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2026-01-02 18:16:35.885540
+Calendar View,Desk,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:29.668268
+Call Log,Telephony,0,0,0,0,field:id,By fieldname,from,,creation,DESC,0,0,0,0,0,,0,1,0,1,0,0,0,2025-12-29 10:37:26.183502
+Campaign,CRM,0,0,0,0,naming_series:,,,,creation,DESC,1,1,0,1,0,,0,0,0,0,0,0,0,2024-03-27 13:06:43.861206
+Campaign Email Schedule,CRM,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:44.019192
+Campaign Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-06-28 11:04:09.815940
+Cashier Closing,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:44.260440
+Cashier Closing Payments,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:44.414987
+Certificate,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.383090
+Changelog Feed,Desk,0,0,0,0,,,,,creation,DESC,0,1,0,0,0,,1,0,1,1,0,0,1,2024-04-08 18:36:42.203032
+Chart of Accounts Importer,Accounts,0,1,0,0,,,,,creation,DESC,1,0,1,0,0,,1,0,1,1,0,0,0,2024-03-27 13:06:44.535780
+Cheque Print Template,Accounts,0,0,0,0,field:bank_name,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:06:44.654989
+Client Script,Custom,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:01:29.862624
+Closed Document,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:44.854280
+Code List,EDI,0,0,0,0,prompt,Set by user,title,description,creation,DESC,0,1,1,0,0,,0,0,0,0,0,0,0,2024-11-16 17:01:40.260293
+Color,Website,0,0,0,0,Prompt,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:29.982660
+Comment,Core,0,0,0,0,,,comment_type,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-08-14 16:10:15.413830
+Common Code,EDI,0,0,0,0,hash,Random,title,"common_code,description",creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2025-10-04 17:22:28.176155
+Communication,Core,0,0,0,0,,,subject,subject,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2025-12-25 19:19:29.427081
+Communication Link,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-11-08 11:07:13.960236
+Communication Medium,Communication,0,0,0,0,Prompt,,,,creation,ASC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-27 13:06:45.112268
+Communication Medium Timeslot,Communication,0,0,1,0,,,,,creation,ASC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:45.252082
+Company,Setup,0,0,0,0,field:company_name,By fieldname,,,creation,ASC,0,1,0,1,0,,0,1,0,0,1,1,0,2025-11-16 16:51:27.624096
+Company History,Website,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:01:30.539017
+Competitor,CRM,0,0,0,0,field:competitor_name,By fieldname,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-12-10 08:26:38.496003
+Competitor Detail,CRM,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:46.068798
+Connected App,Integrations,0,0,0,0,,,provider_name,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,1,2024-07-05 08:24:50.182706
+Console Log,Desk,0,0,0,0,format:Log on {timestamp},Expression,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:30.816591
+Contact,Contacts,0,0,0,0,,By script,full_name,,creation,DESC,0,1,0,1,0,,0,0,0,0,0,0,0,2024-03-23 16:01:30.937045
+Contact Email,Contacts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:31.173691
+Contact Phone,Contacts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:01:31.293047
+Contact Us Settings,Website,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2025-08-22 12:59:39.463182
+Contract,CRM,0,0,0,1,CON-.YYYY.-.#####,Expression,party_name,"party_type, party_name, contract_template",creation,DESC,0,1,0,1,0,,1,1,0,0,0,1,0,2025-12-24 21:33:51.240497
+Contract Fulfilment Checklist,CRM,0,0,1,1,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:46.377767
+Contract Template,CRM,0,0,0,0,field:title,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:46.495091
+Contract Template Fulfilment Terms,CRM,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:46.655043
+Cost Center,Accounts,0,0,0,0,,,,"parent_cost_center, is_group",creation,ASC,0,0,1,1,0,,0,0,0,0,1,1,0,2025-01-22 10:46:42.904001
+Cost Center Allocation,Accounts,0,0,0,1,CC-ALLOC-.#####,Expression (old style),,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:46.938642
+Cost Center Allocation Percentage,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:47.100633
+Country,Geo,0,0,0,0,field:country_name,By fieldname,,,country_name,ASC,1,0,0,1,0,,0,1,0,0,0,0,0,2025-01-03 13:01:46.030113
+Coupon Code,Accounts,0,0,0,0,field:coupon_name,By fieldname,coupon_name,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2024-11-19 16:35:11.836441
+CRM Note,CRM,0,0,1,0,autoincrement,Autoincrement,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:47.394005
+CRM Settings,CRM,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2026-01-02 18:18:52.204988
+Crop,YAM Agri Core,1,0,0,0,field:crop_name,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:33:29.024746
+Currency,Geo,0,0,0,0,field:currency_name,By fieldname,,,creation,DESC,0,1,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:01:31.809369
+Currency Exchange,Setup,0,0,0,0,,,,,name,DESC,1,0,0,1,0,,0,0,0,0,0,0,0,2018-05-15 11:23:35.639039
+Currency Exchange Settings,Accounts,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:19:02.873815
+Currency Exchange Settings Details,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:47.819210
+Currency Exchange Settings Result,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:47.937025
+Custom DocPerm,Core,0,0,0,0,hash,Random,parent,,creation,ASC,0,0,0,1,0,,1,0,1,0,0,0,0,2025-05-22 16:59:35.484376
+Custom Field,Custom,0,0,0,0,,,,"dt,label,fieldtype,options",creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2025-11-12 01:14:24.753774
+Custom HTML Block,Desk,0,0,0,0,prompt,Set by user,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:02:15.380899
+Custom Role,Core,0,0,0,0,hash,,,,creation,DESC,0,0,0,1,0,,1,0,1,0,0,0,0,2024-03-23 16:02:15.554679
+Customer,Selling,0,0,0,0,naming_series:,"By ""Naming Series"" field",customer_name,"customer_group,territory, mobile_no,primary_address",creation,DESC,1,1,0,1,0,,0,1,0,0,0,1,0,2026-01-21 17:23:42.151114
+Customer Credit Limit,Selling,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:48.432478
+Customer Group,Setup,0,0,0,0,field:customer_group_name,By fieldname,,parent_customer_group,creation,DESC,0,1,0,1,0,,0,0,0,0,1,1,0,2025-12-02 13:58:03.378607
+Customer Group Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:48.735688
+Customer Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:48.844074
+Customer Number At Supplier,Buying,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-04-27 12:06:04.146431
+Customize Form,Custom,0,1,0,0,DL.####,Expression (old style),,doc_type,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-09-23 07:13:52.631903
+Customize Form Field,Custom,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-12-23 14:17:10.458916
+Customs Tariff Number,Stock,0,0,0,0,field:tariff_number,,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:48.957880
+Dashboard,Desk,0,0,0,0,field:dashboard_name,,dashboard_name,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:02:16.071715
+Dashboard Chart,Desk,0,0,0,0,field:chart_name,By fieldname,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2025-06-08 22:49:08.587921
+Dashboard Chart Field,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:02:16.427669
+Dashboard Chart Link,Desk,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:02:16.522316
+Dashboard Chart Source,Desk,0,0,0,0,field:source_name,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:02:16.623353
+Dashboard Settings,Desk,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,1,1,0,0,0,2024-03-23 16:02:16.763875
+Data Export,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:02:16.856404
+Data Import,Core,0,0,0,0,format:{reference_doctype} Import on {creation},Expression,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,1,2025-01-14 17:36:22.389195
+Data Import Log,Core,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,1,1,0,0,0,2024-04-29 18:44:17.050909
+DefaultValue,Core,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:02:17.533639
+Deleted Document,Core,0,0,0,0,,,deleted_name,,creation,DESC,0,0,0,0,0,,1,1,0,1,0,0,0,2025-02-20 19:22:00.734438
+Delivery Note,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"status,customer,customer_name, territory,base_grand_total",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2026-02-03 12:27:19.055918
+Delivery Note Item,Stock,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-05-31 19:51:32.651562
+Delivery Schedule Item,Selling,0,0,0,0,,,item_code,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-08-21 18:11:30.134073
+Delivery Settings,Stock,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:18:39.931428
+Delivery Stop,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:50.465672
+Delivery Trip,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",driver_name,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:50.643296
+Department,Setup,0,0,0,0,,,,,creation,ASC,0,1,0,1,0,,0,0,0,0,1,1,0,2024-06-12 16:10:31.451257
+Dependent Task,Projects,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:51.107280
+Depreciation Schedule,Assets,0,0,1,0,,,,,creation,DESC,1,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:06:51.227001
+Designation,Setup,0,0,0,0,field:designation_name,By fieldname,,,creation,ASC,1,1,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:06:51.361961
+Desktop Icon,Desk,0,0,0,0,field:label,By fieldname,label,,creation,DESC,1,1,0,1,0,,0,1,1,0,0,0,0,2026-01-27 18:17:48.667070
+Desktop Layout,Desk,0,0,0,0,field:user,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2026-01-25 15:30:12.805037
+Desktop Settings,Desk,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2026-01-12 14:14:52.189474
+Discounted Invoice,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:06:51.610919
+Discussion Reply,Website,0,0,0,0,REPLY.####,Expression (old style),,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:02:18.000815
+Discussion Topic,Website,0,0,0,0,TOPIC.####,Expression (old style),title,title,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:02:18.102531
+DocField,Core,0,0,1,0,hash,Random,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2026-01-06 01:37:29.723265
+DocPerm,Core,0,0,1,0,hash,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-05-20 16:50:32.679113
+DocShare,Core,0,0,0,0,hash,Random,,,creation,DESC,0,0,0,1,0,,0,1,1,1,0,0,0,2024-03-23 16:03:21.134272
+DocType,Core,0,0,0,0,Prompt,Set by user,,module,creation,DESC,0,1,0,0,0,,0,1,0,0,0,1,0,2025-09-23 06:48:13.555017
+DocType Action,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:21.873210
+DocType Layout,Custom,0,0,0,0,prompt,Set by user,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:22.020755
+DocType Layout Field,Custom,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:22.165461
+DocType Link,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:22.273487
+DocType State,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:22.416470
+Document Follow,Email,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,1,1,0,0,0,2024-03-23 16:03:22.555030
+Document Naming Rule,Core,0,0,0,0,,,document_type,,priority,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2023-11-21 11:58:25.712375
+Document Naming Rule Condition,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:22.677527
+Document Naming Settings,Core,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-11-15 18:04:40.268244
+Document Share Key,Core,0,0,0,0,hash,Expression,,,creation,DESC,0,1,0,0,0,,1,0,1,1,0,0,0,2024-03-23 16:03:22.892995
+Domain,Core,0,0,0,0,field:domain,,domain,domain,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:22.994251
+Domain Settings,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:23.087355
+Downtime Entry,Manufacturing,0,0,0,0,naming_series:,,workstation,,creation,DESC,1,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:08:18.393488
+Driver,Setup,0,0,0,0,naming_series:,,full_name,full_name,creation,DESC,1,1,0,1,0,,1,1,0,0,0,1,0,2024-03-27 13:08:18.825438
+Driving License Category,Setup,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:08:19.062758
+Dunning,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,,creation,ASC,0,0,0,0,0,,0,1,0,0,0,0,1,2024-11-26 13:46:07.760867
+Dunning Letter Text,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:08:19.435616
+Dunning Type,Accounts,0,0,0,0,,By script,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,1,2024-03-27 13:08:19.584112
+Dynamic Link,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:23.469424
+Email Account,Email,0,0,0,0,field:email_account_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2026-02-04 15:50:27.898578
+Email Campaign,CRM,0,0,0,0,format:MAIL-CAMP-{YYYY}-{#####},,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:36.177528
+Email Digest,Setup,0,0,0,0,Prompt,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:09:36.439936
+Email Digest Recipient,Setup,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:36.733439
+Email Domain,Email,0,0,0,0,field:domain_name,By fieldname,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-12-04 23:26:20.993971
+Email Flag Queue,Email,0,0,0,0,,,,,creation,DESC,0,0,1,0,0,,0,0,0,1,0,0,0,2024-03-23 16:03:24.005944
+Email Group,Email,0,0,0,0,field:title,By fieldname,,,creation,DESC,1,1,0,1,0,,0,1,0,0,0,1,0,2024-09-25 15:24:37.576084
+Email Group Member,Email,0,0,0,0,hash,Random,email,,creation,DESC,1,0,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:03:24.266714
+Email Queue,Email,0,0,0,0,hash,Random,,,creation,DESC,0,0,0,0,0,,0,1,0,1,0,0,0,2026-01-06 05:45:35.503215
+Email Queue Recipient,Email,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,0,0,0,0,0,0,0,2024-03-23 16:03:24.564197
+Email Rule,Email,0,0,0,0,field:email_id,,,,creation,DESC,1,0,1,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:24.671100
+Email Template,Email,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:03:24.779791
+Email Unsubscribe,Email,0,0,0,0,,,,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:24.894291
+Employee,Setup,0,0,0,0,naming_series:,"By ""Naming Series"" field",employee_name,employee_name,creation,DESC,0,1,0,1,0,,1,1,0,0,1,1,0,2025-08-29 11:52:12.819878
+Employee Education,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:38.507746
+Employee External Work History,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:38.624280
+Employee Group,Setup,0,0,0,0,field:employee_group_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:39.303885
+Employee Group Table,Setup,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:39.428291
+Employee Internal Work History,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:39.822645
+Error Log,Core,0,0,0,0,,,method,,creation,DESC,0,0,0,0,0,,0,0,0,1,0,0,0,2025-11-27 18:04:21.399557
+Event,Desk,0,0,0,0,EV.#####,Expression (old style),subject,,creation,DESC,0,0,0,1,0,,0,1,1,0,0,0,0,2025-10-07 08:53:24.732646
+Event Notifications,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-10-01 14:26:21.526868
+Event Participants,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-10-06 15:03:36.186683
+Exchange Rate Revaluation,Accounts,0,0,0,1,ACC-ERR-.YYYY.-.#####,Expression (old style),,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:09:42.951164
+Exchange Rate Revaluation Account,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:43.128675
+File,Core,0,0,0,0,,,file_name,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2025-01-15 11:46:42.917146
+Finance Book,Accounts,0,0,0,0,field:finance_book_name,,,finance_book_name,creation,DESC,1,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:09:44.514241
+Financial Report Row,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-10-14 09:23:27.208072
+Financial Report Template,Accounts,0,0,0,0,field:template_name,By fieldname,template_name,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-11-14 00:11:03.508139
+Fiscal Year,Accounts,0,0,0,0,field:year,By fieldname,,,name,DESC,0,0,0,1,0,,0,0,0,0,0,1,0,2024-05-27 17:29:55.560840
+Fiscal Year Company,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:44.659251
+Form Tour,Desk,0,0,0,0,field:title,By fieldname,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-11-17 13:06:48.120836
+Form Tour Step,Desk,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:26.150327
+Gender,Contacts,0,0,0,0,field:gender,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:26.299387
+Geolocation Settings,Integrations,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-06-22 09:18:34.306542
+GL Entry,Accounts,0,0,0,0,ACC-GLE-.YYYY.-.#####,Expression (old style),,"voucher_no,account,posting_date,against_voucher",creation,DESC,1,0,0,0,0,,0,0,0,1,0,0,0,2025-08-22 12:57:17.750252
+Global Defaults,Setup,0,1,0,0,,,,,creation,DESC,0,0,1,0,0,,0,0,1,1,0,0,0,2026-01-12 09:45:59.819161
+Global Search DocType,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:26.489242
+Global Search Settings,Desk,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:26.580482
+Google Calendar,Integrations,0,0,0,0,field:calendar_name,By fieldname,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-01-27 13:06:00
+Google Contacts,Integrations,0,0,0,0,format:GC-{email_id},Expression,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:26.863560
+Google Settings,Integrations,0,1,0,0,,,,,creation,ASC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:27.101069
+Has Domain,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:27.198356
+Has Role,Core,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:27.291168
+Help Article,Website,0,0,0,0,,,title,,creation,DESC,0,0,0,1,1,,0,1,0,0,0,0,0,2024-03-23 16:03:27.427297
+Help Category,Website,0,0,0,0,,,,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:03:27.650255
+Holiday,Setup,0,0,1,0,,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-08-28 15:15:44.177181
+Holiday List,Setup,0,0,0,0,field:holiday_list_name,By fieldname,,,creation,DESC,0,1,0,1,0,,0,0,0,0,0,0,0,2025-08-28 15:17:05.313383
+IMAP Folder,Email,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:27.792499
+Import Supplier Invoice,Regional,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:50.384173
+Incoming Call Handling Schedule,Telephony,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:50.824179
+Incoming Call Settings,Telephony,0,0,0,0,Prompt,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:50.947071
+Incoterm,Setup,0,0,0,0,field:code,By fieldname,title,,name,ASC,0,1,0,0,0,,1,0,0,0,0,0,0,2022-11-17 22:35:52.084553
+Industry Type,Selling,0,0,0,0,field:industry,By fieldname,,,creation,DESC,1,1,0,1,0,,0,0,0,0,0,0,0,2024-03-27 13:09:51.081515
+Installation Note,Selling,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:09:51.216007
+Installation Note Item,Selling,0,0,1,0,hash,Random,,,creation,ASC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:51.390239
+Installed Application,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2025-05-27 12:26:49.523690
+Installed Applications,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-06-30 21:26:13.462828
+Integration Request,Integrations,0,0,0,0,,,integration_request_service,,creation,DESC,0,0,0,0,0,,1,1,0,1,0,0,0,2025-12-11 18:23:54.669112
+Inventory Dimension,Stock,0,0,0,0,field:dimension_name,By fieldname,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-07-07 15:51:29.329064
+Invoice Discounting,Accounts,0,0,0,1,ACC-INV-DISC-.YYYY.-.#####,,,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:09:52.746196
+Issue,Support,0,0,0,0,naming_series:,"By ""Naming Series"" field",subject,"status,customer,subject,raised_by",creation,DESC,1,1,0,1,0,,0,1,0,0,0,0,0,2025-09-25 11:10:53.556731
+Issue Priority,Support,0,0,0,0,Prompt,,,,creation,ASC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-08-16 19:23:40.697426
+Issue Type,Support,0,0,0,0,Prompt,,,,creation,DESC,1,1,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:09:53.242486
+Item,Stock,0,0,0,0,field:item_code,By fieldname,item_name,"item_name,description,item_group,customer_code",creation,DESC,1,1,0,1,0,,1,1,0,0,0,1,0,2025-12-15 20:08:35.634046
+Item Alternative,Stock,0,0,0,0,,,item_code,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:53.809482
+Item Attribute,Stock,0,0,0,0,field:attribute_name,By fieldname,,,creation,DESC,0,1,0,1,0,,0,1,0,0,0,0,0,2024-11-26 20:05:29.421714
+Item Attribute Value,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:54.109874
+Item Barcode,Stock,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2025-12-30 12:24:11.749128
+Item Customer Detail,Stock,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:54.332166
+Item Default,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-10-21 10:50:46.144721
+Item Group,Setup,0,0,0,0,field:item_group_name,By fieldname,,parent_item_group,creation,DESC,0,1,0,1,0,,0,0,0,0,1,1,0,2025-12-02 13:58:30.018021
+Item Lead Time,Stock,0,0,0,0,field:item_code,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-10-30 11:45:03.602345
+Item Manufacturer,Stock,0,0,0,0,,,item_code,,creation,ASC,1,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:09:54.784023
+Item Price,Stock,0,0,0,0,hash,Random,item_name,,creation,ASC,1,0,0,1,0,,0,1,0,0,0,0,0,2025-03-19 20:27:21.382369
+Item Quality Inspection Parameter,Stock,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:55.104213
+Item Reorder,Stock,0,0,1,0,hash,Random,,,creation,ASC,0,0,0,0,0,,1,0,0,1,0,0,0,2025-12-02 16:02:23.254963
+Item Supplier,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:55.339052
+Item Tax,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:55.445934
+Item Tax Template,Accounts,0,0,0,0,,,title,,creation,DESC,0,1,0,1,0,,1,1,0,0,0,1,0,2024-03-27 13:09:55.573483
+Item Tax Template Detail,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:55.735360
+Item Variant,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:55.854357
+Item Variant Attribute,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-11-26 20:10:49.873339
+Item Variant Settings,Stock,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:18:23.005859
+Item Website Specification,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:56.223492
+Item Wise Tax Detail,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2025-09-26 15:54:19.750714
+Job Card,Manufacturing,0,0,0,1,naming_series:,"By ""Naming Series"" field",operation,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-12-22 14:20:07.817118
+Job Card Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-04 14:30:19.472294
+Job Card Operation,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-08-20 21:44:43.941434
+Job Card Scheduled Time,Manufacturing,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:09:57.211836
+Job Card Scrap Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-07-29 13:09:57.323835
+Job Card Time Log,Manufacturing,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-13 14:27:46.788056
+Journal Entry,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,"voucher_type,posting_date, due_date, cheque_no",creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2026-02-03 14:40:39.944524
+Journal Entry Account,Accounts,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-27 12:23:33.157655
+Journal Entry Template,Accounts,0,0,0,0,field:template_title,,template_title,"voucher_type, company",creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:09:58.814734
+Journal Entry Template Account,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-09 13:16:27.615083
+Kanban Board,Desk,0,0,0,0,field:kanban_board_name,By fieldname,,,creation,DESC,0,1,0,0,0,,1,1,1,0,0,0,0,2024-03-23 16:03:28.240133
+Kanban Board Column,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:28.384170
+Landed Cost Item,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-11-12 18:12:47.107898
+Landed Cost Purchase Receipt,Stock,0,0,1,0,,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-06-11 08:53:11.869853
+Landed Cost Taxes and Charges,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-07-16 15:27:59.175530
+Landed Cost Vendor Invoice,Stock,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-07-30 23:15:43.737772
+Landed Cost Voucher,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,1,0,2025-08-27 00:41:53.537375
+Language,Core,0,0,0,0,field:language_code,By fieldname,language_name,language_name,creation,DESC,0,0,0,0,0,,0,1,0,1,0,0,0,2024-07-21 08:25:25.130166
+LDAP Group Mapping,Integrations,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:28.603657
+LDAP Settings,Integrations,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,1,1,1,1,0,0,0,2024-03-23 16:03:28.700269
+Lead,CRM,0,0,0,0,naming_series:,"By ""Naming Series"" field",title,"lead_name,lead_owner,status",creation,DESC,0,1,0,1,0,,0,0,0,0,0,1,0,2025-06-26 11:02:01.158901
+Ledger Health,Accounts,0,0,0,0,autoincrement,Autoincrement,,,modified,DESC,0,0,0,0,0,,0,0,1,1,0,0,0,2024-04-09 11:16:07.044484
+Ledger Health Monitor,Accounts,0,1,0,0,,,,,modified,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2024-03-27 10:14:16.511681
+Ledger Health Monitor Company,Accounts,0,0,1,0,,,,,modified,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 10:06:22.806155
+Ledger Merge,Accounts,0,0,0,0,format:{account_name} merger on {creation},Expression,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:02.198009
+Ledger Merge Accounts,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:02.352067
+Letter Head,Printing,0,0,0,0,field:letter_head_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2024-04-12 10:30:25.793932
+Linked Location,Assets,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-02-22 16:03:42.113322
+List Filter,Desk,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,1,1,0,0,0,2024-03-23 16:03:29.075357
+List View Settings,Desk,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,1,0,0,0,0,2025-12-12 14:26:20.920434
+Location,Assets,0,0,0,0,field:location_name,By fieldname,,,creation,DESC,1,1,0,1,0,,1,1,0,0,1,1,0,2025-04-29 13:53:13.488906
+Log Setting User,Core,0,0,1,0,field:user,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:29.303855
+Log Settings,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:29.392292
+Logs To Clear,Core,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:29.489001
+Lost Reason Detail,CRM,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:02.759568
+Lot,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.509024
+Lot Transformation,Yam Agri Qms Trace,1,0,0,0,XFORM-.YYYY.-.#####,Expression,,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2026-02-22 08:45:33.573322
+Lot Transformation Line,Yam Agri Qms Trace,1,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2026-02-22 08:25:13.659154
+Lower Deduction Certificate,Regional,0,0,0,0,field:certificate_no,By fieldname,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-04-18 15:25:25.808355
+Loyalty Point Entry,Accounts,0,0,0,0,,,customer,,creation,DESC,1,0,0,0,0,,1,1,0,1,0,0,0,2024-07-01 08:51:13.927009
+Loyalty Point Entry Redemption,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:03.240439
+Loyalty Program,Accounts,0,0,0,0,field:loyalty_program_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:03.361383
+Loyalty Program Collection,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-09-06 09:26:03.323912
+Maintenance Schedule,Maintenance,0,0,0,1,naming_series:,"By ""Naming Series"" field",,"status,customer,customer_name",creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:10:03.659952
+Maintenance Schedule Detail,Maintenance,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:03.867515
+Maintenance Schedule Item,Maintenance,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:03.992727
+Maintenance Team Member,Assets,0,0,1,0,field:team_member,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:04.127108
+Maintenance Visit,Maintenance,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"status,maintenance_type,customer,customer_name,mntc_date,company",creation,DESC,0,0,0,0,0,,0,0,0,0,0,1,0,2024-03-27 13:10:04.257508
+Maintenance Visit Purpose,Maintenance,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:04.435746
+Manufacturer,Stock,0,0,0,0,field:short_name,,short_name,"short_name, full_name",creation,DESC,0,1,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:10:04.558108
+Manufacturing Settings,Manufacturing,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2026-01-02 18:18:05.759229
+Market Segment,CRM,0,0,0,0,field:market_segment,By fieldname,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2025-12-17 12:09:34.687368
+Master Production Schedule,Manufacturing,0,0,0,0,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-11-13 19:15:36.090622
+Master Production Schedule Item,Manufacturing,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-09-02 19:41:27.167095
+Material Request,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,"status,transaction_date",creation,DESC,1,0,0,1,0,,0,0,0,0,0,1,0,2026-01-21 12:48:40.792323
+Material Request Item,Stock,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-06 20:47:27.317226
+Material Request Plan Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-10-30 17:01:25.996352
+Milestone,Automation,0,0,0,0,,,reference_type,,creation,DESC,1,0,0,0,0,,0,1,0,1,0,0,0,2024-03-23 16:03:29.694506
+Milestone Tracker,Automation,0,0,0,0,format:{document_type}-{track_field},,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:29.801483
+Mode of Payment,Accounts,0,0,0,0,field:mode_of_payment,,,,creation,ASC,1,1,0,1,0,,0,0,0,0,0,1,0,2024-08-16 19:22:42.942264
+Mode of Payment Account,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:05.748999
+Module Def,Core,0,0,0,0,field:module_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,1,0,2024-09-18 12:39:19.512528
+Module Onboarding,Desk,0,0,0,0,Prompt,,,,creation,DESC,0,0,0,0,0,,1,1,1,0,0,0,0,2024-03-23 16:03:30.074327
+Module Profile,Core,0,0,0,0,field:module_profile_name,By fieldname,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:30.237678
+Monthly Distribution,Accounts,0,0,0,0,field:distribution_id,By fieldname,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:10:05.873547
+Monthly Distribution Percentage,Accounts,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:06.023385
+Navbar Item,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-11-15 14:12:19.803995
+Navbar Settings,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-05-01 14:09:54.587137
+Network Printer Settings,Printing,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:30.772015
+Non Conformance,Quality Management,0,0,0,0,format:QA-NC-{#####},,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:06.304357
+Nonconformance,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.616409
+Note,Desk,0,0,0,0,hash,Random,title,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2025-03-26 18:19:45.079747
+Note Seen By,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:31.419397
+Notification,Email,0,0,0,0,Prompt,Set by user,subject,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2025-10-21 23:14:52.345857
+Notification Log,Desk,0,0,0,0,,,subject,,creation,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2025-05-30 20:17:44.969738
+Notification Recipient,Email,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:31.847915
+Notification Settings,Desk,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,1,1,0,0,0,2025-04-16 17:15:25.641232
+Notification Subscribed Document,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:32.089922
+Number Card,Desk,0,0,0,0,,,label,"label, document_type",creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2025-09-17 21:00:11.351605
+Number Card Link,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:32.353267
+OAuth Authorization Code,Integrations,0,0,0,0,field:authorization_code,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:32.445085
+OAuth Bearer Token,Integrations,0,0,0,0,field:access_token,By fieldname,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-04-17 17:57:52.268893
+OAuth Client,Integrations,0,0,0,0,,,app_name,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-07-04 14:07:36.146393
+OAuth Client Role,Integrations,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-04-29 12:16:48.018031
+OAuth Provider Settings,Integrations,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:32.808772
+OAuth Scope,Integrations,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:32.890426
+OAuth Settings,Integrations,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-07-04 15:01:45.453238
+Onboarding Permission,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:32.987560
+Onboarding Step,Desk,0,0,0,0,prompt,Set by user,,,creation,DESC,1,0,0,0,0,,1,1,1,0,0,0,0,2024-03-23 16:03:33.078443
+Onboarding Step Map,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:33.218395
+Opening Invoice Creation Tool,Accounts,0,1,0,0,,,,,creation,DESC,1,0,1,0,0,,1,1,0,0,0,0,1,2024-03-27 13:10:06.564397
+Opening Invoice Creation Tool Item,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-01 16:18:07.997594
+Operation,Manufacturing,0,0,0,0,Prompt,Set by user,,,creation,DESC,1,1,0,1,0,,0,1,0,0,0,0,0,2025-08-04 16:14:57.659318
+Opportunity,CRM,0,0,0,0,naming_series:,"By ""Naming Series"" field",title,"status,transaction_date,party_name,opportunity_type,territory,company",creation,DESC,0,1,0,1,0,,1,0,0,0,0,1,0,2025-08-11 13:35:39.476016
+Opportunity Item,CRM,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:07.307773
+Opportunity Lost Reason,CRM,0,0,0,0,field:lost_reason,,,,creation,DESC,1,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:07.445661
+Opportunity Lost Reason Detail,CRM,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:07.582746
+Opportunity Type,CRM,0,0,0,0,Prompt,Set by user,,,creation,DESC,1,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:10:07.690090
+Overdue Payment,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:07.823644
+Package,Core,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:33.307130
+Package Import,Core,0,0,0,0,format:Package Import at {creation},Expression,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:33.422131
+Package Release,Core,0,0,0,0,,By script,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:33.536719
+Packed Item,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-07-09 19:12:45.850219
+Packing Slip,Stock,0,0,0,1,MAT-PAC-.YYYY.-.#####,Expression (old style),,delivery_note,creation,DESC,0,0,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:10:08.149919
+Packing Slip Item,Stock,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:08.352880
+Page,Core,0,0,0,0,field:page_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:33.657255
+Party Account,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:08.489183
+Party Link,Accounts,0,0,0,0,ACC-PT-LNK-.###.,,primary_party,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:08.607170
+Party Specific Item,Selling,0,0,0,0,,,party,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:10:08.752476
+Party Type,Setup,0,0,0,0,field:party_type,,,,creation,DESC,0,0,0,0,0,,1,1,0,1,0,1,0,2024-03-27 13:10:08.874345
+Patch Log,Core,0,0,0,0,hash,Random,patch,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:34.014409
+Pause SLA On Status,Support,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:09.017196
+Payment Entry,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2025-12-18 13:56:40.206038
+Payment Entry Deduction,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-08-13 06:52:46.130142
+Payment Entry Reference,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-05 14:18:03.286224
+Payment Gateway Account,Accounts,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-07-14 16:49:55.210352
+Payment Ledger Entry,Accounts,0,0,0,0,,,,"voucher_no, against_voucher_no",creation,DESC,0,1,0,0,0,,1,0,0,1,0,0,0,2024-03-27 13:10:09.967095
+Payment Order,Accounts,0,0,0,1,naming_series:,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:10.186727
+Payment Order Reference,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:10.347330
+Payment Reconciliation,Accounts,0,1,0,0,,,,,creation,DESC,0,0,1,0,0,,0,0,0,0,0,0,0,2024-04-23 12:38:29.557315
+Payment Reconciliation Allocation,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-08-20 19:12:50.406769
+Payment Reconciliation Invoice,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:10.857341
+Payment Reconciliation Payment,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-10-29 16:24:43.021230
+Payment Request,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,0,0,,0,0,0,1,0,0,0,2025-08-29 11:52:48.555415
+Payment Schedule,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-07-31 08:38:25.820701
+Payment Term,Accounts,0,0,0,0,field:payment_term_name,,,,creation,DESC,1,1,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:10:11.511137
+Payment Terms Template,Accounts,0,0,0,0,field:template_name,By fieldname,,,creation,DESC,0,1,0,1,0,,1,1,0,0,0,0,0,2024-04-07 11:26:42.021585
+Payment Terms Template Detail,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:11.829680
+Pegged Currencies,Accounts,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-06-02 11:46:31.936714
+Pegged Currency Details,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-06-17 14:11:16.521193
+Period Closing Voucher,Accounts,0,0,0,1,ACC-PCV-.YYYY.-.#####,Expression (old style),closing_account_head,"fiscal_year, period_start_date, period_end_date",creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-08-30 17:22:45.291628
+Permission Inspector,Core,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,1,2024-03-23 16:03:34.140177
+Permission Log,Core,0,0,0,0,hash,Random,changed_by,,modified,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-09-25 17:23:31.599897
+Permission Type,Core,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,1,1,0,0,0,2025-11-13 16:17:58.536849
+Personal Data Deletion Request,Website,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:34.247405
+Personal Data Deletion Step,Website,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:34.371453
+Personal Data Download Request,Website,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:34.487641
+Pick List,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,modified,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-10-03 18:36:52.282355
+Pick List Item,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-18 21:09:12.737036
+Plaid Settings,ERPNext Integrations,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:13.672028
+Plant Floor,Manufacturing,0,0,0,0,field:floor_name,By fieldname,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-09-25 10:27:41.139634
+Portal Menu Item,Website,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:34.594033
+Portal Settings,Website,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:34.722063
+Portal User,Utilities,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:13.951962
+POS Closing Entry,Accounts,0,0,0,1,POS-CLO-.YYYY.-.#####,Expression (old style),,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-06-14 02:38:14.962291
+POS Closing Entry Detail,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:14.302402
+POS Closing Entry Taxes,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-06-06 11:54:02.414461
+POS Customer Group,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:14.539093
+POS Field,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:14.648160
+POS Invoice,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"posting_date, due_date, customer, base_grand_total, outstanding_amount",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2026-01-29 21:20:51.376875
+POS Invoice Item,Accounts,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-11-12 18:11:11.818015
+POS Invoice Merge Log,Accounts,0,0,0,1,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-07-02 17:08:04.747202
+POS Invoice Reference,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:15.790122
+POS Item Group,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:15.920412
+POS Opening Entry,Accounts,0,0,0,1,POS-OPE-.YYYY.-.#####,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:16.034296
+POS Opening Entry Detail,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:16.209635
+POS Payment Method,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:16.345262
+POS Profile,Accounts,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-06-24 11:19:19.834905
+POS Profile User,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:16.846276
+POS Search Fields,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-07-29 18:08:40.323579
+POS Settings,Accounts,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-09 17:30:41.476806
+Prepared Report,Core,0,0,0,0,hash,Random,report_name,,creation,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2024-12-20 10:18:19.174608
+Price List,Stock,0,0,0,0,field:price_list_name,By fieldname,,currency,creation,ASC,0,1,0,1,0,,0,0,0,0,0,1,0,2024-08-16 19:41:19.591111
+Price List Country,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:17.401786
+Pricing Rule,Accounts,0,0,0,0,naming_series:,"By ""Naming Series"" field",title,,creation,DESC,0,1,0,1,0,,0,0,0,0,0,1,0,2025-08-20 11:40:07.096854
+Pricing Rule Brand,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:17.857046
+Pricing Rule Detail,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:17.968137
+Pricing Rule Item Code,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:18.103860
+Pricing Rule Item Group,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:18.221095
+Print Format,Printing,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2025-09-23 10:39:51.123539
+Print Format Field Template,Printing,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:35.138827
+Print Heading,Printing,0,0,0,0,field:print_heading,By fieldname,,print_heading,creation,DESC,1,1,0,1,0,,0,0,0,0,0,0,0,2025-06-26 05:40:55.559700
+Print Settings,Printing,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2026-01-10 11:54:14.176810
+Print Style,Printing,0,0,0,0,field:print_style_name,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:35.511731
+Process Deferred Accounting,Accounts,0,0,0,1,ACC-PDA-.#####,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:18.458661
+Process Payment Reconciliation,Accounts,0,0,0,1,format:ACC-PPR-{#####},Expression,company,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-01-08 08:22:14.798085
+Process Payment Reconciliation Log,Accounts,0,0,0,0,format:PPR-LOG-{##},Expression,,"allocated, reconciled, total_allocations, reconciled_entries",creation,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2025-01-08 08:22:19.104975
+Process Payment Reconciliation Log Allocations,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-01-23 16:09:01.058574
+Process Period Closing Voucher,Accounts,0,0,0,1,format:Process-PCV-{###},Expression,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2025-11-05 11:40:24.996403
+Process Period Closing Voucher Detail,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-10-20 12:03:59.106931
+Process Statement Of Accounts,Accounts,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2025-10-07 12:19:20.719898
+Process Statement Of Accounts CC,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-12-11 12:10:39.772598
+Process Statement Of Accounts Customer,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:19.335889
+Process Subscription,Accounts,0,0,0,1,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:19.450675
+Product Bundle,Selling,0,0,0,0,,,,,creation,ASC,0,0,0,1,0,,0,0,0,0,0,0,0,2024-03-27 13:10:19.599302
+Product Bundle Item,Selling,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-05-08 10:08:01.818998
+Production Plan,Manufacturing,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,ASC,0,0,0,0,0,,0,0,0,0,0,0,0,2025-08-12 19:48:09.302503
+Production Plan Item,Manufacturing,0,0,1,0,hash,Random,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-06-03 13:10:20.252166
+Production Plan Item Reference,Manufacturing,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-05-07 17:47:36.244083
+Production Plan Material Request,Manufacturing,0,0,1,0,hash,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:20.526011
+Production Plan Material Request Warehouse,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:20.638727
+Production Plan Sales Order,Manufacturing,0,0,1,0,hash,Random,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-08-21 15:16:13.828240
+Production Plan Sub Assembly Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-11-03 14:33:50.677717
+Project,Projects,0,0,0,0,naming_series:,"By ""Naming Series"" field",project_name,"project_name,customer, status, priority, is_active",creation,DESC,1,1,0,1,0,,0,0,0,0,0,1,0,2025-08-21 17:57:58.314809
+Project Template,Projects,0,0,0,0,Prompt,Set by user,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2025-03-12 14:20:57.301906
+Project Template Task,Projects,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:21.458334
+Project Type,Projects,0,0,0,0,field:project_type,,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-08-16 19:24:29.480229
+Project Update,Projects,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:21.721160
+Project User,Projects,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:21.859474
+Projects Settings,Projects,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:18:28.414222
+Promotional Scheme,Accounts,0,0,0,0,Prompt,,,,creation,DESC,0,1,0,1,0,,1,1,0,0,0,0,0,2025-08-20 11:48:23.231081
+Promotional Scheme Price Discount,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-07-23 12:33:46.574950
+Promotional Scheme Product Discount,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-07-22 17:25:07.880984
+Property Setter,Custom,0,0,0,0,,,,"doc_type,property",creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:35.631784
+Prospect,CRM,0,0,0,0,field:company_name,By fieldname,company_name,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2025-03-06 11:31:49.083983
+Prospect Lead,CRM,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:22.993745
+Prospect Opportunity,CRM,0,0,1,0,autoincrement,Autoincrement,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:23.116345
+PSOA Cost Center,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-05-03 17:16:51.666461
+PSOA Project,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:23.351144
+Purchase Invoice,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,"posting_date, supplier, bill_no, base_grand_total, outstanding_amount",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2026-02-05 20:45:16.964500
+Purchase Invoice Advance,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-12-20 12:04:46.729972
+Purchase Invoice Item,Accounts,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-12-13 14:10:02.379392
+Purchase Order,Buying,0,0,0,1,naming_series:,"By ""Naming Series"" field",supplier_name,"status, transaction_date, supplier, grand_total",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2026-02-03 14:44:55.192192
+Purchase Order Item,Buying,0,0,1,0,hash,Random,,item_name,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-10-30 16:51:56.761673
+Purchase Order Item Supplied,Buying,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:25.280016
+Purchase Receipt,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,"status, posting_date, supplier",creation,DESC,0,0,0,1,0,,1,1,0,0,0,1,0,2026-01-29 21:24:30.652933
+Purchase Receipt Item,Stock,0,0,1,0,hash,Random,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-10-21 10:39:32.659933
+Purchase Receipt Item Supplied,Buying,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:26.235916
+Purchase Taxes and Charges,Accounts,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-24 18:22:56.886010
+Purchase Taxes and Charges Template,Accounts,0,0,0,0,,,title,,creation,DESC,0,1,0,1,0,,0,1,0,0,0,0,0,2024-03-27 13:10:26.945131
+Push Notification Settings,Integrations,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,1,2024-03-23 16:03:35.768559
+Putaway Rule,Stock,0,0,0,0,PUT-.####,Expression (old style),item_code,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-07-08 09:19:26.711470
+QA Check Execution,Yam Agri Qms Trace,1,0,0,0,QCE-.YYYY.-.#####,Expression,,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2026-02-21 21:40:00.217394
+QA Checkpoint Template,Yam Agri Qms Trace,1,0,0,0,,,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,0,0,2026-02-21 21:20:00.353467
+QCTest,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.698014
+Quality Action,Quality Management,0,0,0,0,format:QA-ACT-{#####},,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:27.562854
+Quality Action Resolution,Quality Management,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:27.714729
+Quality Feedback,Quality Management,0,0,0,0,format:QA-FB-{#####},,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:27.838693
+Quality Feedback Parameter,Quality Management,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:28.002632
+Quality Feedback Template,Quality Management,0,0,0,0,field:template,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:28.126214
+Quality Feedback Template Parameter,Quality Management,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:28.289038
+Quality Goal,Quality Management,0,0,0,0,field:goal,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:28.400976
+Quality Goal Objective,Quality Management,0,0,1,0,format:{####},Expression,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:28.564795
+Quality Inspection,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",,"item_code, report_date, reference_name",creation,ASC,0,0,0,0,0,,1,0,0,0,0,1,0,2025-12-24 15:21:03.240008
+Quality Inspection Parameter,Stock,0,0,0,0,field:parameter,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:28.861722
+Quality Inspection Parameter Group,Stock,0,0,0,0,field:group_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:29.001044
+Quality Inspection Reading,Stock,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:29.141984
+Quality Inspection Template,Stock,0,0,0,0,field:quality_inspection_template_name,,,,creation,DESC,0,1,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:10:29.303619
+Quality Meeting,Quality Management,0,0,0,0,format:QA-MEET-{YY}-{MM}-{DD},,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:29.470120
+Quality Meeting Agenda,Quality Management,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:29.623622
+Quality Meeting Minutes,Quality Management,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:29.730732
+Quality Procedure,Quality Management,0,0,0,0,field:quality_procedure_name,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,1,0,0,2024-03-27 13:10:29.849511
+Quality Procedure Process,Quality Management,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:30.055569
+Quality Review,Quality Management,0,0,0,0,format:QA-REV-{#####},,goal,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:30.167995
+Quality Review Objective,Quality Management,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:30.328235
+Query Parameters,Integrations,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:35.861622
+Quick Stock Balance,Stock,0,1,0,0,,,,,creation,DESC,1,0,1,0,0,,1,1,0,0,0,1,0,2024-03-27 13:10:30.449554
+Quotation,Selling,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"status,transaction_date,party_name,order_type",creation,DESC,0,0,0,1,0,,1,0,0,0,0,1,0,2026-01-29 21:18:48.836168
+Quotation Item,Selling,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-30 12:56:08.320190
+Quotation Lost Reason,Setup,0,0,0,0,field:order_lost_reason,By fieldname,,,creation,DESC,1,0,0,1,0,,0,0,0,0,0,0,0,2024-12-10 08:21:38.280627
+Quotation Lost Reason Detail,Setup,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:31.568485
+Recorder,Core,0,0,0,0,,,path,,duration,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2024-05-14 15:16:55.626656
+Recorder Query,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-05-13 17:13:20.785329
+Recorder Suggested Index,Core,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-05-14 17:43:57.231051
+Reminder,Automation,0,0,0,0,hash,Random,description,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:36.224060
+Rename Tool,Utilities,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2025-12-09 14:18:33.838623
+Report,Core,0,0,0,0,field:report_name,By fieldname,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,1,0,2025-08-28 18:28:32.510719
+Report Column,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:36.524357
+Report Filter,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:36.633258
+Repost Accounting Ledger,Accounts,0,0,0,1,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-06-03 17:30:37.012593
+Repost Accounting Ledger Items,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:32.170897
+Repost Accounting Ledger Settings,Accounts,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,1,0,0,0,2026-01-02 18:19:08.888368
+Repost Allowed Types,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:32.415806
+Repost Item Valuation,Stock,0,0,0,1,hash,Random,,,creation,DESC,0,0,0,1,0,,1,0,0,0,0,0,0,2025-12-24 14:59:15.512898
+Repost Payment Ledger,Accounts,0,0,0,1,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-06-03 17:31:04.472279
+Repost Payment Ledger Items,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-03-27 13:10:32.915489
+Request for Quotation,Buying,0,0,0,1,naming_series:,"By ""Naming Series"" field",,"status, transaction_date",creation,DESC,0,0,0,1,0,,0,0,0,0,0,1,0,2026-01-06 10:31:08.747043
+Request for Quotation Item,Buying,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-31 19:46:27.884592
+Request for Quotation Supplier,Buying,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-05 14:08:27.274538
+Role,Core,0,0,0,0,field:role_name,By fieldname,,,creation,DESC,1,1,0,0,0,,0,1,0,0,0,0,0,2026-01-28 15:58:11.939407
+Role Permission for Page and Report,Core,0,1,0,0,,,,,creation,DESC,1,0,1,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:36.991083
+Role Profile,Core,0,0,0,0,role_profile,Expression (old style),role_profile,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-15 20:00:18.844434
+Role Replication,Core,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2024-06-24 19:26:54.279801
+Route History,Desk,0,0,0,0,,,route,,creation,DESC,0,0,1,0,0,,1,0,0,1,0,0,0,2024-03-23 16:03:37.217673
+Routing,Manufacturing,0,0,0,0,field:routing_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:33.725991
+RQ Job,Core,0,0,0,0,field:job_id,By fieldname,job_name,,creation,DESC,0,0,1,0,0,,1,0,0,1,0,0,0,2024-03-23 16:03:37.325708
+RQ Worker,Core,0,0,0,0,,,pid,,creation,DESC,0,0,1,0,0,,1,0,0,1,0,0,0,2024-03-23 16:03:37.451604
+Sales Forecast,Manufacturing,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2026-01-02 15:09:32.165242
+Sales Forecast Item,Manufacturing,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-08-18 21:59:38.859082
+Sales Invoice,Accounts,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"posting_date, due_date, customer, base_grand_total, outstanding_amount",creation,DESC,1,0,0,1,0,,0,1,0,0,0,1,0,2026-02-06 20:43:44.732805
+Sales Invoice Advance,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-12-20 11:58:28.962370
+Sales Invoice Item,Accounts,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-09-04 11:08:25.583561
+Sales Invoice Payment,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:36.427565
+Sales Invoice Reference,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-03-20 01:14:57.890299
+Sales Invoice Timesheet,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-23 13:54:17.677187
+Sales Order,Selling,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"status,transaction_date,customer,customer_name, territory,order_type,company",creation,DESC,0,0,0,1,0,,1,1,0,0,0,1,0,2026-02-06 11:06:16.092658
+Sales Order Item,Selling,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-10-13 10:57:43.378448
+Sales Partner,Setup,0,0,0,0,field:partner_name,,,,creation,ASC,0,1,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:10:37.455664
+Sales Partner Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:37.651093
+Sales Partner Type,Selling,0,0,0,0,field:sales_partner_type,By fieldname,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:37.773308
+Sales Person,Setup,0,0,0,0,field:sales_person_name,By fieldname,,parent_sales_person,creation,ASC,0,1,0,1,0,,0,0,0,0,1,1,0,2024-03-27 13:10:37.891377
+Sales Stage,CRM,0,0,0,0,field:stage_name,By fieldname,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:38.067960
+Sales Taxes and Charges,Accounts,0,0,1,0,,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-07-24 15:08:34.381704
+Sales Taxes and Charges Template,Accounts,0,0,0,0,,,title,,creation,ASC,0,1,0,1,0,,0,1,0,0,0,0,0,2024-03-27 13:10:38.343481
+Sales Team,Selling,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:38.504580
+Salutation,Contacts,0,0,0,0,field:salutation,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:37.726490
+Scheduled Job Log,Core,0,0,0,0,,,scheduled_job_type,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:37.828186
+Scheduled Job Type,Core,0,0,0,0,,,method,,creation,DESC,1,0,0,0,0,,1,1,0,1,0,0,0,2025-12-17 12:02:56.228336
+Scheduler Event,Core,0,0,0,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,1,0,0,0,2025-01-14 10:49:21.304114
+Selling Settings,Selling,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2026-01-23 00:04:33.105916
+Serial and Batch Bundle,Stock,0,0,0,1,hash,Random,item_code,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-09-24 16:24:48.154853
+Serial and Batch Entry,Stock,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2026-01-11 11:05:10.789054
+Serial No,Stock,0,0,0,0,field:serial_no,By fieldname,,item_code,creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2025-12-24 20:14:52.942251
+Server Script,Core,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-09-02 11:11:07.528661
+Service Day,Support,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:39.401960
+Service Level Agreement,Support,0,0,0,0,format:SLA-{document_type}-{service_level},Expression,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:39.518860
+Service Level Priority,Support,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:39.731977
+Session Default,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:38.225606
+Session Default Settings,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:38.318576
+Share Balance,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-10 08:06:40.611761
+Share Transfer,Accounts,0,0,0,1,ACC-SHT-.YYYY.-.#####,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:40.003178
+Share Type,Accounts,0,0,0,0,field:title,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:40.190914
+Shareholder,Accounts,0,0,0,0,naming_series:,"By ""Naming Series"" field",title,folio_no,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:40.356171
+Shipment,Stock,0,0,0,1,SHIPMENT-.#####,Expression,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2026-01-16 14:59:28.547953
+Shipment Delivery Note,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:41.282195
+Shipment Parcel,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:41.396354
+Shipment Parcel Template,Stock,0,0,0,0,field:parcel_template_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:41.521126
+Shipping Rule,Accounts,0,0,0,0,field:label,,,,creation,ASC,0,0,0,1,0,,0,0,0,0,0,0,0,2024-03-27 13:10:41.653314
+Shipping Rule Condition,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:41.848136
+Shipping Rule Country,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:41.965545
+Sidebar Item Group,Desk,0,0,0,0,field:sidebar,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-11-13 10:03:42.852599
+Sidebar Item Group Link,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-11-13 10:03:51.263771
+Site,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:14:17.067710
+SLA Fulfilled On Status,Support,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:42.898951
+Slack Webhook URL,Integrations,0,0,0,0,field:webhook_name,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:38.414990
+SMS Center,Selling,0,1,0,0,,,,,creation,DESC,0,0,1,0,0,,0,0,1,0,0,0,0,2024-03-27 13:10:43.007491
+SMS Log,Core,0,0,0,0,SYS-SMS-.#####,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:38.537041
+SMS Parameter,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-03-12 19:40:34.519601
+SMS Settings,Core,0,1,0,0,,,,,creation,DESC,0,0,1,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:38.762589
+Social Link Settings,Website,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:38.866493
+Social Login Key,Integrations,0,0,0,0,,,provider_name,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2025-07-03 12:47:01.696817
+South Africa VAT Account,Accounts,0,0,1,0,account,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:43.141409
+South Africa VAT Settings,Regional,0,0,0,0,field:company,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:43.257718
+Stock Closing Balance,Stock,0,0,0,0,,,,,creation,DESC,0,0,1,0,0,,0,0,0,1,0,0,0,2024-12-10 21:56:36.633567
+Stock Closing Entry,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-12-29 10:35:32.507988
+Stock Entry,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",stock_entry_type,"posting_date, from_warehouse, to_warehouse, purpose, remarks",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2025-10-13 15:09:23.905118
+Stock Entry Detail,Stock,0,0,1,0,hash,Random,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-10-16 11:50:50.573443
+Stock Entry Type,Stock,0,0,0,0,Prompt,Set by user,,,creation,ASC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-09-04 13:03:31.283348
+Stock Ledger Entry,Stock,0,0,0,0,MAT-SLE-.YYYY.-.#####,Expression (old style),,,creation,DESC,0,0,1,0,0,,0,0,0,1,0,0,0,2025-10-04 09:59:15.546556
+Stock Reconciliation,Stock,0,0,0,1,naming_series:,"By ""Naming Series"" field",,posting_date,creation,DESC,0,0,0,0,0,,0,0,0,0,0,1,0,2025-08-04 19:21:20.179658
+Stock Reconciliation Item,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-11-20 15:27:13.868179
+Stock Reposting Settings,Stock,0,1,0,0,,,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,1,2026-01-02 18:18:57.115176
+Stock Reservation Entry,Stock,0,0,0,1,MAT-SRE-.YYYY.-.#####,Expression (old style),voucher_no,,creation,DESC,0,0,1,0,0,,1,1,0,1,0,0,0,2025-11-10 16:09:10.380024
+Stock Settings,Stock,0,1,0,0,,,,,creation,ASC,1,0,0,0,0,,0,1,0,0,0,0,0,2026-02-09 15:01:12.466175
+Sub Operation,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-08-04 16:15:11.425349
+Subcontracting BOM,Subcontracting,0,0,0,0,format:SB-{####},Expression,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:45.904619
+Subcontracting Inward Order,Subcontracting,0,0,0,1,naming_series:,"By ""Naming Series"" field",customer_name,"status, transaction_date, customer",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2025-12-09 15:52:55.781346
+Subcontracting Inward Order Item,Subcontracting,0,0,1,0,hash,Random,,item_name,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-10-18 18:04:04.204651
+Subcontracting Inward Order Received Item,Subcontracting,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-11-03 17:46:49.905804
+Subcontracting Inward Order Scrap Item,Subcontracting,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-10-14 10:28:30.192350
+Subcontracting Inward Order Service Item,Subcontracting,0,0,1,0,hash,Random,,item_name,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-09-05 13:33:49.154869
+Subcontracting Order,Subcontracting,0,0,0,1,naming_series:,"By ""Naming Series"" field",supplier_name,"status, transaction_date, supplier",creation,DESC,0,0,0,1,0,,0,1,0,0,0,1,0,2025-11-14 10:31:40.682892
+Subcontracting Order Item,Subcontracting,0,0,1,0,hash,Random,,item_name,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-11-03 12:29:45.156101
+Subcontracting Order Service Item,Subcontracting,0,0,1,0,hash,Random,,item_name,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-11-13 16:04:45.020225
+Subcontracting Order Supplied Item,Subcontracting,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-10-30 16:00:43.379828
+Subcontracting Receipt,Subcontracting,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,"status, posting_date, supplier",creation,DESC,0,0,0,0,0,,1,1,0,1,0,1,0,2025-10-08 21:43:27.065640
+Subcontracting Receipt Item,Subcontracting,0,0,1,0,hash,Random,,,modified,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-09-26 12:00:38.877638
+Subcontracting Receipt Supplied Item,Subcontracting,0,0,1,0,,Autoincrement,,,modified,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-05-27 12:33:58.772638
+Submission Queue,Core,0,0,0,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,1,2024-03-23 16:03:39.111282
+Subscription,Accounts,0,0,0,0,ACC-SUB-.YYYY.-.#####,Expression (old style),,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-12-23 19:42:52.036034
+Subscription Invoice,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:47.880704
+Subscription Plan,Accounts,0,0,0,0,field:plan_name,By fieldname,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:47.998597
+Subscription Plan Detail,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:48.168122
+Subscription Settings,Accounts,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:18:34.671062
+Success Action,Core,0,0,0,0,field:ref_doctype,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:03:39.228220
+Supplier,Buying,0,0,0,0,naming_series:,"By ""Naming Series"" field",supplier_name,supplier_group,creation,ASC,1,1,0,1,0,,0,1,0,0,0,1,0,2026-02-06 12:58:01.398824
+Supplier Group,Setup,0,0,0,0,field:supplier_group_name,By fieldname,,,creation,ASC,0,1,0,1,0,,0,0,0,0,1,1,0,2025-12-02 13:57:57.814686
+Supplier Group Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:48.895401
+Supplier Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:48.995425
+Supplier Number At Customer,Selling,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-04-27 12:00:04.890068
+Supplier Quotation,Buying,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,"status, transaction_date, supplier,grand_total",creation,DESC,0,0,0,1,0,,0,0,0,0,0,1,0,2026-01-29 21:23:13.778468
+Supplier Quotation Item,Buying,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-06-17 12:05:52.441645
+Supplier Scorecard,Buying,0,0,0,0,field:supplier,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:49.727302
+Supplier Scorecard Criteria,Buying,0,0,0,0,field:criteria_name,By fieldname,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:49.920492
+Supplier Scorecard Period,Buying,0,0,0,1,naming_series:,,,,creation,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2024-03-27 13:10:50.051033
+Supplier Scorecard Scoring Criteria,Buying,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:50.201230
+Supplier Scorecard Scoring Standing,Buying,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:50.322056
+Supplier Scorecard Scoring Variable,Buying,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:50.456611
+Supplier Scorecard Standing,Buying,0,0,0,0,field:standing_name,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:50.574065
+Supplier Scorecard Variable,Buying,0,0,0,0,field:variable_label,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:50.711158
+Support Search Source,Support,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:50.849602
+Support Settings,Support,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2026-01-02 18:18:11.475222
+System Console,Desk,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-05-28 09:26:57.614890
+System Health Report,Desk,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,1,2024-05-02 13:32:16.495750
+System Health Report Errors,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-04-19 17:10:43.199907
+System Health Report Failing Jobs,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-04-22 11:46:53.574720
+System Health Report Queue,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-04-19 15:47:47.592170
+System Health Report Tables,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-04-19 15:46:57.993123
+System Health Report Workers,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2024-04-19 15:44:52.298443
+System Settings,Core,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2026-01-02 18:13:45.430712
+Tag,Desk,0,0,0,0,Prompt,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2024-03-23 16:03:39.682626
+Tag Link,Desk,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,1,0,1,0,0,0,0,2025-02-04 12:02:03.779623
+Target Detail,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:51.347225
+Task,Projects,0,0,0,0,TASK-.YYYY.-.#####,Expression (old style),subject,subject,creation,DESC,1,0,0,1,0,,0,0,0,0,1,1,0,2025-10-16 08:39:12.214577
+Task Depends On,Projects,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:51.702279
+Task Type,Projects,0,0,0,0,Prompt,Set by user,,,creation,ASC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-03-27 13:10:51.823692
+Tax Category,Accounts,0,0,0,0,field:title,By fieldname,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:51.976600
+Tax Rule,Accounts,0,0,0,0,ACC-TAX-RULE-.YYYY.-.#####,,,,creation,DESC,0,1,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:10:52.121252
+Tax Withholding Account,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-04-30 10:26:48.218294
+Tax Withholding Category,Accounts,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,1,0,,1,1,0,0,0,0,0,2025-07-30 07:13:51.785735
+Tax Withholding Entry,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-12-22 09:07:26.701207
+Tax Withholding Group,Accounts,0,0,0,0,field:group_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-06-29 05:25:50.243710
+Tax Withholding Rate,Accounts,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-06-29 05:31:05.120377
+Telephony Call Type,Telephony,0,0,0,1,field:call_type,By fieldname,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:52.942655
+Terms and Conditions,Setup,0,0,0,0,field:title,By fieldname,,,creation,ASC,1,1,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:10:53.065872
+Territory,Setup,0,0,0,0,field:territory_name,By fieldname,,"parent_territory,territory_manager",creation,DESC,0,1,0,1,0,,0,0,0,0,1,1,0,2025-12-02 13:58:55.190485
+Territory Item,Accounts,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:53.433659
+Timesheet,Projects,0,0,0,1,naming_series:,"By ""Naming Series"" field",title,,creation,ASC,0,0,0,1,0,,1,0,0,0,0,0,0,2025-12-19 13:48:23.453636
+Timesheet Detail,Projects,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:53.799414
+ToDo,Desk,0,0,0,0,hash,,description,"description, reference_type, reference_name",creation,DESC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:03:58.758787
+Token Cache,Integrations,0,0,0,0,format:{connected_app}-{user},Expression,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,1,2024-03-23 16:03:58.980060
+Top Bar Item,Website,0,0,1,0,,,,,creation,ASC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:03:59.197387
+Transaction Deletion Record,Setup,0,0,0,1,TDL.####,Expression (old style),,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-18 15:02:46.427695
+Transaction Deletion Record Details,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-11-14 16:17:25.584675
+Transaction Deletion Record Item,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-14 16:17:47.755531
+Transaction Deletion Record To Delete,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-14 16:17:04.494126
+Translation,Core,0,0,0,0,hash,Random,source_text,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:03:59.551788
+UAE VAT Account,Regional,0,0,1,0,account,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:55.699335
+UAE VAT Settings,Regional,0,0,0,0,field:company,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:55.812173
+Unhandled Email,Email,0,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,1,0,0,0,2024-03-23 16:03:59.723830
+Unreconcile Payment,Accounts,0,0,0,1,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-10-10 12:03:50.022444
+Unreconcile Payment Entries,Accounts,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:10:57.224053
+UOM,Setup,0,0,0,0,field:uom_name,By fieldname,,,creation,ASC,1,1,0,1,0,,0,0,0,0,0,1,0,2025-08-21 18:59:27.900209
+UOM Category,Stock,0,0,0,0,field:category_name,,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:57.525335
+UOM Conversion Detail,Stock,0,0,1,0,hash,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-11-19 21:27:13.968771
+UOM Conversion Factor,Setup,0,0,0,0,MAT-UOM-CNV-.#####,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:57.756872
+User,Core,0,0,0,0,,,full_name,full_name,creation,DESC,1,1,0,1,0,,0,1,0,0,0,1,0,2026-01-12 16:04:21.542524
+User Document Type,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-07-12 17:32:15.721862
+User Email,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:00.460634
+User Group,Core,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:00.597980
+User Group Member,Core,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:00.733681
+User Invitation,Core,0,0,0,0,,,,,creation,DESC,1,1,0,0,0,,0,0,0,0,0,0,0,2025-07-26 11:52:46.984800
+User Permission,Core,0,0,0,0,,,user,,creation,DESC,0,0,0,1,0,,1,1,0,0,0,0,0,2025-12-01 06:55:21.174845
+User Role,Core,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-07-17 10:56:36.357715
+User Role Profile,Core,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:00.948988
+User Select Document Type,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:01.071552
+User Session Display,Core,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-09-10 11:43:47.325045
+User Social Login,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:01.200476
+User Type,Core,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:01.336002
+User Type Module,Core,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:01.539682
+UTM Campaign,Website,0,0,0,0,prompt,Set by user,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2024-06-28 15:05:14.714600
+UTM Medium,Website,0,0,0,0,prompt,Set by user,,,modified,DESC,1,1,0,0,0,,0,0,0,0,0,0,0,2024-06-28 15:04:51.679189
+UTM Source,Website,0,0,0,0,prompt,Set by user,,,modified,DESC,1,1,0,0,0,,0,0,0,0,0,0,0,2024-06-28 15:04:59.643513
+Variant Field,Stock,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:58.011300
+Vehicle,Setup,0,0,0,0,field:license_plate,By fieldname,,"license_plate,location,model",modified,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2025-01-24 06:22:33.129805
+Version,Core,0,0,0,0,hash,Random,docname,,creation,DESC,1,0,0,0,0,,0,1,0,1,0,0,0,2025-02-20 19:20:33.616072
+Video,Utilities,0,0,0,0,field:title,,,,creation,DESC,0,1,0,1,0,,1,1,0,0,0,0,0,2024-03-27 13:10:58.743905
+Video Settings,Utilities,0,1,0,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:58.942609
+View Log,Core,0,0,0,0,,,,,creation,DESC,1,0,0,0,0,,1,0,0,0,0,0,0,2025-02-20 19:21:33.012224
+Voice Call Settings,Telephony,0,0,0,0,field:user,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:59.080888
+Warehouse,Stock,0,0,0,0,,,,,creation,DESC,0,0,0,1,0,,0,1,0,0,1,1,0,2025-09-05 14:47:17.140099
+Warehouse Type,Stock,0,0,0,0,Prompt,,,,creation,ASC,1,0,0,0,0,,0,1,0,0,0,0,0,2024-03-27 13:10:59.427114
+Warranty Claim,Support,0,0,0,0,naming_series:,"By ""Naming Series"" field",customer_name,"status,customer,customer_name,territory",creation,DESC,0,0,0,1,0,,0,0,0,0,0,1,0,2024-03-27 13:10:59.601423
+Web Form,Website,0,0,0,0,,,title,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2025-12-12 16:29:35.806107
+Web Form Field,Website,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-10-13 16:53:27.147994
+Web Form List Column,Website,0,0,1,0,autoincrement,Autoincrement,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-09-24 22:28:54.931089
+Web Page,Website,0,0,0,0,,,title,title,creation,DESC,0,0,0,1,1,,0,1,0,0,0,1,0,2024-04-12 10:30:49.022735
+Web Page Block,Website,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:02.614392
+Web Page View,Website,0,0,0,0,,,path,,creation,DESC,1,0,0,1,0,,1,0,1,1,0,0,0,2025-02-20 19:20:47.267461
+Web Template,Website,0,0,0,0,Prompt,Set by user,,,creation,DESC,0,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:02.852688
+Web Template Field,Website,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:02.982364
+Webhook,Integrations,0,0,0,0,prompt,Set by user,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-07-18 18:22:38.276809
+Webhook Data,Integrations,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:03.331064
+Webhook Header,Integrations,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:03.419176
+Webhook Request Log,Integrations,0,0,0,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,1,0,0,0,2025-02-25 15:16:24.028963
+Website Attribute,Portal,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:59.786446
+Website Filter Field,Portal,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-27 13:10:59.895736
+Website Item Group,Setup,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:11:00.011403
+Website Meta Tag,Website,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:03.618341
+Website Route Meta,Website,0,0,0,0,Prompt,,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:03.714438
+Website Route Redirect,Website,0,0,1,0,,,,,creation,ASC,1,0,0,0,0,,0,0,0,0,0,0,0,2025-10-06 11:45:35.866316
+Website Script,Website,0,1,0,0,,,,,creation,ASC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:04:03.907275
+Website Settings,Website,0,1,0,0,,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:04:03.999928
+Website Sidebar,Website,0,0,0,0,field:title,,,,creation,DESC,1,1,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:04.210555
+Website Sidebar Item,Website,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:04.319910
+Website Slideshow,Website,0,0,0,0,field:slideshow_name,,,,creation,DESC,0,0,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:04:04.409255
+Website Slideshow Item,Website,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:04.516513
+Website Theme,Website,0,0,0,0,field:theme,By fieldname,,,creation,DESC,0,0,0,1,0,,0,1,0,0,0,0,0,2024-03-23 16:04:04.610086
+Website Theme Ignore App,Website,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:04.760483
+Work Order,Manufacturing,0,0,0,1,naming_series:,"By ""Naming Series"" field",production_item,,creation,ASC,0,0,0,1,0,,0,1,0,0,0,0,0,2025-10-12 14:24:57.699749
+Work Order Item,Manufacturing,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-12-02 11:16:05.081613
+Work Order Operation,Manufacturing,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-05-15 15:10:06.885440
+Workflow,Workflow,0,0,0,0,field:workflow_name,,,,creation,DESC,0,1,0,0,0,,0,1,0,0,0,1,0,2024-03-23 16:04:04.849665
+Workflow Action,Workflow,0,0,0,0,,,reference_name,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:04.989036
+Workflow Action Master,Workflow,0,0,0,0,field:workflow_action_name,,,,creation,DESC,1,1,0,0,0,,0,1,0,0,0,0,0,2024-03-23 16:04:05.108415
+Workflow Action Permitted Role,Workflow,0,0,1,0,hash,Random,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:05.199852
+Workflow Document State,Workflow,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,1,0,0,0,0,0,2025-11-08 10:16:23.592473
+Workflow State,Workflow,0,0,0,0,field:workflow_state_name,By fieldname,,,creation,DESC,1,0,0,1,0,,0,1,0,0,0,1,0,2024-03-23 16:04:05.395556
+Workflow Transition,Workflow,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2025-07-04 15:56:34.345888
+Workflow Transition Task,Workflow,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-07-14 12:13:18.108225
+Workflow Transition Tasks,Workflow,0,0,0,0,prompt,Set by user,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-07-08 12:23:01.908648
+Workspace,Desk,0,0,0,0,field:label,By fieldname,,,creation,DESC,0,1,0,0,0,,1,1,0,1,0,0,1,2024-09-26 15:47:24.710881
+Workspace Chart,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:05.810019
+Workspace Custom Block,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:05.916601
+Workspace Link,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-06-10 16:04:00.746903
+Workspace Number Card,Desk,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2024-03-23 16:04:06.156245
+Workspace Quick List,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2024-03-23 16:04:06.260947
+Workspace Shortcut,Desk,0,0,1,0,,,,,creation,DESC,1,0,0,0,0,,1,1,0,0,0,0,0,2025-03-27 20:23:13.192488
+Workspace Sidebar,Desk,0,0,0,0,field:title,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2026-02-02 12:35:38.009501
+Workspace Sidebar Item,Desk,0,0,1,0,hash,Random,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2026-01-12 15:35:56.930873
+Workstation,Manufacturing,0,0,0,0,field:workstation_name,By fieldname,,,creation,ASC,1,1,0,1,0,,0,1,0,0,0,1,0,2025-08-19 12:07:05.374386
+Workstation Cost,Manufacturing,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-08-17 19:21:02.725365
+Workstation Operating Component,Manufacturing,0,0,0,0,field:component_name,By fieldname,,,creation,DESC,0,1,0,0,0,,0,0,0,0,0,0,0,2025-08-17 19:23:47.510540
+Workstation Operating Component Account,Manufacturing,0,0,1,0,,,,,creation,DESC,0,1,0,0,0,,1,0,0,0,0,0,0,2025-08-17 19:24:01.487406
+Workstation Type,Manufacturing,0,0,0,0,field:workstation_type,By fieldname,,,creation,ASC,1,1,0,1,0,,0,1,0,0,0,1,0,2025-08-19 12:06:56.683558
+Workstation Working Hour,Manufacturing,0,0,1,0,,,,,creation,DESC,0,0,0,0,0,,1,0,0,0,0,0,0,2024-03-27 13:11:01.081988
+YAM Crop Variety,YAM Agri Core,1,0,0,0,field:variety_name,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.778049
+YAM Crop Variety Recommendation,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.859245
+YAM Plot,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:42.945822
+YAM Plot Yield,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:43.010384
+YAM Soil Test,YAM Agri Core,1,0,0,0,,,,,creation,DESC,0,0,0,0,0,,0,0,0,0,0,0,0,2026-02-22 16:03:43.080245
