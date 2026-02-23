@@ -1,0 +1,24 @@
+{
+  "doctype": "DocType",
+  "name": "Device",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "device_name", "fieldtype": "Data", "label": "Device Name"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {
+      "fieldname": "device_type",
+      "fieldtype": "Select",
+      "options": "Scale\nTemperature Sensor\nHumidity Sensor\nOther",
+      "label": "Device Type"
+    },
+    {"fieldname": "serial_number", "fieldtype": "Data", "label": "Serial Number"},
+    {"fieldname": "model", "fieldtype": "Data", "label": "Model"},
+    {"fieldname": "status", "fieldtype": "Select", "options": "Active\nInactive", "label": "Status"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "QA Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}

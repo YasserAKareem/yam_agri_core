@@ -1,0 +1,23 @@
+{
+  "doctype": "DocType",
+  "name": "ScaleTicket",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "ticket_number", "fieldtype": "Data", "label": "Ticket Number"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "device", "fieldtype": "Link", "options": "Device", "label": "Device"},
+    {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot"},
+    {"fieldname": "ticket_datetime", "fieldtype": "Datetime", "label": "Ticket Datetime"},
+    {"fieldname": "gross_kg", "fieldtype": "Float", "label": "Gross (kg)"},
+    {"fieldname": "tare_kg", "fieldtype": "Float", "label": "Tare (kg)"},
+    {"fieldname": "net_kg", "fieldtype": "Float", "label": "Net (kg)"},
+    {"fieldname": "vehicle", "fieldtype": "Data", "label": "Vehicle"},
+    {"fieldname": "driver", "fieldtype": "Data", "label": "Driver"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "QA Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}

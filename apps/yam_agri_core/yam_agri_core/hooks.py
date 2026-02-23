@@ -12,8 +12,24 @@ after_install = "yam_agri_core.yam_agri_core.install.after_install"
 after_migrate = "yam_agri_core.yam_agri_core.install.after_migrate"
 
 
+extend_bootinfo = "yam_agri_core.yam_agri_core.boot.extend_bootinfo"
+
+# Fallback for Frappe variants that use `boot_session` instead of `extend_bootinfo`.
+boot_session = "yam_agri_core.yam_agri_core.boot.boot_session"
+
+
 permission_query_conditions = {
 	"Site": "yam_agri_core.yam_agri_core.site_permissions.site_query_conditions",
+	"Lot": "yam_agri_core.yam_agri_core.site_permissions.lot_query_conditions",
+	"QCTest": "yam_agri_core.yam_agri_core.site_permissions.qc_test_query_conditions",
+	"Certificate": "yam_agri_core.yam_agri_core.site_permissions.certificate_query_conditions",
+	"Nonconformance": "yam_agri_core.yam_agri_core.site_permissions.nonconformance_query_conditions",
+	"Device": "yam_agri_core.yam_agri_core.site_permissions.device_query_conditions",
+	"Observation": "yam_agri_core.yam_agri_core.site_permissions.observation_query_conditions",
+	"ScaleTicket": "yam_agri_core.yam_agri_core.site_permissions.scale_ticket_query_conditions",
+	"Transfer": "yam_agri_core.yam_agri_core.site_permissions.transfer_query_conditions",
+	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_query_conditions",
+	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_query_conditions",
 	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_query_conditions",
 	"YAM Soil Test": "yam_agri_core.yam_agri_core.site_permissions.yam_soil_test_query_conditions",
 	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_query_conditions",

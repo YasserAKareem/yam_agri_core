@@ -1,0 +1,26 @@
+{
+  "doctype": "DocType",
+  "name": "Observation",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "device", "fieldtype": "Link", "options": "Device", "label": "Device"},
+    {"fieldname": "observed_at", "fieldtype": "Datetime", "label": "Observed At"},
+    {"fieldname": "observation_type", "fieldtype": "Data", "label": "Observation Type"},
+    {"fieldname": "value", "fieldtype": "Float", "label": "Value"},
+    {"fieldname": "unit", "fieldtype": "Data", "label": "Unit"},
+    {
+      "fieldname": "quality_flag",
+      "fieldtype": "Select",
+      "options": "OK\nQuarantine\nInvalid",
+      "label": "Quality Flag"
+    },
+    {"fieldname": "raw_payload", "fieldtype": "Long Text", "label": "Raw Payload"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "QA Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}

@@ -6,10 +6,37 @@ import frappe
 def after_install() -> None:
     ensure_site_geo_fields()
 
+    from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
+
+    # Dev convenience: workspace navigation + sample org chart (guarded)
+    from yam_agri_core.yam_agri_core.dev_seed import (
+        seed_dev_baseline_demo_data_if_enabled,
+        seed_dev_org_chart_if_enabled,
+    )
+    from yam_agri_core.yam_agri_core.workspace_setup import ensure_yam_agri_workspaces
+
+    ensure_workflow_states_from_active_workflows()
+    ensure_yam_agri_workspaces()
+    seed_dev_org_chart_if_enabled()
+    seed_dev_baseline_demo_data_if_enabled()
+
 
 def after_migrate() -> None:
     # Keeps dev/staging/prod consistent even if installed long ago.
     ensure_site_geo_fields()
+
+    from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
+
+    from yam_agri_core.yam_agri_core.dev_seed import (
+        seed_dev_baseline_demo_data_if_enabled,
+        seed_dev_org_chart_if_enabled,
+    )
+    from yam_agri_core.yam_agri_core.workspace_setup import ensure_yam_agri_workspaces
+
+    ensure_workflow_states_from_active_workflows()
+    ensure_yam_agri_workspaces()
+    seed_dev_org_chart_if_enabled()
+    seed_dev_baseline_demo_data_if_enabled()
 
 
 def ensure_site_geo_fields() -> None:

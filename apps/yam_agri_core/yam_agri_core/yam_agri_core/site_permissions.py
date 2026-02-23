@@ -133,3 +133,43 @@ def yam_crop_variety_query_conditions(user: str) -> str | None:
 
 def yam_crop_variety_recommendation_query_conditions(user: str) -> str | None:
     return build_site_query_condition("YAM Crop Variety Recommendation", user=user)
+
+
+def lot_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Lot", user=user)
+
+
+def qc_test_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("QCTest", user=user)
+
+
+def certificate_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Certificate", user=user)
+
+
+def nonconformance_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Nonconformance", user=user)
+
+
+def device_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Device", user=user)
+
+
+def observation_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Observation", user=user)
+
+
+def scale_ticket_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("ScaleTicket", user=user)
+
+
+def transfer_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Transfer", user=user)
+
+
+def evidence_pack_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("EvidencePack", user=user)
+
+
+def complaint_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("Complaint", user=user)

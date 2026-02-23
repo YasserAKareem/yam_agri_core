@@ -1,0 +1,30 @@
+{
+  "doctype": "DocType",
+  "name": "Transfer",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {
+      "fieldname": "transfer_type",
+      "fieldtype": "Select",
+      "options": "Split\nMerge\nBlend\nMove",
+      "label": "Transfer Type"
+    },
+    {"fieldname": "from_lot", "fieldtype": "Link", "options": "Lot", "label": "From Lot"},
+    {"fieldname": "to_lot", "fieldtype": "Link", "options": "Lot", "label": "To Lot"},
+    {"fieldname": "qty_kg", "fieldtype": "Float", "label": "Quantity (kg)"},
+    {"fieldname": "transfer_datetime", "fieldtype": "Datetime", "label": "Transfer Datetime"},
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "options": "Draft\nSubmitted\nApproved\nRejected",
+      "label": "Status"
+    },
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "QA Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}
