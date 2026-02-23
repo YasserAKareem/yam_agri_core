@@ -1,0 +1,16 @@
+{
+  "doctype": "DocType",
+  "name": "Crop",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "autoname": "field:crop_name",
+  "fields": [
+    {"fieldname": "crop_name", "fieldtype": "Data", "label": "Crop Name"},
+    {"fieldname": "description", "fieldtype": "Small Text", "label": "Description"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "Agriculture Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "QA Manager", "read": 1, "write": 0, "create": 0, "delete": 0}
+  ]
+}

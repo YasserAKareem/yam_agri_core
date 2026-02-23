@@ -11,7 +11,7 @@
 
 ### Get recommendations
 
-- Method: `yam_agri_core.api.agr_cereal_001.get_variety_recommendations`
+- Method: `yam_agri_core.yam_agri_core.api.agr_cereal_001.get_variety_recommendations`
 - Type: whitelisted, **no writes**
 - Site access: enforced via `User Permission` on `Site`
 
@@ -37,7 +37,21 @@ Example payload (JSON):
 
 ### Run demo
 
-- Method: `yam_agri_core.seed.agr_cereal_001_demo.run_demo`
+- Method: `yam_agri_core.yam_agri_core.seed.agr_cereal_001_demo.run_demo`
+
+## Sample data (writes)
+
+Create demo records (Site + Plot + Soil Test + Yield + Varieties) for Desk/report demos.
+
+- Method: `yam_agri_core.yam_agri_core.seed.agr_cereal_001_sample_data.create_sample_data`
+- Safety: requires `confirm=1`
+
+Example:
+
+```bash
+bench --site localhost execute yam_agri_core.yam_agri_core.seed.agr_cereal_001_sample_data.create_sample_data \
+  --kwargs '{"confirm": 1, "site_name": "DEMO-SITE", "crop_name": "Wheat", "plot_name": "P-001"}'
+```
 
 ## Report
 
