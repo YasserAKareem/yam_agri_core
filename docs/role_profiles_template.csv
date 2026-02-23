@@ -1,0 +1,13 @@
+Human Role Profile,Typical Job Title(s),Baseline Roles Included,Site Isolation Required?,Approval Authority?
+YAM Farm Ops (Field),Farm Manager; Field Supervisor,"Agriculture Manager; Stock User",Yes,No
+YAM Agronomist,Agronomist,"Agriculture Manager",Yes,No
+YAM Warehouse User,Warehouse Operator,"Stock User",Yes,No
+YAM Warehouse Manager,Warehouse Manager,"Stock Manager; Stock User",Yes,No
+YAM QA User,Lab Technician,"Quality Manager",Yes,No
+YAM QA Manager,QA Manager,"Quality Manager",Yes,Yes
+YAM Procurement User,Procurement Officer,"Purchase User",Yes,No
+YAM Procurement Manager,Procurement Lead,"Purchase Manager; Purchase User",Yes,No
+YAM Sales User,Sales Officer,"Sales User",Yes,No
+YAM Support,Customer Support,"Support Team",Yes,No
+YAM Compliance / Audit,Compliance; Auditor,"Auditor",Yes,No
+YAM IT / Admin,IT Admin,"System Manager",No,No

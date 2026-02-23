@@ -1,0 +1,13 @@
+Concept,Target DocType,Status,Existing DocType Candidates (from inventory),Proposed Approach (Reuse/Extend/New),Notes
+Site isolation root,Site,Present,Site,Reuse,"Already exists as custom DocType in YAM Agri Core; enforce Rule #1: every record belongs to a Site."
+Traceability unit,Lot,Present,Lot,Reuse,"Already exists as custom DocType in YAM Agri Core; confirm fields needed for cereals (crop, season, grade, batch/lot code)."
+Quality test,QCTest,Present,QCTest,Reuse,"Already exists as custom DocType in YAM Agri Core; align tests to season policy + certificate rules."
+Compliance certificate,Certificate,Present,Certificate,Reuse,"Already exists as custom DocType in YAM Agri Core; add expiry checks + mandatory attachments via EvidencePack or File links."
+CAPA / deviation,Nonconformance,Present,Nonconformance,Reuse,"Already exists as custom DocType in YAM Agri Core; ensure workflow approval for high-risk actions (QA Manager)."
+Physical storage container,StorageBin,Missing,"Bin; Location; Warehouse (not listed by name-match but exists in Stock module)",Extend or New,"Decide whether StorageBin is a true physical bin model (new DocType) or mapped onto ERPNext Stock (Warehouse/Bin) with a Site link."
+Device / sensor / scale,Device,Missing,Asset; Asset Activity; Asset Maintenance Log,Extend or New,"Option A: extend Asset with Site + device metadata; Option B: new Device DocType (preferred if Asset semantics don’t fit sensors)."
+Lot lineage event,Transfer,Missing,Stock Entry; Stock Entry Type; Asset Movement,Extend or New,"Prefer reusing Stock Entry for quantity movement; create Transfer DocType only if you need explicit split/merge/blend lineage independent of stock valuation."
+Weighing record,ScaleTicket,Missing,(none by keyword),New,"No standard weighbridge/scale DocType detected in snapshot; create ScaleTicket in YAM Agri Core and link to Lot + Site + optional Stock Entry."
+Audit evidence bundle,EvidencePack,Missing,File; Audit Trail; Document Follow,New (with reuse of File),"Use core File attachments for raw evidence; EvidencePack groups them by Site/date/audit/customer."
+Customer complaint,Complaint,Missing,Issue; Warranty Claim,Extend or New,"If Issue works for your process, extend it with Site + Lot linkage; otherwise create Complaint DocType for audit/traceability needs."
+Universal observation model,Observation,Missing,Access Log; Activity Log; API Request Log; Console Log,New,"No domain Observation DocType exists; create one for sensor/derived signals with quality_flag quarantine behavior."
