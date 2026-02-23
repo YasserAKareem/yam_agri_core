@@ -1,10 +1,11 @@
 # Project Charter — YAM Agri Platform V1.1
 
 > **SDLC Phase:** Initiation  
-> **Version:** 1.1  
-> **Status:** ⚠️ Draft — awaiting owner sign-off  
+> **Version:** 1.2  
+> **Status:** ✅ Approved — owner sign-off pending on v1.2  
 > **Date:** 2026-02-23  
 > **Owner:** YasserAKareem  
+> **Related:** [WBS & Gantt](../planning/WBS_AND_GANTT.md) | [Backlog & Features Inventory](../planning/BACKLOG_AND_FEATURES_INVENTORY.md) | [Excel WBS+Gantt](../planning/YAM_AGRI_WBS_GANTT.xlsx)  
 
 ---
 
@@ -145,18 +146,58 @@ YAM Agri aims to build a smart, valuable enterprise by using technology to:
 
 ## 5. Project Timeline (V1.1)
 
-| Phase | Description | Exit criteria |
-|-------|-------------|--------------|
-| Phase 0 | Dev runtime (Docker Compose) | Stack starts; Frappe login works |
-| Phase 1 | Custom app scaffolding | `yam_agri_core` app installs on dev site |
-| Phase 2 | Core DocTypes (12) | AT-01, AT-10 pass |
-| Phase 3 | Traceability engine | AT-03, AT-04, AT-05 pass |
-| Phase 4 | QA/QC controls + season policy | AT-02, AT-06 pass |
-| Phase 5 | Scale + Sensor integrations | AT-07, AT-08 pass |
-| Phase 6 | AI Assist layer (propose-only) | AI suggestions visible; no auto-actions |
-| Phase 7 | EvidencePack generator | AT-09 passes |
-| Phase 8 | Staging (k3s) | All 10 acceptance tests pass on staging |
-| Phase 9 | V1.1 release | Owner sign-off; release notes published |
+> Full WBS decomposition and Gantt chart: [docs/planning/WBS_AND_GANTT.md](../planning/WBS_AND_GANTT.md) | [docs/planning/YAM_AGRI_WBS_GANTT.xlsx](../planning/YAM_AGRI_WBS_GANTT.xlsx)
+
+### 5.1 Phase Summary
+
+| Phase | Description | Target dates | Milestone | Exit criteria |
+|-------|-------------|-------------|-----------|--------------|
+| Phase 0 | Dev runtime (Docker Compose) | W1–W2 (2026-02-23 → 2026-03-06) | M0 | Stack starts; Frappe login works |
+| Phase 1 | Custom app scaffolding | W2–W3 (→ 2026-03-13) | M1 | `yam_agri_core` app installs; CI green |
+| Phase 2 | Core DocTypes (12) | W3–W6 (→ 2026-04-03) | M2 | AT-01, AT-10 pass |
+| Phase 3 | Traceability engine | W6–W8 (→ 2026-04-17) | M3 | AT-03, AT-04, AT-05 pass |
+| Phase 4 | QA/QC controls + season policy | W8–W10 (→ 2026-05-01) | M4 | AT-02, AT-06 pass |
+| Phase 5 | Scale + Sensor integrations | W10–W12 (→ 2026-05-15) | M5 | AT-07, AT-08 pass |
+| Phase 6 | AI Assist layer (propose-only) | W12–W14 (→ 2026-05-29) | M6 | AI suggestions visible; governance tests pass |
+| Phase 7 | EvidencePack generator | W13–W15 (→ 2026-06-05) | M7 | AT-09 passes |
+| Phase 8 | Staging (k3s) | W15–W18 (→ 2026-06-26) | M8 | All 10 acceptance tests pass on staging |
+| Phase 9 | V1.1 release | W18–W20 (→ 2026-07-10) | M9 | Owner sign-off; release notes published; tag v1.1.0 |
+
+### 5.2 Summary Gantt (ASCII)
+
+```
+Phase                W1  W2  W3  W4  W5  W6  W7  W8  W9 W10 W11 W12 W13 W14 W15 W16 W17 W18 W19 W20
+Ph0 Dev Env          ███ ███
+Ph1 App Scaffold             ███
+Ph2 DocTypes (12)                ███ ███ ███
+Ph3 Traceability                         ███ ███
+Ph4 QA/QC + Season                               ███ ███
+Ph5 Scale + Sensor                                       ███ ███
+Ph6 AI Assist                                                    ███ ███
+Ph7 EvidencePack                                                 ███ ███
+Ph8 Staging k3s                                                          ███ ███ ███
+Ph9 V1.1 Release                                                                     ███ ███
+Doc Documentation    ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░ ░░░
+─────────────────────────────────────────────────────────────────────────────────────────────────────
+Milestone            M0          M1      M2          M3      M4      M5      M6-7    M8          M9
+```
+
+### 5.3 Effort Summary
+
+| Phase | Est. Effort |
+|-------|------------|
+| Ph0 Dev Environment | 7 dev-days |
+| Ph1 App Scaffolding | 5 dev-days |
+| Ph2 Core DocTypes (12) | 18 dev-days |
+| Ph3 Traceability Engine | 12 dev-days |
+| Ph4 QA/QC + Season Policy | 11 dev-days |
+| Ph5 Scale + Sensor | 10 dev-days |
+| Ph6 AI Assist | 12 dev-days |
+| Ph7 EvidencePack | 7 dev-days |
+| Ph8 Staging | 9 dev-days |
+| Ph9 Release | 4 dev-days |
+| Documentation (parallel) | 10 dev-days |
+| **Total V1.1** | **≈ 105 dev-days** |
 
 > **Rule:** Never start the next phase until the current phase's exit criteria are met on the dev environment, and never deploy to production until all 10 acceptance tests pass on staging.
 
@@ -166,13 +207,15 @@ YAM Agri aims to build a smart, valuable enterprise by using technology to:
 
 ### 6.1 Version Roadmap
 
-| Release | Focus | Key backlog stages | Approximate items |
-|---------|-------|--------------------|------------------|
-| **V1.1** | Quality + Traceability Core | — (ERP foundation) | Manual controls |
-| V1.2 | Storage & Harvest AI layer | D, E, F | AGR-CEREAL-028 → 055 |
-| V1.3 | Pre-season Planning & Field Ops AI | A, B, C | AGR-CEREAL-001 → 027 |
-| V2.0 | Logistics, Trading & Processing AI | G, H | AGR-CEREAL-056 → 071 |
-| V2.1+ | Customer, Market & Platform AI | I | AGR-CEREAL-072 → 080 |
+> Full backlog and features inventory: [docs/planning/BACKLOG_AND_FEATURES_INVENTORY.md](../planning/BACKLOG_AND_FEATURES_INVENTORY.md)
+
+| Release | Target | Focus | Key backlog stages | Items |
+|---------|--------|-------|--------------------|-------|
+| **V1.1** | 2026-Q3 | Quality + Traceability Core | — (ERP foundation) | 12 DocTypes, 50 FRs, 10 ATs |
+| V1.2 | 2026-Q4 | Storage & Harvest AI layer | D, E, F | AGR-CEREAL-028 → 055 (28 items) |
+| V1.3 | 2027-Q1 | Pre-season Planning & Field Ops AI | A, B, C | AGR-CEREAL-001 → 027 (27 items) |
+| V2.0 | 2027-Q3 | Logistics, Trading & Processing AI | G, H | AGR-CEREAL-056 → 071 (16 items) |
+| V2.1+ | 2028+ | Customer, Market & Platform AI | I | AGR-CEREAL-072 → 080 (9 items) |
 
 ### 6.2 AI Enhancement Strategy
 
@@ -220,3 +263,4 @@ The 80-item backlog (`docs/20260222 YAM_AGRI_BACKLOG v1.csv`) maps every stage o
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-02-23 | YasserAKareem | Initial charter — V1.1 scope |
+| 1.2 | 2026-02-23 | YasserAKareem | Added WBS-linked timeline (§5), dated milestones, effort totals, Gantt ASCII (§5.2), updated roadmap (§6.1) with item counts; added links to WBS_AND_GANTT.md and BACKLOG_AND_FEATURES_INVENTORY.md |
