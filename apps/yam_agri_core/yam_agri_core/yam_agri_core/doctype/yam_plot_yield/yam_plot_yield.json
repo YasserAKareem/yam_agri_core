@@ -1,0 +1,18 @@
+{
+  "doctype": "DocType",
+  "name": "YAM Plot Yield",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "plot", "fieldtype": "Link", "options": "YAM Plot", "label": "Plot"},
+    {"fieldname": "season", "fieldtype": "Data", "label": "Season"},
+    {"fieldname": "crop", "fieldtype": "Link", "options": "Crop", "label": "Crop"},
+    {"fieldname": "yield_kg_per_ha", "fieldtype": "Float", "label": "Yield (kg/ha)"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "Agriculture Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}

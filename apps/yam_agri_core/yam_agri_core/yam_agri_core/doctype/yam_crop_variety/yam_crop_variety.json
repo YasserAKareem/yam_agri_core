@@ -1,0 +1,20 @@
+{
+  "doctype": "DocType",
+  "name": "YAM Crop Variety",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "autoname": "field:variety_name",
+  "fields": [
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "crop", "fieldtype": "Link", "options": "Crop", "label": "Crop"},
+    {"fieldname": "variety_name", "fieldtype": "Data", "label": "Variety Name"},
+    {"fieldname": "maturity_days", "fieldtype": "Int", "label": "Maturity (days)"},
+    {"fieldname": "drought_tolerance", "fieldtype": "Float", "label": "Drought Tolerance (0-5)"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "Agriculture Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "QA Manager", "read": 1, "write": 0, "create": 0, "delete": 0}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "doctype": "DocType",
+  "name": "YAM Plot",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "plot_name", "fieldtype": "Data", "label": "Plot Name"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "area_ha", "fieldtype": "Float", "label": "Area (ha)"},
+    {"fieldname": "last_crop", "fieldtype": "Link", "options": "Crop", "label": "Last Crop"},
+    {"fieldname": "boundary_geojson", "fieldtype": "Code", "label": "Boundary GeoJSON", "options": "JSON"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "Agriculture Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}

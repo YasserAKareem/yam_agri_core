@@ -1,0 +1,51 @@
+{
+  "add_total_row": 0,
+  "columns": [],
+  "creation": "2026-02-22 00:00:00.000000",
+  "disable_prepared_report": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Report",
+  "filters": [
+    {
+      "fieldname": "site",
+      "fieldtype": "Link",
+      "label": "Site",
+      "mandatory": 1,
+      "options": "Site",
+      "wildcard_filter": 0
+    },
+    {
+      "fieldname": "season",
+      "fieldtype": "Data",
+      "label": "Season",
+      "mandatory": 1
+    },
+    {
+      "fieldname": "crop",
+      "fieldtype": "Link",
+      "label": "Crop",
+      "mandatory": 1,
+      "options": "Crop"
+    }
+  ],
+  "is_standard": "Yes",
+  "letterhead": null,
+  "modified": "2026-02-22 00:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Yam Agri Core",
+  "name": "YAM Crop Variety Recommendations",
+  "owner": "Administrator",
+  "prepared_report": 0,
+  "ref_doctype": null,
+  "report_name": "YAM Crop Variety Recommendations",
+  "report_type": "Script Report",
+  "roles": [
+    {
+      "role": "System Manager"
+    },
+    {
+      "role": "Agriculture Manager"
+    }
+  ]
+}

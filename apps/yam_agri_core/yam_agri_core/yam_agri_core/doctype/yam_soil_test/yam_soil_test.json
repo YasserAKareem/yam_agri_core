@@ -1,0 +1,18 @@
+{
+  "doctype": "DocType",
+  "name": "YAM Soil Test",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "fields": [
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "plot", "fieldtype": "Link", "options": "YAM Plot", "label": "Plot"},
+    {"fieldname": "sample_date", "fieldtype": "Date", "label": "Sample Date"},
+    {"fieldname": "organic_matter_pct", "fieldtype": "Float", "label": "Organic Matter (%)"},
+    {"fieldname": "ph", "fieldtype": "Float", "label": "pH"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "Agriculture Manager", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
+}
