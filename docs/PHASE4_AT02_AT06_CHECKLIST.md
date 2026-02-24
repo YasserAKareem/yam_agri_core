@@ -158,3 +158,10 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
   - `CI` run: `22343761795` -> `success`
     - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22343761795`
   - `Packaging Metadata` run: `22343761861` -> `failure` (tracked separately)
+
+### 2026-02-24 (CI metadata for AT-06 cross-site enhancement)
+
+- Commit SHA: `20dc3a2e525ab97c1d42c914d961341f8d1e8aa5`
+  - `CI` run: `22343974792` -> `success`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22343974792`
+  - `Packaging Metadata` run: `22343974787` -> `failure` (non-gating for this acceptance flow)
