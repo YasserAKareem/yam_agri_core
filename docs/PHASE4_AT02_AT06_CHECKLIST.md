@@ -1,0 +1,148 @@
+# Phase 4 Acceptance Checklist (AT-02, AT-06, Dispatch Gate)
+
+This checklist is the repeatable validation baseline for Phase 4 dispatch-gate readiness.
+
+## Scope
+
+- AT-02: required QC/Certificate evidence gates dispatch.
+- AT-06: stale QC and expired Certificate block dispatch until refreshed.
+- Regression bundle: seeded data + AT-02 + AT-06 + AT-10 + smoke.
+
+## Preconditions
+
+- Dev stack is healthy:
+  - `cd infra/docker`
+  - `bash preflight.sh`
+- Site has required apps installed:
+  - `erpnext`
+  - `agriculture`
+  - `yam_agri_core`
+  - `yam_agri_qms_trace`
+- AT-10 readiness is complete:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+  - expected `{"status":"ready" ...}`
+
+## Artifact Locations
+
+- Evidence collector output dir: `artifacts/evidence/phase4_at02_at06/`
+- Report JSON: `artifacts/evidence/phase4_at02_at06/evidence_report.json`
+- Screenshots dir: `artifacts/evidence/phase4_at02_at06/screenshots/`
+
+## AT-02 (Season Policy required evidence)
+
+### Command
+
+- `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
+
+### Expected result
+
+- `status=pass`
+- `evidence.blocked_without_evidence=true`
+- `evidence.allowed_with_evidence=true`
+
+### Evidence fields to log
+
+- `policy`, `lot`, `qc_test`, `certificate`
+- `blocked_error` and `allow_error`
+
+## AT-06 (Stale/Expired evidence revalidation)
+
+### Command
+
+- `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
+
+### Expected result
+
+- `status=pass`
+- `evidence.blocked_with_stale_or_expired=true`
+- `evidence.allowed_after_refresh=true`
+
+### Evidence fields to log
+
+- `policy`, `lot`
+- `stale_qc_test`, `expired_certificate`
+- `fresh_qc_test`, `valid_certificate`
+- `blocked_error` and `allow_error`
+
+## Full Regression Bundle (single run window)
+
+1. Seed balanced dataset:
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
+2. Run acceptance checks:
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
+3. Capture visual/report artifacts:
+   - `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.phase4_at02_at06.json`
+
+### Exit criteria
+
+- All commands return pass/ok in same run window.
+- Evidence report and screenshots are generated under `artifacts/evidence/phase4_at02_at06/`.
+- Run log entry is appended below with timestamp, commit SHA, and key IDs.
+
+## Run Log Template
+
+- Date:
+- Environment:
+- Tester:
+- Commit SHA:
+- Seed result:
+- AT-02: PASS/FAIL
+- AT-06: PASS/FAIL
+- AT-10: PASS/FAIL
+- Smoke: PASS/FAIL
+- Evidence report path:
+- CI run URL / Run ID / Conclusion:
+- Blockers:
+- Follow-up actions:
+
+## Run Log Entries
+
+### 2026-02-24 (M4 implementation baseline run)
+
+- Date: 2026-02-24
+- Environment: dev (`localhost`, docker bench wrapper)
+- Tester: Copilot (automated)
+- Commit SHA: `5b2dbb8` (baseline prior to this implementation batch)
+- Seed result:
+  - Command: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
+  - Result: `{"status":"ok","seed_tag":"20260224115220","target_records":140,"core_total":144,"created_records":0}`
+- AT-02: PASS
+  - Result: `status=pass`
+  - Evidence: `policy=YAM-SP-2026-00001`, `lot=YAM-LOT-2026-00019`, `qc_test=YAM-QCT-2026-00032`, `certificate=YAM-CERT-2026-00019`
+- AT-06: PASS
+  - Result: `status=pass`
+  - Evidence: `policy=YAM-SP-2026-00004`, `lot=YAM-LOT-2026-00020`, `stale_qc_test=YAM-QCT-2026-00033`, `expired_certificate=YAM-CERT-2026-00020`
+- AT-10: PASS
+  - Result: `status=pass`
+- Smoke: PASS
+  - Result: `status=ok`
+- Evidence report path:
+  - `artifacts/evidence/phase4_at02_at06/evidence_report.json`
+  - `artifacts/evidence/phase4_at02_at06/screenshots/`
+- Collector summary:
+  - `captured_at=2026-02-24T20:02:37.975085+00:00`
+  - Bench execute results in report: `run_at02_automated_check=pass`, `run_at06_automated_check=pass`, `run_at10_automated_check=pass`, `run_phase2_smoke=ok`
+- CI run URL / Run ID / Conclusion:
+  - Pending for implementation commit SHA (to be appended after push).
+- Blockers:
+  - None blocking this baseline run.
+- Follow-up actions:
+  - Append CI metadata for this implementation commit after push.
+  - Refresh WBS statuses after this evidence entry is committed.
+
+### 2026-02-24 (Seed realism validation rerun)
+
+- Date: 2026-02-24
+- Environment: dev (`localhost`, docker bench wrapper)
+- Tester: Copilot (automated)
+- Seed result:
+  - Command: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":180}'`
+  - Result: `{"status":"ok","seed_tag":"20260224115833","target_records":180,"core_total":182,"created_records":19}`
+- Validation checks:
+  - `run_at02_automated_check`: `status=pass`
+  - `run_at06_automated_check`: `status=pass`
+- Notes:
+  - This rerun confirms the updated seed creation path executes with additional record generation (`created_records=19`).

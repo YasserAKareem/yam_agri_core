@@ -694,3 +694,196 @@ def run_at02_automated_check() -> dict:
 		"status": "pass" if pass_checks else "fail",
 		"evidence": evidence,
 	}
+
+
+def run_at06_automated_check() -> dict:
+	"""Execute automated AT-06 checks for stale QC + expired certificate dispatch blocking.
+
+	This validates:
+	- dispatch is blocked when QC test is stale and certificate is expired
+	- dispatch is allowed after replacing with fresh QC and valid certificate
+	"""
+
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == "qa_manager_a@example.com":
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"policy": None,
+		"lot": None,
+		"blocked_with_stale_or_expired": False,
+		"blocked_error": None,
+		"allowed_after_refresh": False,
+		"allow_error": None,
+		"stale_qc_test": None,
+		"expired_certificate": None,
+		"fresh_qc_test": None,
+		"valid_certificate": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		from yam_agri_core.yam_agri_core.doctype.lot.lot import _validate_season_policy_for_dispatch
+
+		policy_name = f"AT06-POLICY-{site_a[-4:]}"
+		policy = frappe.db.exists("Season Policy", {"policy_name": policy_name, "site": site_a})
+		if policy:
+			policy_doc = frappe.get_doc("Season Policy", policy)
+			policy_doc.mandatory_test_types = "AT06-MOISTURE"
+			policy_doc.mandatory_certificate_types = "AT06-COA"
+			policy_doc.max_test_age_days = 3
+			policy_doc.enforce_dispatch_gate = 1
+			policy_doc.active = 1
+			policy_doc.season = "2026"
+			policy_doc.save(ignore_permissions=True)
+		else:
+			policy_doc = frappe.get_doc(
+				{
+					"doctype": "Season Policy",
+					"policy_name": policy_name,
+					"site": site_a,
+					"season": "2026",
+					"mandatory_test_types": "AT06-MOISTURE",
+					"mandatory_certificate_types": "AT06-COA",
+					"max_test_age_days": 3,
+					"enforce_dispatch_gate": 1,
+					"active": 1,
+				}
+			).insert(ignore_permissions=True)
+
+		evidence["policy"] = policy_doc.name
+
+		lot_number = f"AT06-LOT-{frappe.utils.now_datetime().strftime('%H%M%S')}-{site_a[-4:]}"
+		lot_doc = frappe.get_doc(
+			{
+				"doctype": "Lot",
+				"lot_number": lot_number,
+				"site": site_a,
+				"qty_kg": 100,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+		evidence["lot"] = lot_doc.name
+
+		for qct in frappe.get_all(
+			"QCTest",
+			filters={"lot": lot_doc.name, "site": site_a, "test_type": "AT06-MOISTURE"},
+			fields=["name"],
+		):
+			frappe.delete_doc("QCTest", qct.name, force=True, ignore_permissions=True)
+
+		for cert in frappe.get_all(
+			"Certificate",
+			filters={"lot": lot_doc.name, "site": site_a, "cert_type": "AT06-COA"},
+			fields=["name"],
+		):
+			frappe.delete_doc("Certificate", cert.name, force=True, ignore_permissions=True)
+
+		stale_qc_test = frappe.get_doc(
+			{
+				"doctype": "QCTest",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"test_type": "AT06-MOISTURE",
+				"test_date": frappe.utils.add_days(frappe.utils.nowdate(), -8),
+				"result_value": 11.0,
+				"pass_fail": "Pass",
+			}
+		).insert(ignore_permissions=True)
+		evidence["stale_qc_test"] = stale_qc_test.name
+
+		expired_certificate = frappe.get_doc(
+			{
+				"doctype": "Certificate",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"cert_type": "AT06-COA",
+				"expiry_date": frappe.utils.add_days(frappe.utils.nowdate(), -1),
+			}
+		).insert(ignore_permissions=True)
+		evidence["expired_certificate"] = expired_certificate.name
+
+		# 1) Must block with stale/expired evidence.
+		try:
+			lot_doc.reload()
+			lot_doc.status = "For Dispatch"
+			_validate_season_policy_for_dispatch(lot_doc)
+		except Exception as exc:
+			evidence["blocked_error"] = frappe.as_unicode(exc)
+			evidence["blocked_with_stale_or_expired"] = True
+
+		# 2) Refresh evidence and confirm dispatch allowed.
+		frappe.delete_doc("QCTest", stale_qc_test.name, force=True, ignore_permissions=True)
+		frappe.delete_doc("Certificate", expired_certificate.name, force=True, ignore_permissions=True)
+
+		fresh_qc_test = frappe.get_doc(
+			{
+				"doctype": "QCTest",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"test_type": "AT06-MOISTURE",
+				"test_date": frappe.utils.nowdate(),
+				"result_value": 11.2,
+				"pass_fail": "Pass",
+			}
+		).insert(ignore_permissions=True)
+		evidence["fresh_qc_test"] = fresh_qc_test.name
+
+		valid_certificate = frappe.get_doc(
+			{
+				"doctype": "Certificate",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"cert_type": "AT06-COA",
+				"expiry_date": frappe.utils.add_days(frappe.utils.nowdate(), 30),
+			}
+		).insert(ignore_permissions=True)
+		evidence["valid_certificate"] = valid_certificate.name
+
+		try:
+			lot_doc.reload()
+			lot_doc.status = "For Dispatch"
+			_validate_season_policy_for_dispatch(lot_doc)
+			evidence["allowed_after_refresh"] = True
+		except Exception as exc:
+			evidence["allow_error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	pass_checks = all(
+		[
+			evidence["blocked_with_stale_or_expired"],
+			evidence["allowed_after_refresh"],
+			bool(evidence["policy"]),
+			bool(evidence["lot"]),
+			bool(evidence["stale_qc_test"]),
+			bool(evidence["expired_certificate"]),
+			bool(evidence["fresh_qc_test"]),
+			bool(evidence["valid_certificate"]),
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}

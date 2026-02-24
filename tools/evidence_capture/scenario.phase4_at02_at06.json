@@ -1,0 +1,32 @@
+{
+  "name": "phase4-at02-at06-evidence",
+  "base_url": "http://localhost:8000",
+  "login": {
+    "username": "Administrator",
+    "password": "admin"
+  },
+  "output_dir": "artifacts/evidence/phase4_at02_at06",
+  "pages": [
+    "/app/agriculture",
+    "/app/season-policy",
+    "/app/lot",
+    "/app/certificate",
+    "/app/transfer"
+  ],
+  "record_queries": [
+    { "doctype": "Site", "limit": 10 },
+    { "doctype": "Lot", "limit": 20 },
+    { "doctype": "QCTest", "limit": 20 },
+    { "doctype": "Certificate", "limit": 20 },
+    { "doctype": "Transfer", "limit": 20 },
+    { "doctype": "ScaleTicket", "limit": 20 },
+    { "doctype": "Device", "limit": 20 },
+    { "doctype": "Observation", "limit": 20 }
+  ],
+  "bench_execute": [
+    "yam_agri_core.yam_agri_core.smoke.run_at02_automated_check",
+    "yam_agri_core.yam_agri_core.smoke.run_at06_automated_check",
+    "yam_agri_core.yam_agri_core.smoke.run_at10_automated_check",
+    "yam_agri_core.yam_agri_core.smoke.run_phase2_smoke"
+  ]
+}

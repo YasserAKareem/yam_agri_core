@@ -2,6 +2,8 @@
 
 This checklist is the repeatable validation baseline for Phase 2 traceability readiness.
 
+For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_AT06_CHECKLIST.md](docs/PHASE4_AT02_AT06_CHECKLIST.md).
+
 ## Preconditions
 
 - Dev stack is healthy: run from `infra/docker`

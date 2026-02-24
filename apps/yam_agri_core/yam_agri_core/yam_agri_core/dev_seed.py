@@ -543,6 +543,7 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 		sites.append({"name": site_b.name})
 
 	selected_sites = [sites[0]["name"], sites[1]["name"]]
+	available_crops = frappe.get_all("Crop", pluck="name", limit_page_length=10)
 
 	created = 0
 	seed_tag = utils.now_datetime().strftime("%Y%m%d%H%M%S")
@@ -620,14 +621,17 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 	while _core_total() < int(target_records):
 		site = selected_sites[iteration % len(selected_sites)]
 		lot_number = f"M4-LOT-{seed_tag}-{iteration:03d}"
+		lot_payload = {
+			"doctype": "Lot",
+			"lot_number": lot_number,
+			"site": site,
+			"qty_kg": 100 + iteration,
+			"status": "Draft",
+		}
+		if available_crops:
+			lot_payload["crop"] = available_crops[iteration % len(available_crops)]
 		lot_doc = frappe.get_doc(
-			{
-				"doctype": "Lot",
-				"lot_number": lot_number,
-				"site": site,
-				"qty_kg": 100 + iteration,
-				"status": "Draft",
-			}
+			lot_payload
 		).insert(ignore_permissions=True)
 		created += 1
 
@@ -673,6 +677,18 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 			}
 		).insert(ignore_permissions=True)
 		created += 1
+
+		if iteration % 4 == 0:
+			frappe.get_doc(
+				{
+					"doctype": "Certificate",
+					"cert_type": "Origin",
+					"lot": lot_doc.name,
+					"site": site,
+					"expiry_date": utils.add_days(utils.nowdate(), 45),
+				}
+			).insert(ignore_permissions=True)
+			created += 1
 
 		frappe.get_doc(
 			{
