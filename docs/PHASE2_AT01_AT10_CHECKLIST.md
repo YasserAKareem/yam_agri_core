@@ -330,3 +330,21 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   - `docs/YAM_AGRI_WBS_GANTT.xlsx`: `Done=61`, `Partial=0`, `Not Started=75`
   - `docs/planning/YAM_AGRI_WBS_GANTT.xlsx`: `Done=61`, `Partial=0`, `Not Started=75`
   - Target achieved: **remaining Partial rows closed (0)**.
+
+### 2026-02-24 (CI metadata for latest closure SHA)
+
+- Date: 2026-02-24
+- Commit SHA: `7f75b5aa9318902a76aafdb5cb21351d969e499e`
+- Workflow: `ci.yml` (main)
+- Run URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22340370644`
+- Run ID: `22340370644`
+- Overall conclusion: `failure` (`completed`)
+- Job summary:
+  - `Python lint (ruff)=failure`
+  - `Docker Compose validate=success`
+  - `Python unit tests=success`
+  - `Environment config sanity=success`
+  - `YAML lint=success`
+  - `Secret / credential scan=success`
+- Note:
+  - Acceptance and WBS closure evidence remains valid; CI remediation needed for the Ruff lint job before final green release gate.
