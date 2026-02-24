@@ -17,3 +17,7 @@ __pycache__/
 # Copied apps for local dev/migration (do not commit vendor copies by accident)
 apps/agriculture/
 apps/yam_agri_qms_trace/
+
+# Generated evidence / local build artifacts (do not commit)
+artifacts/
+apps/yam_agri_core/yam_agri_core/public/dist/
