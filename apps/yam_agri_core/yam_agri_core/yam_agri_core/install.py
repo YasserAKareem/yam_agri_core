@@ -5,6 +5,7 @@ import frappe
 
 def after_install() -> None:
     ensure_site_geo_fields()
+    ensure_location_site_field()
 
     from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
 
@@ -24,6 +25,8 @@ def after_install() -> None:
 def after_migrate() -> None:
     # Keeps dev/staging/prod consistent even if installed long ago.
     ensure_site_geo_fields()
+    ensure_location_site_field()
+    normalize_lot_crop_links()
 
     from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
 
@@ -37,6 +40,112 @@ def after_migrate() -> None:
     ensure_yam_agri_workspaces()
     seed_dev_org_chart_if_enabled()
     seed_dev_baseline_demo_data_if_enabled()
+
+
+def normalize_lot_crop_links() -> None:
+    """Normalize legacy text values in Lot.crop to canonical Crop links.
+
+    - Ensures every non-empty `Lot.crop` points to an existing Crop name.
+    - Maps legacy text via `name`, `crop_name`, or `title` when available.
+    - Logs unresolved values for manual cleanup.
+    """
+
+    if not frappe.db.exists("DocType", "Lot"):
+        return
+
+    if not frappe.db.exists("DocType", "Crop"):
+        return
+
+    crop_meta = frappe.get_meta("Crop")
+    has_crop_name = crop_meta.has_field("crop_name")
+    has_title = crop_meta.has_field("title")
+
+    lots = frappe.get_all("Lot", fields=["name", "crop"], limit_page_length=0)
+    changed = False
+    unresolved: set[str] = set()
+
+    for lot in lots:
+        raw_crop = (lot.get("crop") or "").strip()
+        if not raw_crop:
+            continue
+
+        if frappe.db.exists("Crop", raw_crop):
+            continue
+
+        crop_name = None
+        if has_crop_name:
+            crop_name = frappe.db.get_value("Crop", {"crop_name": raw_crop}, "name")
+        if not crop_name and has_title:
+            crop_name = frappe.db.get_value("Crop", {"title": raw_crop}, "name")
+
+        if crop_name:
+            frappe.db.set_value("Lot", lot["name"], "crop", crop_name, update_modified=False)
+            changed = True
+            continue
+
+        unresolved.add(raw_crop)
+
+    if changed:
+        frappe.db.commit()
+
+    if unresolved:
+        frappe.log_error(
+            title="Lot crop normalization unresolved values",
+            message="\n".join(sorted(unresolved)),
+        )
+
+
+def get_lot_crop_link_status() -> dict:
+    """Diagnostic summary for Lot->Crop migration readiness.
+
+    Safe to run via:
+    - bench --site <site> execute yam_agri_core.yam_agri_core.install.get_lot_crop_link_status
+    """
+    if not frappe.db.exists("DocType", "Lot"):
+        return {"available": False, "reason": "Lot doctype missing"}
+
+    if not frappe.db.exists("DocType", "Crop"):
+        return {"available": False, "reason": "Crop doctype missing"}
+
+    crop_meta = frappe.get_meta("Crop")
+    has_crop_name = crop_meta.has_field("crop_name")
+    has_title = crop_meta.has_field("title")
+
+    total = 0
+    linked = 0
+    mapped = 0
+    unresolved_values: set[str] = set()
+
+    lots = frappe.get_all("Lot", fields=["name", "crop"], limit_page_length=0)
+    for lot in lots:
+        total += 1
+        crop_value = (lot.get("crop") or "").strip()
+        if not crop_value:
+            continue
+
+        if frappe.db.exists("Crop", crop_value):
+            linked += 1
+            continue
+
+        found = None
+        if has_crop_name:
+            found = frappe.db.get_value("Crop", {"crop_name": crop_value}, "name")
+        if not found and has_title:
+            found = frappe.db.get_value("Crop", {"title": crop_value}, "name")
+
+        if found:
+            mapped += 1
+        else:
+            unresolved_values.add(crop_value)
+
+    return {
+        "available": True,
+        "total_lots": total,
+        "linked_crop_names": linked,
+        "mappable_legacy_values": mapped,
+        "unresolved_count": len(unresolved_values),
+        "unresolved_values": sorted(unresolved_values),
+    }
 
 
 def ensure_site_geo_fields() -> None:
@@ -83,6 +192,53 @@ def ensure_site_geo_fields() -> None:
         options="JSON",
         insert_after="geo_location",
     )
+
+
+def ensure_location_site_field() -> None:
+    """Ensure Location has Site link for Agriculture site-isolation bridge."""
+
+    if not frappe.db.exists("DocType", "Location"):
+        return
+
+    meta = frappe.get_meta("Location")
+    if meta.has_field("site"):
+        return
+
+    insert_after = "location_name" if meta.has_field("location_name") else meta.fields[0].fieldname
+    _ensure_custom_field(
+        dt="Location",
+        fieldname="site",
+        label="Site",
+        fieldtype="Link",
+        options="Site",
+        insert_after=insert_after,
+    )
+
+
+def get_site_location_bridge_status() -> dict:
+    """Diagnostic summary for Site->Location bridge used by Agriculture isolation.
+
+    Safe to run via:
+    - bench --site <site> execute yam_agri_core.yam_agri_core.install.get_site_location_bridge_status
+    """
+    if not frappe.db.exists("DocType", "Location"):
+        return {"available": False, "reason": "Location doctype missing"}
+
+    location_meta = frappe.get_meta("Location")
+    if not location_meta.has_field("site"):
+        return {"available": False, "reason": "Location.site custom field missing"}
+
+    rows = frappe.get_all("Location", fields=["name", "site"], limit_page_length=0)
+    mapped = [r.get("name") for r in rows if (r.get("site") or "").strip()]
+    unmapped = [r.get("name") for r in rows if not (r.get("site") or "").strip()]
+
+    return {
+        "available": True,
+        "total_locations": len(rows),
+        "mapped_count": len(mapped),
+        "unmapped_count": len(unmapped),
+        "unmapped_locations": sorted(unmapped),
+    }
 
 
 def _ensure_custom_field(

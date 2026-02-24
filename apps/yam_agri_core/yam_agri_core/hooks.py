@@ -28,6 +28,7 @@ permission_query_conditions = {
 	"Observation": "yam_agri_core.yam_agri_core.site_permissions.observation_query_conditions",
 	"ScaleTicket": "yam_agri_core.yam_agri_core.site_permissions.scale_ticket_query_conditions",
 	"Transfer": "yam_agri_core.yam_agri_core.site_permissions.transfer_query_conditions",
+	"StorageBin": "yam_agri_core.yam_agri_core.site_permissions.storage_bin_query_conditions",
 	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_query_conditions",
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_query_conditions",
 	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_query_conditions",
@@ -35,4 +36,7 @@ permission_query_conditions = {
 	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_query_conditions",
 	"YAM Crop Variety": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_query_conditions",
 	"YAM Crop Variety Recommendation": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_recommendation_query_conditions",
+	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_query_conditions",
+	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_query_conditions",
+	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_query_conditions",
 }

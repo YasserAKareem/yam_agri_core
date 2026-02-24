@@ -25,6 +25,30 @@ def get_allowed_sites(user: str | None = None) -> list[str]:
     return [s for s in (v.strip() for v in allowed or []) if s]
 
 
+def get_allowed_locations(user: str | None = None) -> list[str]:
+    user = user or frappe.session.user
+
+    if user in ("Administrator",):
+        return []
+
+    if frappe.has_role("System Manager", user=user):
+        return []
+
+    if not frappe.db.exists("DocType", "Location"):
+        return []
+
+    location_meta = frappe.get_meta("Location")
+    if not location_meta.has_field("site"):
+        return []
+
+    allowed_sites = get_allowed_sites(user)
+    if not allowed_sites:
+        return []
+
+    locations = frappe.get_all("Location", filters={"site": ["in", allowed_sites]}, pluck="name")
+    return [loc for loc in (v.strip() for v in (locations or [])) if loc]
+
+
 def build_site_query_condition(doctype: str, user: str | None = None) -> str | None:
     """Return SQL WHERE condition for site isolation.
 
@@ -167,9 +191,78 @@ def transfer_query_conditions(user: str) -> str | None:
     return build_site_query_condition("Transfer", user=user)
 
 
+def storage_bin_query_conditions(user: str) -> str | None:
+    return build_site_query_condition("StorageBin", user=user)
+
+
 def evidence_pack_query_conditions(user: str) -> str | None:
     return build_site_query_condition("EvidencePack", user=user)
 
 
 def complaint_query_conditions(user: str) -> str | None:
     return build_site_query_condition("Complaint", user=user)
+
+
+def location_query_conditions(user: str) -> str | None:
+    user = user or frappe.session.user
+
+    if user in ("Administrator",):
+        return None
+
+    if frappe.has_role("System Manager", user=user):
+        return None
+
+    if not frappe.db.exists("DocType", "Location"):
+        return None
+
+    location_meta = frappe.get_meta("Location")
+    if not location_meta.has_field("site"):
+        return None
+
+    allowed_sites = get_allowed_sites(user)
+    if not allowed_sites:
+        return "1=0"
+
+    escaped = ",".join(frappe.db.escape(s) for s in allowed_sites)
+    return f"`tabLocation`.`site` in ({escaped})"
+
+
+def weather_query_conditions(user: str) -> str | None:
+    user = user or frappe.session.user
+
+    if user in ("Administrator",):
+        return None
+
+    if frappe.has_role("System Manager", user=user):
+        return None
+
+    allowed_locations = get_allowed_locations(user)
+    if not allowed_locations:
+        return "1=0"
+
+    escaped = ",".join(frappe.db.escape(loc) for loc in allowed_locations)
+    return f"`tabWeather`.`location` in ({escaped})"
+
+
+def crop_cycle_query_conditions(user: str) -> str | None:
+    user = user or frappe.session.user
+
+    if user in ("Administrator",):
+        return None
+
+    if frappe.has_role("System Manager", user=user):
+        return None
+
+    allowed_locations = get_allowed_locations(user)
+    if not allowed_locations:
+        return "1=0"
+
+    escaped = ",".join(frappe.db.escape(loc) for loc in allowed_locations)
+    return (
+        "exists ("
+        "select 1 from `tabLinked Location` ll "
+        "where ll.parent = `tabCrop Cycle`.`name` "
+        "and ll.parenttype = 'Crop Cycle' "
+        f"and ll.location in ({escaped})"
+        ")"
+    )

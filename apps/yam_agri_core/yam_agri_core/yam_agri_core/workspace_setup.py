@@ -60,6 +60,8 @@ def ensure_yam_agri_workspaces() -> None:
 		shortcuts=[
 			("DocType", "Site", "List", "Sites"),
 			("DocType", "Lot", "List", "Lots"),
+			("DocType", "StorageBin", "List", "Storage Bins"),
+			("DocType", "Crop", "List", "Crops"),
 			("DocType", "QCTest", "List", "QC Tests"),
 			("DocType", "Certificate", "List", "Certificates"),
 			("DocType", "Nonconformance", "List", "Nonconformance"),
@@ -92,6 +94,26 @@ def ensure_yam_agri_workspaces() -> None:
 
 	# Include any installed YAM Agri Core DocTypes in sensible buckets.
 	for dt in _get_yam_agri_core_doctypes():
+		if dt in {"Lot", "Transfer", "ScaleTicket", "Scale Ticket", "StorageBin", "Storage Bin"}:
+			traceability_shortcuts.append(("DocType", dt, "List", dt))
+		elif dt in {"QCTest", "Certificate", "Nonconformance"}:
+			quality_shortcuts.append(("DocType", dt, "List", dt))
+		elif dt in {"EvidencePack", "Evidence Pack"}:
+			evidence_shortcuts.append(("DocType", dt, "List", dt))
+		elif dt in {"Device", "Observation"}:
+			devices_shortcuts.append(("DocType", dt, "List", dt))
+		elif dt in {"Complaint"}:
+			complaints_shortcuts.append(("DocType", dt, "List", dt))
+
+	for dt in _get_agriculture_doctypes():
+		if dt in {"Crop", "Crop Cycle", "Fertilizer", "Disease"}:
+			traceability_shortcuts.append(("DocType", dt, "List", dt))
+		elif dt in {"Soil Analysis", "Plant Analysis", "Water Analysis"}:
+			quality_shortcuts.append(("DocType", dt, "List", dt))
+		elif dt in {"Weather", "Weather Parameter"}:
+			devices_shortcuts.append(("DocType", dt, "List", dt))
+
+	for dt in _get_yam_agri_qms_trace_doctypes():
 		if dt in {"Lot", "Transfer", "ScaleTicket", "Scale Ticket", "StorageBin", "Storage Bin"}:
 			traceability_shortcuts.append(("DocType", dt, "List", dt))
 		elif dt in {"QCTest", "Certificate", "Nonconformance"}:
@@ -305,6 +327,24 @@ def _get_yam_agri_core_doctypes() -> list[str]:
 	try:
 		dts = frappe.get_all("DocType", filters={"module": "YAM Agri Core"}, pluck="name")
 		# Keep it deterministic.
+		return sorted(set(dts))
+	except Exception:
+		return []
+
+
+def _get_agriculture_doctypes() -> list[str]:
+	"""Return installed DocTypes that belong to the Agriculture module."""
+	return _get_module_doctypes("Agriculture")
+
+
+def _get_yam_agri_qms_trace_doctypes() -> list[str]:
+	"""Return installed DocTypes that belong to the Yam Agri Qms Trace module."""
+	return _get_module_doctypes("Yam Agri Qms Trace")
+
+
+def _get_module_doctypes(module_name: str) -> list[str]:
+	try:
+		dts = frappe.get_all("DocType", filters={"module": module_name}, pluck="name")
 		return sorted(set(dts))
 	except Exception:
 		return []
