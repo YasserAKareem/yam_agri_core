@@ -348,3 +348,21 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   - `Secret / credential scan=success`
 - Note:
   - Acceptance and WBS closure evidence remains valid; CI remediation needed for the Ruff lint job before final green release gate.
+
+### 2026-02-24 (CI green after Ruff remediation)
+
+- Date: 2026-02-24
+- Commit SHA: `b5310b9ae4ad6f75fd0b1047ea1f4eaf12840636`
+- Workflow: `ci.yml` (main)
+- Run URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22340487137`
+- Run ID: `22340487137`
+- Overall conclusion: `success` (`completed`)
+- Job summary:
+  - `Secret / credential scan=success`
+  - `Python lint (ruff)=success`
+  - `Environment config sanity=success`
+  - `Python unit tests=success`
+  - `YAML lint=success`
+  - `Docker Compose validate=success`
+- Note:
+  - This run closes the previous CI failure on SHA `7f75b5a...` and restores a green release-gate baseline.
