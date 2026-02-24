@@ -166,3 +166,44 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   - Added record-level `has_permission` hooks for site-scoped DocTypes.
   - Replaced `frappe.has_role` usage with runtime-compatible role checks via `frappe.get_roles`.
   - Added migration guard to enforce minimum `Custom DocPerm` rows for `Lot` and `StorageBin` (`QA Manager` and `System Manager`).
+
+### 2026-02-24 (Phase 2 automated acceptance + mapping + WBS refresh)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (automated execution)
+- Commit SHA: `fcdadb6`
+- Executed Commands:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_lot_crop_link_status`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_site_location_bridge_status`
+- AT-01: PARTIAL PASS (schema/validation hooks pass; manual transaction evidence still required)
+- AT-10: PASS (repeatable automated check)
+- Results:
+  - `run_phase2_smoke`: `status=ok`
+  - `get_at10_readiness`: `status=ready`
+  - `run_at10_automated_check`: `status=pass`
+  - `get_lot_crop_link_status`: `{available: true, total_lots: 24, linked_crop_names: 0, unresolved_count: 0}`
+  - `get_site_location_bridge_status`: `{available: true, total_locations: 2, mapped_count: 2, unmapped_count: 0}`
+- Cross-site isolation evidence (repeatable):
+  - `qa_manager_a@example.com`: only Site A lots/bins visible; direct read for Site B lot/bin denied
+  - `qa_manager_b@example.com`: only Site B lots/bins visible; direct read for Site A lot/bin denied
+- Canonical mapping review (Agriculture as canonical):
+  - `Crop`, `Crop Cycle`, `Weather` are owned by `Agriculture`
+  - `Lot`, `QCTest`, `Certificate` are owned by `YAM Agri Core`
+  - Link integrity is correct: `Lot.crop -> Crop`, `QCTest.lot -> Lot`, `Certificate.lot -> Lot`
+  - Remaining conflict/gap: existing `Lot.crop` values are empty in current data (`24/24` empty), so business-level crop attribution is not yet populated
+- WBS refresh applied:
+  - Updated milestone status in both workbook copies:
+    - `docs/YAM_AGRI_WBS_GANTT.xlsx`
+    - `docs/planning/YAM_AGRI_WBS_GANTT.xlsx`
+  - Current milestone-weighted progress: `25.0%` (`2 done`, `1 in progress`, `10 total`)
+- Blockers:
+  - AT-01 still needs manual end-to-end evidence capture (record IDs/screenshots)
+  - `Lot.crop` data backfill is pending for historical lots
+- Follow-up actions:
+  1. Execute manual AT-01 flow and attach evidence IDs/screenshots.
+  2. Run one-time data enrichment to populate `Lot.crop` for legacy lots where source is known.
+  3. Keep AT-10 automated check in routine smoke run before each push to staging.
