@@ -630,9 +630,7 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 		}
 		if available_crops:
 			lot_payload["crop"] = available_crops[iteration % len(available_crops)]
-		lot_doc = frappe.get_doc(
-			lot_payload
-		).insert(ignore_permissions=True)
+		lot_doc = frappe.get_doc(lot_payload).insert(ignore_permissions=True)
 		created += 1
 
 		qct_pass = "Fail" if iteration % 7 == 0 else "Pass"
