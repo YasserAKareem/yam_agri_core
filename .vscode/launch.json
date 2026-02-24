@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Frappe Skill Agent: Debug (text report)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/frappe_skill_agent.py",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Frappe Skill Agent: Debug (verbose)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/frappe_skill_agent.py",
+      "args": ["--verbose"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Frappe Skill Agent: Debug (JSON output)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/frappe_skill_agent.py",
+      "args": ["--format", "json"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
