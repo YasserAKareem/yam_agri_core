@@ -8,6 +8,7 @@ def after_install() -> None:
     ensure_site_geo_fields()
     ensure_location_site_field()
     ensure_minimum_doc_permissions()
+    ensure_role_profiles()
 
     from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
 
@@ -33,6 +34,7 @@ def after_migrate() -> None:
     ensure_site_geo_fields()
     ensure_location_site_field()
     ensure_minimum_doc_permissions()
+    ensure_role_profiles()
     normalize_lot_crop_links()
 
     from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
@@ -252,6 +254,51 @@ def ensure_minimum_doc_permissions() -> None:
         role="System Manager",
         flags={"read": 1, "write": 1, "create": 1, "delete": 0},
     )
+
+
+def ensure_role_profiles() -> None:
+    """Create baseline role profiles used by site-isolated operators.
+
+    Note: access to business records is still constrained by Site User Permissions.
+    These profiles grant role capabilities only; without explicit Site grants,
+    query hooks return no records by default.
+    """
+
+    if not frappe.db.exists("DocType", "Role Profile"):
+        return
+
+    _ensure_role_profile(
+        "YAM QA Manager",
+        [
+            "QA Manager",
+            "Agriculture Manager",
+        ],
+    )
+    _ensure_role_profile(
+        "YAM Site Operator",
+        [
+            "Quality Manager",
+            "Stock User",
+        ],
+    )
+
+
+def _ensure_role_profile(profile_name: str, roles: list[str]) -> None:
+    if frappe.db.exists("Role Profile", profile_name):
+        doc = frappe.get_doc("Role Profile", profile_name)
+    else:
+        doc = frappe.new_doc("Role Profile")
+        doc.role_profile = profile_name
+
+    existing_roles = {row.role for row in (doc.get("roles") or []) if row.role}
+    for role in roles:
+        if not role or not frappe.db.exists("Role", role):
+            continue
+        if role not in existing_roles:
+            doc.append("roles", {"role": role})
+
+    doc.save(ignore_permissions=True)
+    frappe.db.commit()
 
 
 def _ensure_doctype_role_permissions(*, doctype: str, role: str, flags: dict[str, int]) -> None:
