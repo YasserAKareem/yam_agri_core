@@ -173,3 +173,30 @@ jobs:
             --ignore=apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_doc_validations.py
         # test_doc_validations.py requires a live frappe.db; run via `bench run-tests` instead.
         # test_agr_cereal_001.py is pure Python and runs here.
+
+  # ── 7. Frappe Skill Agent QC scan ──────────────────────────────────────
+  frappe-skill-qc:
+    name: Frappe Skill Agent QC
+    runs-on: ubuntu-latest
+    continue-on-error: true   # informational — does not block merges while backlog is cleared
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Frappe Skill Agent
+        run: |
+          python tools/frappe_skill_agent.py --format json > /tmp/qc-report.json
+          python tools/frappe_skill_agent.py
+        # Exit code 1 = critical/high findings present; captured via continue-on-error above.
+        # See .github/copilot-instructions.md §19 for the full rule reference (FS-001–FS-020).
+
+      - name: Upload QC report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frappe-skill-qc-report
+          path: /tmp/qc-report.json

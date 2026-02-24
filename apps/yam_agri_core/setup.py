@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
 	name="yam_agri_core",
-	version="1.1.0-dev",
+	version="1.1.0.dev0",
 	packages=find_packages(),
 	include_package_data=True,
 	description="YAM Agri Core — cereal supply chain quality and traceability platform",
