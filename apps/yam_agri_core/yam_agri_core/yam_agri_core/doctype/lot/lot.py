@@ -23,11 +23,141 @@ def check_certificates_for_dispatch(lot_name, status):
 	for c in certs:
 		expiry = c.get("expiry_date")
 		if expiry:
-			if utils.getdate(expiry) < utils.nowdate():
+			if utils.getdate(expiry) < utils.getdate(utils.nowdate()):
 				frappe.throw(
 					_("Cannot dispatch: Certificate {0} is expired").format(c.get("name")),
 					frappe.ValidationError,
 				)
+
+
+def _parse_csv_values(raw: str | None) -> list[str]:
+	text = (raw or "").replace("\n", ",")
+	parts = [p.strip() for p in text.split(",")]
+	return [p for p in parts if p]
+
+
+def _get_active_season_policy(site: str, crop: str | None) -> dict | None:
+	filters = {"site": site, "active": 1}
+	if crop:
+		filters["crop"] = crop
+
+	policies = frappe.get_all(
+		"Season Policy",
+		filters=filters,
+		fields=[
+			"name",
+			"mandatory_test_types",
+			"mandatory_certificate_types",
+			"max_test_age_days",
+			"enforce_dispatch_gate",
+		],
+		order_by="modified desc",
+		limit_page_length=1,
+	)
+	if policies:
+		return policies[0]
+
+	if crop:
+		fallback = frappe.get_all(
+			"Season Policy",
+			filters={"site": site, "active": 1},
+			fields=[
+				"name",
+				"mandatory_test_types",
+				"mandatory_certificate_types",
+				"max_test_age_days",
+				"enforce_dispatch_gate",
+			],
+			order_by="modified desc",
+			limit_page_length=1,
+		)
+		if fallback:
+			return fallback[0]
+
+	return None
+
+
+def _validate_season_policy_for_dispatch(lot_doc):
+	status = (lot_doc.get("status") or "").strip().lower()
+	if status not in DISPATCH_STATUSES:
+		return
+
+	policy = _get_active_season_policy(lot_doc.get("site"), lot_doc.get("crop"))
+	if not policy:
+		frappe.throw(
+			_("Cannot dispatch: no active Season Policy found for this Site/Crop"), frappe.ValidationError
+		)
+
+	if not int(policy.get("enforce_dispatch_gate") or 0):
+		return
+
+	max_age_days = int(policy.get("max_test_age_days") or 7)
+	required_tests = _parse_csv_values(policy.get("mandatory_test_types"))
+	required_certs = _parse_csv_values(policy.get("mandatory_certificate_types"))
+
+	missing_tests: list[str] = []
+	for test_type in required_tests:
+		records = frappe.get_all(
+			"QCTest",
+			filters={
+				"lot": lot_doc.name,
+				"site": lot_doc.get("site"),
+				"test_type": test_type,
+				"pass_fail": "Pass",
+			},
+			fields=["name", "test_date"],
+			order_by="test_date desc",
+			limit_page_length=1,
+		)
+		if not records:
+			missing_tests.append(test_type)
+			continue
+
+		test_date = records[0].get("test_date")
+		if not test_date:
+			missing_tests.append(test_type)
+			continue
+
+		days_old = (utils.getdate(utils.nowdate()) - utils.getdate(test_date)).days
+		if days_old > max_age_days:
+			missing_tests.append(test_type)
+
+	if missing_tests:
+		frappe.throw(
+			_("Cannot dispatch: missing or stale required QC tests: {0}").format(
+				", ".join(sorted(set(missing_tests)))
+			),
+			frappe.ValidationError,
+		)
+
+	missing_certs: list[str] = []
+	for cert_type in required_certs:
+		records = frappe.get_all(
+			"Certificate",
+			filters={
+				"lot": lot_doc.name,
+				"site": lot_doc.get("site"),
+				"cert_type": cert_type,
+			},
+			fields=["name", "expiry_date"],
+			order_by="modified desc",
+			limit_page_length=1,
+		)
+		if not records:
+			missing_certs.append(cert_type)
+			continue
+
+		expiry = records[0].get("expiry_date")
+		if expiry and utils.getdate(expiry) < utils.getdate(utils.nowdate()):
+			missing_certs.append(cert_type)
+
+	if missing_certs:
+		frappe.throw(
+			_("Cannot dispatch: missing or expired required certificates: {0}").format(
+				", ".join(sorted(set(missing_certs)))
+			),
+			frappe.ValidationError,
+		)
 
 
 class Lot(Document):
@@ -54,6 +184,9 @@ class Lot(Document):
 			check_certificates_for_dispatch(self.name, self.get("status"))
 		except frappe.ValidationError:
 			raise
+
+		# Enforce season policy gate for dispatch.
+		_validate_season_policy_for_dispatch(self)
 
 		# Enforce QA Manager approval for status transitions to Accepted/Rejected
 		new_status = (self.get("status") or "").strip()

@@ -209,6 +209,10 @@ def complaint_query_conditions(user: str) -> str | None:
 	return build_site_query_condition("Complaint", user=user)
 
 
+def season_policy_query_conditions(user: str) -> str | None:
+	return build_site_query_condition("Season Policy", user=user)
+
+
 def location_query_conditions(user: str) -> str | None:
 	user = user or frappe.session.user
 
@@ -376,6 +380,10 @@ def evidence_pack_has_permission(doc, user: str | None = None, permission_type: 
 
 
 def complaint_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
+def season_policy_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
 

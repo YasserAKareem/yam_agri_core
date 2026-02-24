@@ -21,6 +21,7 @@ def run_phase2_smoke() -> dict:
 			"StorageBin": frappe.db.exists("DocType", "StorageBin") is not None,
 			"Lot": frappe.db.exists("DocType", "Lot") is not None,
 			"Crop": frappe.db.exists("DocType", "Crop") is not None,
+			"Season Policy": frappe.db.exists("DocType", "Season Policy") is not None,
 			"Location": frappe.db.exists("DocType", "Location") is not None,
 			"Weather": frappe.db.exists("DocType", "Weather") is not None,
 			"Crop Cycle": frappe.db.exists("DocType", "Crop Cycle") is not None,
@@ -42,6 +43,7 @@ def run_phase2_smoke() -> dict:
 
 	checks["permission_hooks"] = {
 		"StorageBin": "StorageBin" in (frappe.get_hooks("permission_query_conditions") or {}),
+		"Season Policy": "Season Policy" in (frappe.get_hooks("permission_query_conditions") or {}),
 		"Weather": "Weather" in (frappe.get_hooks("permission_query_conditions") or {}),
 		"Crop Cycle": "Crop Cycle" in (frappe.get_hooks("permission_query_conditions") or {}),
 	}
@@ -361,6 +363,7 @@ def run_at01_automated_check() -> dict:
 
 	try:
 		frappe.set_user("Administrator")
+		from yam_agri_core.yam_agri_core.doctype.lot.lot import _validate_season_policy_for_dispatch
 
 		device_a = frappe.db.exists("Device", {"device_name": "AT01-DEV-A", "site": site_a})
 		if not device_a:
@@ -520,6 +523,170 @@ def run_at01_automated_check() -> dict:
 			bool(evidence["records"].get("transfer_a")),
 			bool(evidence["records"].get("ticket_a")),
 			evidence["cross_site_invalid_blocked"],
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_at02_automated_check() -> dict:
+	"""Execute automated AT-02 checks for QCTest + Certificate + Season Policy gate.
+
+	This validates:
+	- dispatch is blocked when required tests/certificates are missing
+	- dispatch is allowed after required QC and certificate evidence is present
+	"""
+
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == "qa_manager_a@example.com":
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"policy": None,
+		"lot": None,
+		"blocked_without_evidence": False,
+		"blocked_error": None,
+		"allowed_with_evidence": False,
+		"allow_error": None,
+		"qc_test": None,
+		"certificate": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		from yam_agri_core.yam_agri_core.doctype.lot.lot import _validate_season_policy_for_dispatch
+
+		policy_name = f"AT02-POLICY-{site_a[-4:]}"
+		policy = frappe.db.exists("Season Policy", {"policy_name": policy_name, "site": site_a})
+		if policy:
+			policy_doc = frappe.get_doc("Season Policy", policy)
+			policy_doc.mandatory_test_types = "AT02-MOISTURE"
+			policy_doc.mandatory_certificate_types = "AT02-COA"
+			policy_doc.max_test_age_days = 7
+			policy_doc.enforce_dispatch_gate = 1
+			policy_doc.active = 1
+			policy_doc.season = "2026"
+			policy_doc.save(ignore_permissions=True)
+		else:
+			policy_doc = frappe.get_doc(
+				{
+					"doctype": "Season Policy",
+					"policy_name": policy_name,
+					"site": site_a,
+					"season": "2026",
+					"mandatory_test_types": "AT02-MOISTURE",
+					"mandatory_certificate_types": "AT02-COA",
+					"max_test_age_days": 7,
+					"enforce_dispatch_gate": 1,
+					"active": 1,
+				}
+			).insert(ignore_permissions=True)
+
+		evidence["policy"] = policy_doc.name
+
+		lot_number = f"AT02-LOT-{frappe.utils.now_datetime().strftime('%H%M%S')}-{site_a[-4:]}"
+		lot_doc = frappe.get_doc(
+			{
+				"doctype": "Lot",
+				"lot_number": lot_number,
+				"site": site_a,
+				"qty_kg": 100,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+
+		evidence["lot"] = lot_doc.name
+
+		# Remove pre-existing AT-02 QC/certs so blocked scenario is deterministic.
+		for qct in frappe.get_all(
+			"QCTest",
+			filters={"lot": lot_doc.name, "site": site_a, "test_type": "AT02-MOISTURE"},
+			fields=["name"],
+		):
+			frappe.delete_doc("QCTest", qct.name, force=True, ignore_permissions=True)
+
+		for cert in frappe.get_all(
+			"Certificate",
+			filters={"lot": lot_doc.name, "site": site_a, "cert_type": "AT02-COA"},
+			fields=["name"],
+		):
+			frappe.delete_doc("Certificate", cert.name, force=True, ignore_permissions=True)
+
+		# 1) Must block without required QC/cert evidence.
+		try:
+			lot_doc.reload()
+			lot_doc.status = "For Dispatch"
+			_validate_season_policy_for_dispatch(lot_doc)
+		except Exception as exc:
+			evidence["blocked_error"] = frappe.as_unicode(exc)
+			evidence["blocked_without_evidence"] = True
+
+		# 2) Provide required evidence and confirm dispatch allowed.
+		qc_test = frappe.get_doc(
+			{
+				"doctype": "QCTest",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"test_type": "AT02-MOISTURE",
+				"test_date": frappe.utils.nowdate(),
+				"result_value": 11.2,
+				"pass_fail": "Pass",
+			}
+		).insert(ignore_permissions=True)
+		evidence["qc_test"] = qc_test.name
+
+		certificate = frappe.get_doc(
+			{
+				"doctype": "Certificate",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"cert_type": "AT02-COA",
+				"expiry_date": frappe.utils.add_days(frappe.utils.nowdate(), 30),
+			}
+		).insert(ignore_permissions=True)
+		evidence["certificate"] = certificate.name
+
+		try:
+			lot_doc.reload()
+			lot_doc.status = "For Dispatch"
+			_validate_season_policy_for_dispatch(lot_doc)
+			evidence["allowed_with_evidence"] = True
+		except Exception as exc:
+			evidence["allow_error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	pass_checks = all(
+		[
+			evidence["blocked_without_evidence"],
+			evidence["allowed_with_evidence"],
+			bool(evidence["policy"]),
+			bool(evidence["lot"]),
+			bool(evidence["qc_test"]),
+			bool(evidence["certificate"]),
 		]
 	)
 

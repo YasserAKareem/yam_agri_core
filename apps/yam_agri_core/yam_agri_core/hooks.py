@@ -57,6 +57,7 @@ permission_query_conditions = {
 	"StorageBin": "yam_agri_core.yam_agri_core.site_permissions.storage_bin_query_conditions",
 	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_query_conditions",
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_query_conditions",
+	"Season Policy": "yam_agri_core.yam_agri_core.site_permissions.season_policy_query_conditions",
 	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_query_conditions",
 	"YAM Soil Test": "yam_agri_core.yam_agri_core.site_permissions.yam_soil_test_query_conditions",
 	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_query_conditions",
@@ -81,6 +82,7 @@ has_permission = {
 	"StorageBin": "yam_agri_core.yam_agri_core.site_permissions.storage_bin_has_permission",
 	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_has_permission",
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_has_permission",
+	"Season Policy": "yam_agri_core.yam_agri_core.site_permissions.season_policy_has_permission",
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
@@ -105,6 +107,7 @@ global_search_doctypes = {
 		{"doctype": "Nonconformance", "index": 8},
 		{"doctype": "EvidencePack", "index": 9},
 		{"doctype": "Complaint", "index": 10},
+		{"doctype": "Season Policy", "index": 11},
 	],
 }
 

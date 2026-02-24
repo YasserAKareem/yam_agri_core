@@ -366,3 +366,24 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   - `Docker Compose validate=success`
 - Note:
   - This run closes the previous CI failure on SHA `7f75b5a...` and restores a green release-gate baseline.
+
+### 2026-02-24 (M4 baseline run: 140-target seeding + AT-02 policy gate)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost`, docker bench wrapper)
+- Tester: Copilot (automated implementation + execution)
+- Seed execution:
+  - Command:
+    - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
+  - Result:
+    - `{"status":"ok","seed_tag":"20260224112009","target_records":140,"core_total":141,"created_records":92}`
+- Acceptance execution:
+  - `run_at02_automated_check`: `status=pass`
+    - `blocked_without_evidence=true`
+    - `allowed_with_evidence=true`
+    - Evidence: `policy=YAM-SP-2026-00001`, `lot=YAM-LOT-2026-00018`, `qc_test=YAM-QCT-2026-00031`, `certificate=YAM-CERT-2026-00018`
+  - `run_phase2_smoke`: `status=ok`
+  - `run_at10_automated_check`: `status=pass`
+- Notes:
+  - M4 policy-gate baseline is now executable and repeatable on seeded data.
+  - Core record target achieved/exceeded (`core_total=141` vs target `140`).

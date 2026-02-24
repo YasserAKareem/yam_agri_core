@@ -16,4 +16,4 @@ class Certificate(Document):
 		expiry = self.get("expiry_date")
 		if not expiry:
 			return False
-		return utils.getdate(expiry) < utils.nowdate()
+		return utils.getdate(expiry) < utils.getdate(utils.nowdate())

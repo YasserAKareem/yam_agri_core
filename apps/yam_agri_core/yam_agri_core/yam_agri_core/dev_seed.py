@@ -492,3 +492,245 @@ def _ensure_designation(designation_name: str) -> None:
 		}
 	)
 	doc.insert(ignore_permissions=True)
+
+
+def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dict[str, int | str]:
+	"""Create balanced M4 sample data for QA/QC and season-policy gate testing.
+
+	Use via:
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1, "target_records":140}'
+
+	Behavior:
+	- Requires confirm=1.
+	- Ensures at least two Sites and active Season Policy per site.
+	- Inserts mixed pass/fail QCTest and valid/expired Certificate scenarios.
+	- Stops when selected core records total reaches target_records.
+	"""
+
+	if int(confirm) != 1:
+		frappe.throw("Set confirm=1 to execute sample-data generation")
+
+	if int(target_records) < 20:
+		frappe.throw("target_records must be at least 20")
+
+	for dt in (
+		"Site",
+		"StorageBin",
+		"Device",
+		"Lot",
+		"QCTest",
+		"Certificate",
+		"Transfer",
+		"ScaleTicket",
+		"Season Policy",
+	):
+		if not frappe.db.exists("DocType", dt):
+			frappe.throw(f"Missing DocType: {dt}")
+
+	sites = frappe.get_all("Site", fields=["name"], limit_page_length=10)
+	if not sites:
+		sites = [{"name": _ensure_default_site()}]
+
+	if len(sites) < 2:
+		site_b = frappe.get_doc(
+			{
+				"doctype": "Site",
+				"site_name": "M4 Site B",
+				"site_type": "Warehouse",
+				"description": "Auto-seeded M4 secondary site",
+			}
+		).insert(ignore_permissions=True)
+		sites.append({"name": site_b.name})
+
+	selected_sites = [sites[0]["name"], sites[1]["name"]]
+
+	created = 0
+	seed_tag = utils.now_datetime().strftime("%Y%m%d%H%M%S")
+
+	def _core_total() -> int:
+		return sum(
+			[
+				int(frappe.db.count("Season Policy")),
+				int(frappe.db.count("Lot")),
+				int(frappe.db.count("QCTest")),
+				int(frappe.db.count("Certificate")),
+				int(frappe.db.count("Transfer")),
+				int(frappe.db.count("ScaleTicket")),
+				int(frappe.db.count("Observation")),
+			]
+		)
+
+	for site in selected_sites:
+		policy_name = f"M4-Policy-{site[-4:]}"
+		policy = frappe.db.exists("Season Policy", {"policy_name": policy_name, "site": site})
+		if policy:
+			policy_doc = frappe.get_doc("Season Policy", policy)
+			policy_doc.season = "2026"
+			policy_doc.mandatory_test_types = "Moisture,Protein"
+			policy_doc.mandatory_certificate_types = "COA"
+			policy_doc.max_test_age_days = 7
+			policy_doc.enforce_dispatch_gate = 1
+			policy_doc.active = 1
+			policy_doc.save(ignore_permissions=True)
+		else:
+			frappe.get_doc(
+				{
+					"doctype": "Season Policy",
+					"policy_name": policy_name,
+					"site": site,
+					"season": "2026",
+					"mandatory_test_types": "Moisture,Protein",
+					"mandatory_certificate_types": "COA",
+					"max_test_age_days": 7,
+					"enforce_dispatch_gate": 1,
+					"active": 1,
+				}
+			).insert(ignore_permissions=True)
+			created += 1
+
+		for i in range(1, 4):
+			storage_bin_name = f"M4-BIN-{site[-4:]}-{i}"
+			if not frappe.db.exists("StorageBin", {"storage_bin_name": storage_bin_name, "site": site}):
+				frappe.get_doc(
+					{
+						"doctype": "StorageBin",
+						"storage_bin_name": storage_bin_name,
+						"site": site,
+						"capacity_kg": 5000,
+						"current_qty_kg": 0,
+						"status": "Active",
+					}
+				).insert(ignore_permissions=True)
+				created += 1
+
+		device_name = f"M4-DEV-{site[-4:]}"
+		if not frappe.db.exists("Device", {"device_name": device_name, "site": site}):
+			frappe.get_doc(
+				{
+					"doctype": "Device",
+					"device_name": device_name,
+					"site": site,
+					"device_type": "Scale",
+					"status": "Active",
+				}
+			).insert(ignore_permissions=True)
+			created += 1
+
+	iteration = 1
+	while _core_total() < int(target_records):
+		site = selected_sites[iteration % len(selected_sites)]
+		lot_number = f"M4-LOT-{seed_tag}-{iteration:03d}"
+		lot_doc = frappe.get_doc(
+			{
+				"doctype": "Lot",
+				"lot_number": lot_number,
+				"site": site,
+				"qty_kg": 100 + iteration,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+		created += 1
+
+		qct_pass = "Fail" if iteration % 7 == 0 else "Pass"
+		test_age_days = 10 if iteration % 9 == 0 else 1
+		qct_date = utils.add_days(utils.nowdate(), -test_age_days)
+		frappe.get_doc(
+			{
+				"doctype": "QCTest",
+				"lot": lot_doc.name,
+				"site": site,
+				"test_type": "Moisture",
+				"test_date": qct_date,
+				"result_value": 12.0,
+				"pass_fail": qct_pass,
+				"notes": f"M4-SEED-{seed_tag}",
+			}
+		).insert(ignore_permissions=True)
+		created += 1
+
+		frappe.get_doc(
+			{
+				"doctype": "QCTest",
+				"lot": lot_doc.name,
+				"site": site,
+				"test_type": "Protein",
+				"test_date": utils.nowdate(),
+				"result_value": 11.0,
+				"pass_fail": "Pass",
+				"notes": f"M4-SEED-{seed_tag}",
+			}
+		).insert(ignore_permissions=True)
+		created += 1
+
+		expiry = utils.add_days(utils.nowdate(), -1 if iteration % 5 == 0 else 30)
+		frappe.get_doc(
+			{
+				"doctype": "Certificate",
+				"cert_type": "COA",
+				"lot": lot_doc.name,
+				"site": site,
+				"expiry_date": expiry,
+			}
+		).insert(ignore_permissions=True)
+		created += 1
+
+		frappe.get_doc(
+			{
+				"doctype": "Transfer",
+				"site": site,
+				"transfer_type": "Move",
+				"from_lot": lot_doc.name,
+				"to_lot": lot_doc.name,
+				"qty_kg": 1,
+				"transfer_datetime": utils.now_datetime(),
+				"status": "Draft",
+				"notes": f"M4-SEED-{seed_tag}",
+			}
+		).insert(ignore_permissions=True)
+		created += 1
+
+		device_name = f"M4-DEV-{site[-4:]}"
+		device_name_doc = frappe.db.get_value("Device", {"device_name": device_name, "site": site}, "name")
+		if device_name_doc:
+			frappe.get_doc(
+				{
+					"doctype": "ScaleTicket",
+					"ticket_number": f"M4-ST-{seed_tag}-{iteration:03d}",
+					"site": site,
+					"device": device_name_doc,
+					"lot": lot_doc.name,
+					"ticket_datetime": utils.now_datetime(),
+					"gross_kg": 120,
+					"tare_kg": 20,
+					"net_kg": 100,
+				}
+			).insert(ignore_permissions=True)
+			created += 1
+
+		if iteration % 3 == 0 and device_name_doc:
+			frappe.get_doc(
+				{
+					"doctype": "Observation",
+					"site": site,
+					"device": device_name_doc,
+					"observed_at": utils.now_datetime(),
+					"observation_type": "temperature",
+					"value": 28.0,
+					"unit": "C",
+					"quality_flag": "OK",
+					"raw_payload": f'{{"seed":"{seed_tag}"}}',
+				}
+			).insert(ignore_permissions=True)
+			created += 1
+
+		iteration += 1
+
+	frappe.db.commit()
+
+	return {
+		"status": "ok",
+		"seed_tag": seed_tag,
+		"target_records": int(target_records),
+		"core_total": _core_total(),
+		"created_records": created,
+	}
