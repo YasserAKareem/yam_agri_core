@@ -125,3 +125,24 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
      - `qa_manager_a@example.com` -> Site A only
      - `qa_manager_b@example.com` -> Site B only
   5. Create at least one `Location` per site and set `Location.site`.
+
+### 2026-02-24 (AT-10 readiness after provisioning)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (automated provisioning + readiness check)
+- Executed Command:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+- Result: `status=ready`
+- Applied setup changes:
+  - Created Site B: `v3qdo4nkun` (`site_name=Site B`)
+  - Created users: `qa_manager_a@example.com`, `qa_manager_b@example.com`
+  - Assigned role: `QA Manager` to both users
+  - Added site permissions:
+    - `qa_manager_a@example.com` -> `eilf0e3t1b`
+    - `qa_manager_b@example.com` -> `v3qdo4nkun`
+  - Created and mapped locations:
+    - `AT10-Location-A` -> `eilf0e3t1b`
+    - `AT10-Location-B` -> `v3qdo4nkun`
+- Notes:
+  - Environment is now ready for manual AT-10 execution with cross-user evidence capture.
