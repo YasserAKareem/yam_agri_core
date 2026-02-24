@@ -60,11 +60,11 @@ This document is the **single source of truth** for all planned features across 
 | AT # | Scenario | Phase | Status |
 |------|----------|-------|--------|
 | AT-01 | Create Site + StorageBin + Lot | Ph2 | ⬜ Pending |
-| AT-02 | Create QCTest + attach Certificate to Lot | Ph4 | ⬜ Pending |
+| AT-02 | Create QCTest + attach Certificate to Lot | Ph4 | ✅ Automated + Evidenced |
 | AT-03 | Transfer: split Lot into shipment Lot | Ph3 | ⬜ Pending |
 | AT-04 | Trace backward from shipment Lot | Ph3 | ⬜ Pending |
 | AT-05 | Trace forward from storage Lot | Ph3 | ⬜ Pending |
-| AT-06 | Block shipment if mandatory QC/cert missing | Ph4 | ⬜ Pending |
+| AT-06 | Block shipment if mandatory QC/cert missing | Ph4 | ✅ Automated + Evidenced |
 | AT-07 | Import ScaleTicket CSV → qty update + mismatch NC | Ph5 | ⬜ Pending |
 | AT-08 | Sensor Observation: invalid data quarantined | Ph5 | ⬜ Pending |
 | AT-09 | Generate EvidencePack for date range + site | Ph7 | ⬜ Pending |

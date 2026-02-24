@@ -549,15 +549,17 @@ def run_at02_automated_check() -> dict:
 		}
 
 	site_a = None
+	site_b = None
 	for permission_entry in readiness["site_permissions"]["entries"]:
 		if permission_entry["user"] == "qa_manager_a@example.com":
 			site_a = permission_entry["for_value"]
-			break
+		elif permission_entry["user"] == "qa_manager_b@example.com":
+			site_b = permission_entry["for_value"]
 
-	if not site_a:
+	if not site_a or not site_b:
 		return {
 			"status": "blocked",
-			"reason": "Could not resolve Site A from user permissions",
+			"reason": "Could not resolve Site A/Site B from user permissions",
 			"readiness": readiness,
 		}
 
@@ -713,23 +715,28 @@ def run_at06_automated_check() -> dict:
 		}
 
 	site_a = None
+	site_b = None
 	for permission_entry in readiness["site_permissions"]["entries"]:
 		if permission_entry["user"] == "qa_manager_a@example.com":
 			site_a = permission_entry["for_value"]
-			break
+		elif permission_entry["user"] == "qa_manager_b@example.com":
+			site_b = permission_entry["for_value"]
 
-	if not site_a:
+	if not site_a or not site_b:
 		return {
 			"status": "blocked",
-			"reason": "Could not resolve Site A from user permissions",
+			"reason": "Could not resolve Site A/Site B from user permissions",
 			"readiness": readiness,
 		}
 
 	original_user = frappe.session.user
 	evidence = {
 		"site": site_a,
+		"cross_site": site_b,
 		"policy": None,
 		"lot": None,
+		"cross_site_invalid_blocked": False,
+		"cross_site_error": None,
 		"blocked_with_stale_or_expired": False,
 		"blocked_error": None,
 		"allowed_after_refresh": False,
@@ -797,6 +804,27 @@ def run_at06_automated_check() -> dict:
 			fields=["name"],
 		):
 			frappe.delete_doc("Certificate", cert.name, force=True, ignore_permissions=True)
+
+		# 0) Cross-site mismatch must be blocked (site_b evidence against site_a lot).
+		invalid_qc_doc = None
+		try:
+			invalid_qc_doc = frappe.get_doc(
+				{
+					"doctype": "QCTest",
+					"lot": lot_doc.name,
+					"site": site_b,
+					"test_type": "AT06-MOISTURE",
+					"test_date": frappe.utils.nowdate(),
+					"result_value": 11.0,
+					"pass_fail": "Pass",
+				}
+			).insert(ignore_permissions=True)
+		except Exception as exc:
+			evidence["cross_site_error"] = frappe.as_unicode(exc)
+			evidence["cross_site_invalid_blocked"] = True
+
+		if invalid_qc_doc:
+			frappe.delete_doc("QCTest", invalid_qc_doc.name, force=True, ignore_permissions=True)
 
 		stale_qc_test = frappe.get_doc(
 			{
@@ -872,6 +900,7 @@ def run_at06_automated_check() -> dict:
 
 	pass_checks = all(
 		[
+			evidence["cross_site_invalid_blocked"],
 			evidence["blocked_with_stale_or_expired"],
 			evidence["allowed_after_refresh"],
 			bool(evidence["policy"]),
