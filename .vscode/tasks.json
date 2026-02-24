@@ -1,0 +1,96 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Frappe Skill Agent: Run (text report)",
+      "type": "shell",
+      "command": "python",
+      "args": ["tools/frappe_skill_agent.py"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Frappe Skill Agent: Run (verbose)",
+      "type": "shell",
+      "command": "python",
+      "args": ["tools/frappe_skill_agent.py", "--verbose"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Frappe Skill Agent: Run (JSON output)",
+      "type": "shell",
+      "command": "python",
+      "args": ["tools/frappe_skill_agent.py", "--format", "json"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Frappe Skill Agent: Save learned rules",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "tools/frappe_skill_agent.py",
+        "--save-learned",
+        "tools/learned_rules.json"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Frappe Skill Agent: Export training data",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "tools/frappe_skill_agent.py",
+        "--export-training-data",
+        "tools/training_dataset.jsonld"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

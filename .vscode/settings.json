@@ -1,0 +1,51 @@
+{
+  // ── Python ────────────────────────────────────────────────────────────────
+  // Ruff is the project linter and formatter (see pyproject.toml).
+  // Install the recommended "charliermarsh.ruff" extension to get
+  // lint errors highlighted and auto-fixed on every save.
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+  // ── Editor defaults ───────────────────────────────────────────────────────
+  // The project uses tabs for Python indentation (Frappe convention).
+  "editor.insertSpaces": false,
+  "editor.tabSize": 4,
+  "editor.rulers": [110],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // ── GitHub Copilot ────────────────────────────────────────────────────────
+  // The main workspace instructions are in .github/copilot-instructions.md.
+  // Copilot will use them automatically for code generation and chat.
+  //
+  // BEGINNER TIP — pick the prompt that matches your role or task:
+  //   • Frappe Skill Agent (QC scanner) → frappe-skill-agent  ← start here
+  //   • App developer  → developer
+  //   • DevOps / infra → devops
+  //   • QA Manager     → qa-manager
+  //   • Platform owner → owner
+  //
+  // In Copilot Chat, click the 📎 "Attach" button → "Prompt…" to pick one.
+  // See docs/SETUP_LOCAL_VSCODE.md for a full beginner walkthrough.
+  "chat.promptFilesLocations": {
+    ".github/prompts": true
+  },
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": ".github/copilot-instructions.md" }
+  ],
+
+  // ── Test discovery ────────────────────────────────────────────────────────
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "apps/yam_agri_core/yam_agri_core/yam_agri_core/tests",
+    "--ignore=apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_doc_validations.py",
+    "-v"
+  ],
+  "python.testing.unittestEnabled": false
+}
