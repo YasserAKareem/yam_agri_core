@@ -9,6 +9,7 @@ _AT10_USER_A = "qa_manager_a@example.com"
 _AT10_USER_B = "qa_manager_b@example.com"
 _AT10_QA_USERS = [_AT10_USER_A, _AT10_USER_B]
 
+
 def run_phase2_smoke() -> dict:
 	"""Minimal post-migrate smoke for Phase 2 integration.
 

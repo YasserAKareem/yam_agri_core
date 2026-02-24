@@ -272,6 +272,7 @@ class TestChecks(unittest.TestCase):
 		self.assertEqual(f.bug_code, "5.2.4")
 		self.assertIn("Step", f.planned_response[0])
 		import shutil
+
 		shutil.rmtree(tmpdir)
 
 	# ── FS-010 ────────────────────────────────────────────────────────────
@@ -289,20 +290,21 @@ class TestChecks(unittest.TestCase):
 		f = report.critical[0]
 		self.assertEqual(f.bug_code, "5.2.2")
 		import shutil
+
 		shutil.rmtree(tmpdir)
 
 	# ── FS-011 ────────────────────────────────────────────────────────────
 
 	def test_fs011_detects_pqc_without_hp(self):
 		content = (
-			'permission_query_conditions = {\n'
+			"permission_query_conditions = {\n"
 			'    "Lot": "yam.lot_qc",\n'
 			'    "Site": "yam.site_qc",\n'
-			'}\n'
-			'has_permission = {\n'
+			"}\n"
+			"has_permission = {\n"
 			'    "Lot": "yam.lot_hp",\n'
-			'    # Site is intentionally missing!\n'
-			'}\n'
+			"    # Site is intentionally missing!\n"
+			"}\n"
 		)
 		tmpdir = tempfile.mkdtemp()
 		hooks_path = os.path.join(tmpdir, "hooks.py")
@@ -314,6 +316,7 @@ class TestChecks(unittest.TestCase):
 		codes = {f.bug_code for f in report.critical}
 		self.assertIn("5.2.3", codes)
 		import shutil
+
 		shutil.rmtree(tmpdir)
 
 
@@ -322,14 +325,16 @@ class TestQCReport(unittest.TestCase):
 
 	def test_to_dict_includes_taxonomy_fields(self):
 		report = QCReport(app_path="/tmp")
-		report.add(_finding(
-			severity="high",
-			rule_id="FS-009",
-			bug_code="5.2.4",
-			file="test.py",
-			line=10,
-			message="test cross-site",
-		))
+		report.add(
+			_finding(
+				severity="high",
+				rule_id="FS-009",
+				bug_code="5.2.4",
+				file="test.py",
+				line=10,
+				message="test cross-site",
+			)
+		)
 		d = report.to_dict()
 		self.assertEqual(d["summary"]["high"], 1)
 		finding = d["findings"][0]
@@ -344,23 +349,27 @@ class TestQCReport(unittest.TestCase):
 	def test_passed_only_when_no_critical_or_high(self):
 		report = QCReport(app_path="/tmp")
 		self.assertTrue(report.passed())
-		report.add(_finding(
-			severity="medium",
-			rule_id="FS-003",
-			bug_code="1.1.1",
-			file="a.json",
-			line=None,
-			message="medium",
-		))
+		report.add(
+			_finding(
+				severity="medium",
+				rule_id="FS-003",
+				bug_code="1.1.1",
+				file="a.json",
+				line=None,
+				message="medium",
+			)
+		)
 		self.assertTrue(report.passed())
-		report.add(_finding(
-			severity="high",
-			rule_id="FS-009",
-			bug_code="5.2.4",
-			file="b.py",
-			line=1,
-			message="high",
-		))
+		report.add(
+			_finding(
+				severity="high",
+				rule_id="FS-009",
+				bug_code="5.2.4",
+				file="b.py",
+				line=1,
+				message="high",
+			)
+		)
 		self.assertFalse(report.passed())
 
 
@@ -372,14 +381,16 @@ class TestPrintTextReport(unittest.TestCase):
 		from contextlib import redirect_stdout
 
 		report = QCReport(app_path="/tmp")
-		report.add(_finding(
-			severity="high",
-			rule_id="FS-001",
-			bug_code="6.3.1",
-			file="site_permissions.py",
-			line=42,
-			message="untranslated throw",
-		))
+		report.add(
+			_finding(
+				severity="high",
+				rule_id="FS-001",
+				bug_code="6.3.1",
+				file="site_permissions.py",
+				line=42,
+				message="untranslated throw",
+			)
+		)
 
 		buf = io.StringIO()
 		with redirect_stdout(buf):
@@ -397,14 +408,16 @@ class TestPrintTextReport(unittest.TestCase):
 		from contextlib import redirect_stdout
 
 		report = QCReport(app_path="/tmp")
-		report.add(_finding(
-			severity="medium",
-			rule_id="FS-008",
-			bug_code="2.2.4",
-			file="api.py",
-			line=10,
-			message="broad except",
-		))
+		report.add(
+			_finding(
+				severity="medium",
+				rule_id="FS-008",
+				bug_code="2.2.4",
+				file="api.py",
+				line=10,
+				message="broad except",
+			)
+		)
 
 		buf_default = io.StringIO()
 		with redirect_stdout(buf_default):
@@ -517,7 +530,7 @@ class TestHardcodedChecks(unittest.TestCase):
 	# ── FS-015 / 11.3.1 ──────────────────────────────────────────────────
 
 	def test_fs015_detects_hardcoded_tax_rate(self):
-		path = self._write_tmp('tax_rate = 15\n')
+		path = self._write_tmp("tax_rate = 15\n")
 		report = QCReport(app_path="/tmp")
 		check_hardcoded_business_logic(report, path, "/tmp")
 		self.assertEqual(len(report.medium), 1)
@@ -525,7 +538,7 @@ class TestHardcodedChecks(unittest.TestCase):
 		os.unlink(path)
 
 	def test_fs015_detects_hardcoded_discount(self):
-		path = self._write_tmp('discount_pct = 10\n')
+		path = self._write_tmp("discount_pct = 10\n")
 		report = QCReport(app_path="/tmp")
 		check_hardcoded_business_logic(report, path, "/tmp")
 		self.assertEqual(len(report.medium), 1)
@@ -551,7 +564,7 @@ class TestHardcodedChecks(unittest.TestCase):
 	# ── FS-019 / 11.3.3 ──────────────────────────────────────────────────
 
 	def test_fs019_detects_hardcoded_feature_flag(self):
-		path = self._write_tmp('is_beta = False\n')
+		path = self._write_tmp("is_beta = False\n")
 		report = QCReport(app_path="/tmp")
 		check_hardcoded_feature_flags(report, path, "/tmp")
 		self.assertEqual(len(report.low), 1)
@@ -695,6 +708,7 @@ class TestAutoLearning(unittest.TestCase):
 		self.assertEqual(lr.suggested_category, "Concurrency Bugs")
 		self.assertEqual(lr.suggested_bug_type, "Thread leaks")
 		import shutil
+
 		shutil.rmtree(tmpdir)
 
 	def test_auto_learn_produces_finding_for_known_pattern(self):
@@ -709,6 +723,7 @@ class TestAutoLearning(unittest.TestCase):
 		self.assertTrue(len(report.findings) >= 1)
 		self.assertEqual(len(report.learned_rules), 0)
 		import shutil
+
 		shutil.rmtree(tmpdir)
 
 	def test_save_and_load_learned_rules(self):
@@ -839,6 +854,7 @@ class TestTrainingDataFields(unittest.TestCase):
 	def test_cwe_ids_are_well_formed(self):
 		"""All non-empty CWE IDs must match 'CWE-NNN' or be the sentinel 'N/A'."""
 		import re
+
 		pattern = re.compile(r"^CWE-\d+$")
 		bad = []
 		for code, defn in TAXONOMY.items():
@@ -849,7 +865,10 @@ class TestTrainingDataFields(unittest.TestCase):
 	def test_td_helper_registers_with_training_data(self):
 		"""_td() must register a BugDefinition with all training fields populated."""
 		_td(
-			"99.99.1", "Test Cat", "Test Sub", "Test Type",
+			"99.99.1",
+			"Test Cat",
+			"Test Sub",
+			"Test Type",
 			"test message",
 			["Step 1"],
 			cwe_id="CWE-20",
@@ -912,25 +931,32 @@ class TestTrainingDataset(unittest.TestCase):
 		graph = TrainingDataset.to_jsonld()["@graph"]
 		node = graph[0]
 		for field in (
-			"@type", "@id", "yam:code", "yam:category", "yam:subcategory",
-			"schema:name", "yam:predefinedMessage", "yam:plannedResponse",
-			"yam:negativeExample", "yam:positiveExample",
-			"yam:telemetrySignatures", "yam:astDiff", "yam:trainingCoverage",
+			"@type",
+			"@id",
+			"yam:code",
+			"yam:category",
+			"yam:subcategory",
+			"schema:name",
+			"yam:predefinedMessage",
+			"yam:plannedResponse",
+			"yam:negativeExample",
+			"yam:positiveExample",
+			"yam:telemetrySignatures",
+			"yam:astDiff",
+			"yam:trainingCoverage",
 		):
 			self.assertIn(field, node, f"Missing field '{field}' in JSON-LD node")
 
 	def test_to_jsonld_node_coverage_value_is_decimal_1(self):
 		"""All nodes must report trainingCoverage 1.0 (100% coverage)."""
 		graph = TrainingDataset.to_jsonld()["@graph"]
-		bad_nodes = [
-			n["@id"] for n in graph
-			if n.get("yam:trainingCoverage", {}).get("@value") != "1.0"
-		]
+		bad_nodes = [n["@id"] for n in graph if n.get("yam:trainingCoverage", {}).get("@value") != "1.0"]
 		self.assertEqual(bad_nodes, [], f"Nodes with coverage < 1.0: {bad_nodes}")
 
 	def test_to_jsonld_cwe_node_has_reference_link(self):
 		"""Nodes with a real CWE-NNN ID must include a cwe:reference @id link."""
 		import re
+
 		cwe_pattern = re.compile(r"^CWE-\d+$")
 		graph = TrainingDataset.to_jsonld()["@graph"]
 		# Only nodes with a proper CWE-NNN id (not N/A) should have a reference link
@@ -982,14 +1008,16 @@ class TestTrainingDataset(unittest.TestCase):
 	def test_qc_report_finding_includes_cwe_fields(self):
 		"""Each finding dict must include cwe_id, cwe_name, and training_coverage."""
 		report = QCReport(app_path="/tmp")
-		report.add(_finding(
-			severity="high",
-			rule_id="FS-001",
-			bug_code="6.3.1",
-			file="site.py",
-			line=10,
-			message="untranslated",
-		))
+		report.add(
+			_finding(
+				severity="high",
+				rule_id="FS-001",
+				bug_code="6.3.1",
+				file="site.py",
+				line=10,
+				message="untranslated",
+			)
+		)
 		d = report.to_dict()
 		finding = d["findings"][0]
 		self.assertIn("cwe_id", finding)
@@ -1016,14 +1044,16 @@ class TestTrainingDataset(unittest.TestCase):
 		from contextlib import redirect_stdout
 
 		report = QCReport(app_path="/tmp")
-		report.add(_finding(
-			severity="high",
-			rule_id="FS-009",
-			bug_code="5.2.4",
-			file="complaint.py",
-			line=42,
-			message="missing cross-site check",
-		))
+		report.add(
+			_finding(
+				severity="high",
+				rule_id="FS-009",
+				bug_code="5.2.4",
+				file="complaint.py",
+				line=42,
+				message="missing cross-site check",
+			)
+		)
 		buf = io.StringIO()
 		with redirect_stdout(buf):
 			print_text_report(report)
@@ -1063,4 +1093,3 @@ class TestTrainingDataset(unittest.TestCase):
 		finally:
 			os.unlink(path)
 			TAXONOMY.pop("99.50.1", None)
-
