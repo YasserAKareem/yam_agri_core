@@ -16,10 +16,14 @@ def after_install() -> None:
         seed_dev_baseline_demo_data_if_enabled,
         seed_dev_org_chart_if_enabled,
     )
-    from yam_agri_core.yam_agri_core.workspace_setup import ensure_yam_agri_workspaces
+    from yam_agri_core.yam_agri_core.workspace_setup import (
+        ensure_agriculture_workspace_modernized,
+        ensure_yam_agri_workspaces,
+    )
 
     ensure_workflow_states_from_active_workflows()
     ensure_yam_agri_workspaces()
+    ensure_agriculture_workspace_modernized()
     seed_dev_org_chart_if_enabled()
     seed_dev_baseline_demo_data_if_enabled()
 
@@ -37,10 +41,14 @@ def after_migrate() -> None:
         seed_dev_baseline_demo_data_if_enabled,
         seed_dev_org_chart_if_enabled,
     )
-    from yam_agri_core.yam_agri_core.workspace_setup import ensure_yam_agri_workspaces
+    from yam_agri_core.yam_agri_core.workspace_setup import (
+        ensure_agriculture_workspace_modernized,
+        ensure_yam_agri_workspaces,
+    )
 
     ensure_workflow_states_from_active_workflows()
     ensure_yam_agri_workspaces()
+    ensure_agriculture_workspace_modernized()
     seed_dev_org_chart_if_enabled()
     seed_dev_baseline_demo_data_if_enabled()
 

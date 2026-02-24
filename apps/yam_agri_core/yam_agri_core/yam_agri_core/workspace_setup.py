@@ -182,7 +182,83 @@ def ensure_yam_agri_workspaces() -> None:
 		_ensure_workspace_sidebar()
 		_ensure_desktop_icon_for_workspace_sidebar(label="YAM Agri", app_name="yam_agri_core")
 
+	# Ensure upstream Agriculture workspace renders with modern shortcut blocks.
+	ensure_agriculture_workspace_modernized()
+
 	frappe.db.commit()
+
+
+def ensure_agriculture_workspace_modernized() -> None:
+	"""Modernize Agriculture workspace to shortcut-based layout for Frappe 16.
+
+	Upstream Agriculture ships legacy `links`/`card` layout which can render empty
+	on some Frappe 16 builds. This keeps the workspace usable without modifying
+	the upstream app files directly.
+	"""
+
+	if not frappe.db.exists("DocType", "Workspace"):
+		return
+
+	if not frappe.db.exists("Workspace", "Agriculture"):
+		return
+
+	shortcuts: list[tuple[str, str, str, str]] = [
+		("DocType", "Crop", "List", "Crop"),
+		("DocType", "Crop Cycle", "List", "Crop Cycle"),
+		("DocType", "Location", "List", "Location"),
+		("DocType", "Plant Analysis", "List", "Plant Analysis"),
+		("DocType", "Soil Analysis", "List", "Soil Analysis"),
+		("DocType", "Water Analysis", "List", "Water Analysis"),
+		("DocType", "Soil Texture", "List", "Soil Texture"),
+		("DocType", "Weather", "List", "Weather"),
+		("DocType", "Agriculture Analysis Criteria", "List", "Agriculture Analysis Criteria"),
+		("DocType", "Disease", "List", "Disease"),
+		("DocType", "Fertilizer", "List", "Fertilizer"),
+	]
+
+	_ensure_shortcuts(workspace="Agriculture", shortcuts=shortcuts)
+	_set_workspace_content_from_shortcuts(workspace="Agriculture", header_text="Agriculture")
+
+
+def _set_workspace_content_from_shortcuts(*, workspace: str, header_text: str) -> None:
+	"""Force workspace content to modern shortcut blocks.
+
+	Use this when migrating legacy card/link workspace definitions to the
+	shortcut-based editor blocks expected by modern Desk pages.
+	"""
+	if not frappe.db.exists("Workspace", workspace):
+		return
+
+	doc = frappe.get_doc("Workspace", workspace)
+	blocks: list[dict] = [
+		{
+			"type": "header",
+			"data": {
+				"text": f"<span class=\"h4\"><b>{header_text}</b></span>",
+				"col": 12,
+			},
+		}
+	]
+
+	seen_labels: set[str] = set()
+	for shortcut in (doc.shortcuts or []):
+		label = (shortcut.label or shortcut.link_to or "").strip()
+		if not label or label in seen_labels:
+			continue
+		seen_labels.add(label)
+		blocks.append(
+			{
+				"type": "shortcut",
+				"data": {
+					"shortcut_name": label,
+					"col": 3,
+				},
+			}
+		)
+
+	doc.content = json.dumps(blocks)
+	doc.save(ignore_permissions=True)
+	_unset_workspace_app(workspace)
 
 
 def _ensure_desktop_icon_for_workspace_sidebar(*, label: str, app_name: str) -> None:
@@ -359,6 +435,23 @@ def _ensure_shortcuts(*, workspace: str, shortcuts: list[tuple[str, str, str, st
 		return
 
 	doc = frappe.get_doc("Workspace", workspace)
+
+	# Remove invalid DocType shortcuts that reference missing doctypes.
+	removed_invalid = False
+	for row in list(doc.shortcuts or []):
+		if (row.type or "").strip() != "DocType":
+			continue
+		link_to = (row.link_to or "").strip()
+		if link_to and not frappe.db.exists("DocType", link_to):
+			try:
+				doc.shortcuts.remove(row)
+				removed_invalid = True
+			except Exception:
+				pass
+
+	if removed_invalid:
+		doc.save(ignore_permissions=True)
+		_unset_workspace_app(workspace)
 
 	# Deduplicate existing shortcut rows by (type, link_to, doc_view).
 	# Keep one row; prefer a label that isn't exactly the DocType name.
