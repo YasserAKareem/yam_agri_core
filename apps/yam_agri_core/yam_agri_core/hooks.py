@@ -1,7 +1,5 @@
 # hooks for yam_agri_core
 
-from . import __version__ as app_version
-
 app_name = "yam_agri_core"
 app_title = "YAM Agri Core"
 app_publisher = "YAM Agri Co."

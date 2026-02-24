@@ -5,7 +5,6 @@ from typing import Any
 import frappe
 from frappe import utils
 
-
 BASELINE_DOCTYPES = (
 	"Site",
 	"StorageBin",
