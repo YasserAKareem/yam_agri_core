@@ -6,6 +6,21 @@ import frappe
 from frappe import utils
 
 
+BASELINE_DOCTYPES = (
+	"Site",
+	"StorageBin",
+	"Lot",
+	"QCTest",
+	"Certificate",
+	"Device",
+	"Observation",
+	"ScaleTicket",
+	"Transfer",
+	"EvidencePack",
+	"Complaint",
+)
+
+
 def seed_dev_org_chart_if_enabled() -> None:
 	"""Seed a small org chart in dev only.
 
@@ -65,6 +80,10 @@ def seed_dev_baseline_demo_data_if_enabled() -> None:
 		return
 
 	site = _ensure_default_site()
+	_ensure_demo_storage_bin(site)
+	lot = _ensure_demo_lot(site)
+	_ensure_demo_qc_test(site, lot)
+	_ensure_demo_certificate(site, lot)
 	device = _ensure_demo_device(site)
 	_ensure_demo_observation(site, device)
 	_ensure_demo_scale_ticket(site, device)
@@ -86,11 +105,15 @@ def seed_baseline_demo_data_force() -> None:
 	"""
 
 	# Require our baseline DocTypes.
-	for dt in ("Site", "Device", "Observation", "ScaleTicket", "Transfer", "EvidencePack", "Complaint"):
+	for dt in BASELINE_DOCTYPES:
 		if not frappe.db.exists("DocType", dt):
 			frappe.throw(f"Missing DocType: {dt}")
 
 	site = _ensure_default_site()
+	_ensure_demo_storage_bin(site)
+	lot = _ensure_demo_lot(site)
+	_ensure_demo_qc_test(site, lot)
+	_ensure_demo_certificate(site, lot)
 	device = _ensure_demo_device(site)
 	_ensure_demo_observation(site, device)
 	_ensure_demo_scale_ticket(site, device)
@@ -132,7 +155,7 @@ def _should_seed_baseline() -> bool:
 		return False
 
 	# Require our baseline DocTypes.
-	for dt in ("Site", "Device", "Observation", "ScaleTicket", "Transfer", "EvidencePack", "Complaint"):
+	for dt in BASELINE_DOCTYPES:
 		if not frappe.db.exists("DocType", dt):
 			return False
 
@@ -152,6 +175,98 @@ def _ensure_default_site() -> str:
 			"site_name": "Dev Site",
 			"site_type": "Warehouse",
 			"description": "Auto-seeded for developer mode",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return str(doc.name)
+
+
+def _ensure_demo_storage_bin(site: str) -> str:
+	bin_name = "Dev Storage Bin"
+	existing = frappe.db.get_value(
+		"StorageBin",
+		{"site": site, "storage_bin_name": bin_name},
+		"name",
+	)
+	if existing:
+		return str(existing)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "StorageBin",
+			"storage_bin_name": bin_name,
+			"site": site,
+			"capacity_kg": 2000.0,
+			"current_qty_kg": 100.0,
+			"status": "Active",
+			"notes": "Auto-seeded for developer mode",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return str(doc.name)
+
+
+def _ensure_demo_lot(site: str) -> str:
+	lot_number = "DEV-LOT-0001"
+	existing = frappe.db.get_value("Lot", {"site": site, "lot_number": lot_number}, "name")
+	if existing:
+		return str(existing)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Lot",
+			"lot_number": lot_number,
+			"site": site,
+			"qty_kg": 100.0,
+			"status": "Draft",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return str(doc.name)
+
+
+def _ensure_demo_qc_test(site: str, lot: str) -> str:
+	test_type = "Moisture"
+	existing = frappe.db.get_value(
+		"QCTest",
+		{"site": site, "lot": lot, "test_type": test_type, "pass_fail": "Pass"},
+		"name",
+	)
+	if existing:
+		return str(existing)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "QCTest",
+			"lot": lot,
+			"site": site,
+			"test_type": test_type,
+			"test_date": utils.nowdate(),
+			"result_value": 12.5,
+			"pass_fail": "Pass",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return str(doc.name)
+
+
+def _ensure_demo_certificate(site: str, lot: str) -> str:
+	cert_type = "Dev COA"
+	existing = frappe.db.get_value(
+		"Certificate",
+		{"site": site, "lot": lot, "cert_type": cert_type},
+		"name",
+	)
+	if existing:
+		return str(existing)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Certificate",
+			"cert_type": cert_type,
+			"lot": lot,
+			"site": site,
+			"expiry_date": utils.add_days(utils.nowdate(), 365),
 		}
 	)
 	doc.insert(ignore_permissions=True)
@@ -345,7 +460,7 @@ def get_baseline_record_counts() -> dict[str, int]:
 	"""
 
 	counts: dict[str, int] = {}
-	for dt in ("Site", "Device", "Observation", "ScaleTicket", "Transfer", "EvidencePack", "Complaint"):
+	for dt in BASELINE_DOCTYPES:
 		try:
 			counts[dt] = int(frappe.db.count(dt))
 		except Exception:
