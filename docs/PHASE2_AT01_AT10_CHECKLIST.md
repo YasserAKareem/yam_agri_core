@@ -76,3 +76,28 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 - AT-10: PASS/FAIL
 - Blockers:
 - Follow-up actions:
+
+## Run Log Entries
+
+### 2026-02-24 (Automated pre-check)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (automated checks)
+- Commit SHA: `e390edd`
+- AT-01: PARTIAL (automated validations passed; full user-flow evidence still required)
+- AT-10: PARTIAL (permission hooks/bridge verified; cross-user manual verification still required)
+- Executed Commands:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_lot_crop_link_status`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_site_location_bridge_status`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
+- Key Results:
+  - `get_lot_crop_link_status`: `{available: true, total_lots: 22, unresolved_count: 0}`
+  - `get_site_location_bridge_status`: `{available: true, total_locations: 0}`
+  - `run_phase2_smoke`: `status=needs_attention` because `Weather` and `Crop Cycle` are not active DocTypes on this site.
+- Blockers:
+  - No mapped `Location` records yet for agriculture site-isolation bridge testing.
+  - No manual two-user (`Site A`/`Site B`) execution evidence captured yet.
+- Follow-up actions:
+  - Seed/create `Location` records and map `Location.site`.
+  - Execute manual AT-01 and AT-10 steps with `qa_manager_a` and `qa_manager_b` and attach evidence.
