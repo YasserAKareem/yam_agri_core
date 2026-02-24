@@ -189,11 +189,10 @@ def ensure_yam_agri_workspaces() -> None:
 
 
 def ensure_agriculture_workspace_modernized() -> None:
-	"""Modernize Agriculture workspace to shortcut-based layout for Frappe 16.
+	"""Modernize Agriculture workspace to Manufacturing-like card layout.
 
-	Upstream Agriculture ships legacy `links`/`card` layout which can render empty
-	on some Frappe 16 builds. This keeps the workspace usable without modifying
-	the upstream app files directly.
+	Keeps a classified, sectioned UX (cards + links) while filtering out missing
+	DocTypes to avoid broken links on partially-installed sites.
 	"""
 
 	if not frappe.db.exists("DocType", "Workspace"):
@@ -202,56 +201,81 @@ def ensure_agriculture_workspace_modernized() -> None:
 	if not frappe.db.exists("Workspace", "Agriculture"):
 		return
 
-	shortcuts: list[tuple[str, str, str, str]] = [
-		("DocType", "Crop", "List", "Crop"),
-		("DocType", "Crop Cycle", "List", "Crop Cycle"),
-		("DocType", "Location", "List", "Location"),
-		("DocType", "Plant Analysis", "List", "Plant Analysis"),
-		("DocType", "Soil Analysis", "List", "Soil Analysis"),
-		("DocType", "Water Analysis", "List", "Water Analysis"),
-		("DocType", "Soil Texture", "List", "Soil Texture"),
-		("DocType", "Weather", "List", "Weather"),
-		("DocType", "Agriculture Analysis Criteria", "List", "Agriculture Analysis Criteria"),
-		("DocType", "Disease", "List", "Disease"),
-		("DocType", "Fertilizer", "List", "Fertilizer"),
-	]
-
-	_ensure_shortcuts(workspace="Agriculture", shortcuts=shortcuts)
-	_set_workspace_content_from_shortcuts(workspace="Agriculture", header_text="Agriculture")
+	_set_agriculture_workspace_links_and_content(workspace="Agriculture")
 
 
-def _set_workspace_content_from_shortcuts(*, workspace: str, header_text: str) -> None:
-	"""Force workspace content to modern shortcut blocks.
-
-	Use this when migrating legacy card/link workspace definitions to the
-	shortcut-based editor blocks expected by modern Desk pages.
-	"""
+def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
+	"""Force Agriculture workspace to classified card/link layout."""
 	if not frappe.db.exists("Workspace", workspace):
 		return
 
 	doc = frappe.get_doc("Workspace", workspace)
+
+	sections: list[tuple[str, list[str]]] = [
+		("Crops & Lands", ["Crop", "Crop Cycle", "Location"]),
+		(
+			"Analytics",
+			[
+				"Plant Analysis",
+				"Soil Analysis",
+				"Water Analysis",
+				"Soil Texture",
+				"Weather",
+				"Agriculture Analysis Criteria",
+			],
+		),
+		("Diseases & Fertilizers", ["Disease", "Fertilizer"]),
+	]
+
+	existing = {dt for dt in frappe.get_all("DocType", filters={"module": "Agriculture"}, pluck="name")}
+
+	# Rebuild links table with valid entries only.
+	doc.set("links", [])
+	for section_label, doctypes in sections:
+		doc.append(
+			"links",
+			{
+				"type": "Card Break",
+				"label": section_label,
+				"hidden": 0,
+				"onboard": 0,
+			},
+		)
+		for dt in doctypes:
+			if dt not in existing:
+				continue
+			doc.append(
+				"links",
+				{
+					"type": "Link",
+					"label": dt,
+					"link_type": "DocType",
+					"link_to": dt,
+					"hidden": 0,
+					"onboard": 0,
+				},
+			)
+
+	# Do not keep shortcuts for this legacy/classified workspace.
+	doc.set("shortcuts", [])
+
 	blocks: list[dict] = [
 		{
 			"type": "header",
 			"data": {
-				"text": f"<span class=\"h4\"><b>{header_text}</b></span>",
+				"text": "<span class=\"h4\"><b>Reports &amp; Masters</b></span>",
 				"col": 12,
 			},
 		}
 	]
 
-	seen_labels: set[str] = set()
-	for shortcut in (doc.shortcuts or []):
-		label = (shortcut.label or shortcut.link_to or "").strip()
-		if not label or label in seen_labels:
-			continue
-		seen_labels.add(label)
+	for section_label, _ in sections:
 		blocks.append(
 			{
-				"type": "shortcut",
+				"type": "card",
 				"data": {
-					"shortcut_name": label,
-					"col": 3,
+					"card_name": section_label,
+					"col": 4,
 				},
 			}
 		)
