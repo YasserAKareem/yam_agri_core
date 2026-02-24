@@ -40,3 +40,22 @@ permission_query_conditions = {
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_query_conditions",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_query_conditions",
 }
+
+
+has_permission = {
+	"Site": "yam_agri_core.yam_agri_core.site_permissions.site_has_permission",
+	"Lot": "yam_agri_core.yam_agri_core.site_permissions.lot_has_permission",
+	"QCTest": "yam_agri_core.yam_agri_core.site_permissions.qc_test_has_permission",
+	"Certificate": "yam_agri_core.yam_agri_core.site_permissions.certificate_has_permission",
+	"Nonconformance": "yam_agri_core.yam_agri_core.site_permissions.nonconformance_has_permission",
+	"Device": "yam_agri_core.yam_agri_core.site_permissions.device_has_permission",
+	"Observation": "yam_agri_core.yam_agri_core.site_permissions.observation_has_permission",
+	"ScaleTicket": "yam_agri_core.yam_agri_core.site_permissions.scale_ticket_has_permission",
+	"Transfer": "yam_agri_core.yam_agri_core.site_permissions.transfer_has_permission",
+	"StorageBin": "yam_agri_core.yam_agri_core.site_permissions.storage_bin_has_permission",
+	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_has_permission",
+	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_has_permission",
+	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
+	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
+	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
+}

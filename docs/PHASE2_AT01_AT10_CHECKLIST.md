@@ -146,3 +146,23 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
     - `AT10-Location-B` -> `v3qdo4nkun`
 - Notes:
   - Environment is now ready for manual AT-10 execution with cross-user evidence capture.
+
+### 2026-02-24 (AT-10 automated execution)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (automated execution)
+- Executed Command:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+- Result: `status=pass`
+- Evidence summary:
+  - `qa_manager_a@example.com`
+    - list checks: `lots_only_site_a=true`, `bins_only_site_a=true`
+    - direct read cross-site: `lot_b_read_allowed=false`, `bin_b_read_allowed=false`
+  - `qa_manager_b@example.com`
+    - list checks: `lots_only_site_b=true`, `bins_only_site_b=true`
+    - direct read cross-site: `lot_a_read_allowed=false`, `bin_a_read_allowed=false`
+- Fixes applied before pass:
+  - Added record-level `has_permission` hooks for site-scoped DocTypes.
+  - Replaced `frappe.has_role` usage with runtime-compatible role checks via `frappe.get_roles`.
+  - Added migration guard to enforce minimum `Custom DocPerm` rows for `Lot` and `StorageBin` (`QA Manager` and `System Manager`).

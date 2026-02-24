@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import frappe
+from frappe.permissions import add_permission, update_permission_property
 
 
 def after_install() -> None:
     ensure_site_geo_fields()
     ensure_location_site_field()
+    ensure_minimum_doc_permissions()
 
     from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
 
@@ -26,6 +28,7 @@ def after_migrate() -> None:
     # Keeps dev/staging/prod consistent even if installed long ago.
     ensure_site_geo_fields()
     ensure_location_site_field()
+    ensure_minimum_doc_permissions()
     normalize_lot_crop_links()
 
     from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
@@ -213,6 +216,49 @@ def ensure_location_site_field() -> None:
         options="Site",
         insert_after=insert_after,
     )
+
+
+def ensure_minimum_doc_permissions() -> None:
+    """Keep critical DocType permissions aligned for QA flows.
+
+    This prevents legacy Custom DocPerm drift from removing QA Manager access.
+    """
+
+    _ensure_doctype_role_permissions(
+        doctype="Lot",
+        role="QA Manager",
+        flags={"read": 1, "write": 1, "create": 0, "delete": 0},
+    )
+    _ensure_doctype_role_permissions(
+        doctype="Lot",
+        role="System Manager",
+        flags={"read": 1, "write": 1, "create": 1, "delete": 1},
+    )
+    _ensure_doctype_role_permissions(
+        doctype="StorageBin",
+        role="QA Manager",
+        flags={"read": 1, "write": 1, "create": 1, "delete": 0},
+    )
+    _ensure_doctype_role_permissions(
+        doctype="StorageBin",
+        role="System Manager",
+        flags={"read": 1, "write": 1, "create": 1, "delete": 0},
+    )
+
+
+def _ensure_doctype_role_permissions(*, doctype: str, role: str, flags: dict[str, int]) -> None:
+    if not frappe.db.exists("DocType", doctype):
+        return
+
+    has_row = frappe.db.exists(
+        "Custom DocPerm",
+        {"parent": doctype, "role": role, "permlevel": 0},
+    )
+    if not has_row:
+        add_permission(doctype, role, 0)
+
+    for fieldname, value in flags.items():
+        update_permission_property(doctype, role, 0, fieldname, int(value))
 
 
 def get_site_location_bridge_status() -> dict:

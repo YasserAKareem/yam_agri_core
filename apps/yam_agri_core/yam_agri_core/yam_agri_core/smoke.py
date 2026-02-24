@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import frappe
+from frappe.exceptions import PermissionError
 
 
 def run_phase2_smoke() -> dict:
@@ -131,3 +132,159 @@ def get_at10_readiness() -> dict:
     ]) else "not_ready"
 
     return readiness
+
+
+def run_at10_automated_check() -> dict:
+    """Execute automated AT-10 checks for Site isolation.
+
+    This validates:
+    - list visibility scoping by site
+    - direct read permission denial for cross-site docs
+    """
+
+    readiness = get_at10_readiness()
+    if readiness.get("status") != "ready":
+        return {
+            "status": "blocked",
+            "reason": "AT-10 readiness is not complete",
+            "readiness": readiness,
+        }
+
+    site_a = None
+    site_b = None
+    for p in readiness["site_permissions"]["entries"]:
+        if p["user"] == "qa_manager_a@example.com":
+            site_a = p["for_value"]
+        elif p["user"] == "qa_manager_b@example.com":
+            site_b = p["for_value"]
+
+    if not site_a or not site_b:
+        return {
+            "status": "blocked",
+            "reason": "Could not resolve Site A/B from user permissions",
+            "readiness": readiness,
+        }
+
+    original_user = frappe.session.user
+    evidence = {
+        "sites": {"site_a": site_a, "site_b": site_b},
+        "list_checks": {},
+        "direct_read_checks": {},
+    }
+
+    try:
+        # Ensure test records exist on both sites.
+        frappe.set_user("Administrator")
+
+        lot_a = frappe.db.exists("Lot", {"lot_number": "AT10-LOT-A"})
+        if not lot_a:
+            lot_a = frappe.get_doc(
+                {
+                    "doctype": "Lot",
+                    "lot_number": "AT10-LOT-A",
+                    "site": site_a,
+                    "qty_kg": 100,
+                    "status": "Draft",
+                }
+            ).insert(ignore_permissions=True).name
+
+        lot_b = frappe.db.exists("Lot", {"lot_number": "AT10-LOT-B"})
+        if not lot_b:
+            lot_b = frappe.get_doc(
+                {
+                    "doctype": "Lot",
+                    "lot_number": "AT10-LOT-B",
+                    "site": site_b,
+                    "qty_kg": 100,
+                    "status": "Draft",
+                }
+            ).insert(ignore_permissions=True).name
+
+        bin_a = frappe.db.exists("StorageBin", {"storage_bin_name": "AT10-BIN-A"})
+        if not bin_a:
+            bin_a = frappe.get_doc(
+                {
+                    "doctype": "StorageBin",
+                    "storage_bin_name": "AT10-BIN-A",
+                    "site": site_a,
+                    "status": "Active",
+                }
+            ).insert(ignore_permissions=True).name
+
+        bin_b = frappe.db.exists("StorageBin", {"storage_bin_name": "AT10-BIN-B"})
+        if not bin_b:
+            bin_b = frappe.get_doc(
+                {
+                    "doctype": "StorageBin",
+                    "storage_bin_name": "AT10-BIN-B",
+                    "site": site_b,
+                    "status": "Active",
+                }
+            ).insert(ignore_permissions=True).name
+
+        # User A visibility and cross-site denial
+        frappe.set_user("qa_manager_a@example.com")
+        try:
+            visible_lots_a = frappe.get_list("Lot", fields=["name", "site"], limit_page_length=200)
+            visible_bins_a = frappe.get_list("StorageBin", fields=["name", "site"], limit_page_length=200)
+            list_error_a = None
+        except PermissionError as exc:
+            visible_lots_a = []
+            visible_bins_a = []
+            list_error_a = str(exc)
+        evidence["list_checks"]["qa_manager_a@example.com"] = {
+            "lots_only_site_a": all((r.get("site") == site_a) for r in visible_lots_a),
+            "bins_only_site_a": all((r.get("site") == site_a) for r in visible_bins_a),
+            "lot_count": len(visible_lots_a),
+            "bin_count": len(visible_bins_a),
+            "error": list_error_a,
+        }
+        lot_b_doc = frappe.get_doc("Lot", lot_b)
+        bin_b_doc = frappe.get_doc("StorageBin", bin_b)
+        evidence["direct_read_checks"]["qa_manager_a@example.com"] = {
+            "lot_b_read_allowed": bool(frappe.has_permission("Lot", "read", lot_b_doc)),
+            "bin_b_read_allowed": bool(frappe.has_permission("StorageBin", "read", bin_b_doc)),
+        }
+
+        # User B visibility and cross-site denial
+        frappe.set_user("qa_manager_b@example.com")
+        try:
+            visible_lots_b = frappe.get_list("Lot", fields=["name", "site"], limit_page_length=200)
+            visible_bins_b = frappe.get_list("StorageBin", fields=["name", "site"], limit_page_length=200)
+            list_error_b = None
+        except PermissionError as exc:
+            visible_lots_b = []
+            visible_bins_b = []
+            list_error_b = str(exc)
+        evidence["list_checks"]["qa_manager_b@example.com"] = {
+            "lots_only_site_b": all((r.get("site") == site_b) for r in visible_lots_b),
+            "bins_only_site_b": all((r.get("site") == site_b) for r in visible_bins_b),
+            "lot_count": len(visible_lots_b),
+            "bin_count": len(visible_bins_b),
+            "error": list_error_b,
+        }
+        lot_a_doc = frappe.get_doc("Lot", lot_a)
+        bin_a_doc = frappe.get_doc("StorageBin", bin_a)
+        evidence["direct_read_checks"]["qa_manager_b@example.com"] = {
+            "lot_a_read_allowed": bool(frappe.has_permission("Lot", "read", lot_a_doc)),
+            "bin_a_read_allowed": bool(frappe.has_permission("StorageBin", "read", bin_a_doc)),
+        }
+
+    finally:
+        frappe.set_user(original_user)
+
+    pass_checks = all([
+        evidence["list_checks"]["qa_manager_a@example.com"]["lots_only_site_a"],
+        evidence["list_checks"]["qa_manager_a@example.com"]["bins_only_site_a"],
+        evidence["list_checks"]["qa_manager_b@example.com"]["lots_only_site_b"],
+        evidence["list_checks"]["qa_manager_b@example.com"]["bins_only_site_b"],
+        not evidence["direct_read_checks"]["qa_manager_a@example.com"]["lot_b_read_allowed"],
+        not evidence["direct_read_checks"]["qa_manager_a@example.com"]["bin_b_read_allowed"],
+        not evidence["direct_read_checks"]["qa_manager_b@example.com"]["lot_a_read_allowed"],
+        not evidence["direct_read_checks"]["qa_manager_b@example.com"]["bin_a_read_allowed"],
+    ])
+
+    return {
+        "status": "pass" if pass_checks else "fail",
+        "evidence": evidence,
+    }
