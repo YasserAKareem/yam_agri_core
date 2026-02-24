@@ -1,5 +1,7 @@
 # hooks for yam_agri_core
 
+from . import __version__ as app_version
+
 app_name = "yam_agri_core"
 app_title = "YAM Agri Core"
 app_publisher = "YAM Agri Co."
@@ -106,4 +108,14 @@ global_search_doctypes = {
 		{"doctype": "EvidencePack", "index": 9},
 		{"doctype": "Complaint", "index": 10},
 	],
+}
+
+
+doc_events = {
+	"QCTest": {
+		"validate": "yam_agri_core.yam_agri_core.site_permissions.enforce_qc_test_site_consistency",
+	},
+	"Certificate": {
+		"validate": "yam_agri_core.yam_agri_core.site_permissions.enforce_certificate_site_consistency",
+	},
 }

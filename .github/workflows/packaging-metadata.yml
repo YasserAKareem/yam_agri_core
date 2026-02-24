@@ -1,0 +1,25 @@
+name: Packaging Metadata
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+permissions:
+  contents: read
+
+jobs:
+  check-packaging:
+    name: Check packaging consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run packaging consistency check
+        run: python tools/check_packaging_consistency.py

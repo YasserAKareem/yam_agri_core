@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-02-24T04:14:18Z",
+  "site": "localhost",
+  "url": "http://localhost:8000/login",
+  "elapsed_seconds": 118,
+  "checks": {
+    "stack_up_under_5_min": true,
+    "login_works": true,
+    "restart_works": true,
+    "site_creation_or_exists": true,
+    "app_install_check": true,
+    "bench_build_smoke": true
+  },
+  "overall_pass": true
+}

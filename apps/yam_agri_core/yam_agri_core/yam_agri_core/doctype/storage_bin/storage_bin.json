@@ -16,13 +16,15 @@
     {
       "fieldname": "storage_bin_name",
       "fieldtype": "Data",
-      "label": "Storage Bin Name"
+      "label": "Storage Bin Name",
+      "reqd": 1
     },
     {
       "fieldname": "site",
       "fieldtype": "Link",
       "options": "Site",
-      "label": "Site"
+      "label": "Site",
+      "reqd": 1
     },
     {
       "fieldname": "warehouse",

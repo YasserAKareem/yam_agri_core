@@ -18,7 +18,7 @@
     {"fieldname": "test_type", "fieldtype": "Data", "label": "Test Type"},
     {"fieldname": "test_date", "fieldtype": "Date", "label": "Test Date"},
     {"fieldname": "result_value", "fieldtype": "Float", "label": "Result Value"},
-    {"fieldname": "pass_fail", "fieldtype": "Select", "options": "Pass\nFail", "label": "Pass/Fail"}
+    {"fieldname": "pass_fail", "fieldtype": "Select", "options": "Pass\nFail", "label": "Pass/Fail", "reqd": 1}
   ],
   "permissions": [
     {"role": "System Manager", "read": 1, "write": 1, "create": 1},

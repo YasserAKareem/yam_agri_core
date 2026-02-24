@@ -167,6 +167,36 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   - Replaced `frappe.has_role` usage with runtime-compatible role checks via `frappe.get_roles`.
   - Added migration guard to enforce minimum `Custom DocPerm` rows for `Lot` and `StorageBin` (`QA Manager` and `System Manager`).
 
+### 2026-02-24 (JSON-driven end-to-end evidence capture)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (Playwright JSON collector)
+- Tooling:
+  - Scenario: `tools/evidence_capture/scenario.at01_at10.json`
+  - Runner: `tools/evidence_capture/run_evidence_collector.py`
+- Executed Command:
+  - `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.at01_at10.json`
+- Artifacts:
+  - Report JSON: `artifacts/evidence/phase2_at01_at10/evidence_report.json`
+  - Screenshots dir: `artifacts/evidence/phase2_at01_at10/screenshots/`
+- Captured coverage summary:
+  - Page screenshots: 8
+  - Record query snapshots: 13 DocTypes
+  - Bench evidence calls: 5 (all exit code `0`)
+- Not-found routes flagged by collector:
+  - `/app/storage-bin`
+  - `/app/qc-test`
+- Record snapshot counts (sample):
+  - `Site=2`, `StorageBin=2`, `Lot=10`, `Transfer=1`, `ScaleTicket=1`, `Device=1`, `Observation=1`, `Crop=2`
+  - `QCTest=0`, `Certificate=0`, `Nonconformance=0`, `Crop Cycle=0`, `Weather=0`
+- Bench evidence highlights:
+  - `run_phase2_smoke`: `status=ok`
+  - `get_at10_readiness`: `status=ready`
+  - `run_at10_automated_check`: `status=pass`
+  - `get_lot_crop_link_status`: `{total_lots: 24, linked_crop_names: 0, unresolved_count: 0}`
+  - `get_site_location_bridge_status`: `{total_locations: 2, mapped_count: 2, unmapped_count: 0}`
+
 ### 2026-02-24 (Phase 2 automated acceptance + mapping + WBS refresh)
 
 - Date: 2026-02-24
@@ -207,3 +237,19 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   1. Execute manual AT-01 flow and attach evidence IDs/screenshots.
   2. Run one-time data enrichment to populate `Lot.crop` for legacy lots where source is known.
   3. Keep AT-10 automated check in routine smoke run before each push to staging.
+
+### 2026-02-24 (AT-01 automated execution)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (automated execution)
+- Executed Command:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
+- Result: `status=pass`
+- Evidence fields captured:
+  - `sites.site_a`, `sites.site_b`
+  - `records.device_a`, `records.storage_bin_a`, `records.lot_a`, `records.transfer_a`, `records.ticket_a`
+  - `cross_site_invalid_blocked=true` with validation error text
+- Notes:
+  - Runtime evidence confirms cross-site mismatch is blocked (`Lot site must match QCTest site`).
+  - AT-01 is now repeatable and eligible to move from partial to done in WBS tracking.

@@ -1,0 +1,41 @@
+{
+  "name": "phase2-at01-at10-evidence",
+  "base_url": "http://localhost:8000",
+  "login": {
+    "username": "Administrator",
+    "password": "admin"
+  },
+  "output_dir": "artifacts/evidence/phase2_at01_at10",
+  "pages": [
+    "/app/agriculture",
+    "/app/site",
+    "/app/storage-bin",
+    "/app/lot",
+    "/app/qc-test",
+    "/app/certificate",
+    "/app/nonconformance",
+    "/app/observation"
+  ],
+  "record_queries": [
+    { "doctype": "Site", "limit": 10 },
+    { "doctype": "StorageBin", "limit": 10 },
+    { "doctype": "Lot", "limit": 10 },
+    { "doctype": "Transfer", "limit": 10 },
+    { "doctype": "ScaleTicket", "limit": 10 },
+    { "doctype": "QCTest", "limit": 10 },
+    { "doctype": "Certificate", "limit": 10 },
+    { "doctype": "Nonconformance", "limit": 10 },
+    { "doctype": "Device", "limit": 10 },
+    { "doctype": "Observation", "limit": 10 },
+    { "doctype": "Crop", "limit": 10 },
+    { "doctype": "Crop Cycle", "limit": 10 },
+    { "doctype": "Weather", "limit": 10 }
+  ],
+  "bench_execute": [
+    "yam_agri_core.yam_agri_core.smoke.run_phase2_smoke",
+    "yam_agri_core.yam_agri_core.smoke.get_at10_readiness",
+    "yam_agri_core.yam_agri_core.smoke.run_at10_automated_check",
+    "yam_agri_core.yam_agri_core.install.get_lot_crop_link_status",
+    "yam_agri_core.yam_agri_core.install.get_site_location_bridge_status"
+  ]
+}
