@@ -205,7 +205,7 @@ def ensure_agriculture_workspace_modernized() -> None:
 
 
 def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
-	"""Force Agriculture workspace to classified card/link layout."""
+	"""Force Agriculture workspace to classified, route-safe shortcut layout."""
 	if not frappe.db.exists("Workspace", workspace):
 		return
 
@@ -229,35 +229,24 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 
 	existing = {dt for dt in frappe.get_all("DocType", filters={"module": "Agriculture"}, pluck="name")}
 
-	# Rebuild links table with valid entries only.
+	# Keep links empty to avoid legacy desk card routing; rely on shortcuts instead.
 	doc.set("links", [])
-	for section_label, doctypes in sections:
-		doc.append(
-			"links",
-			{
-				"type": "Card Break",
-				"label": section_label,
-				"hidden": 0,
-				"onboard": 0,
-			},
-		)
+
+	# Rebuild shortcut rows with valid Agriculture DocTypes only.
+	doc.set("shortcuts", [])
+	for _, doctypes in sections:
 		for dt in doctypes:
 			if dt not in existing:
 				continue
 			doc.append(
-				"links",
+				"shortcuts",
 				{
-					"type": "Link",
-					"label": dt,
-					"link_type": "DocType",
+					"type": "DocType",
 					"link_to": dt,
-					"hidden": 0,
-					"onboard": 0,
+					"doc_view": "List",
+					"label": dt,
 				},
 			)
-
-	# Do not keep shortcuts for this legacy/classified workspace.
-	doc.set("shortcuts", [])
 
 	blocks: list[dict] = [
 		{
@@ -269,16 +258,29 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 		}
 	]
 
-	for section_label, _ in sections:
+	for section_label, doctypes in sections:
+		valid_doctypes = [dt for dt in doctypes if dt in existing]
+		if not valid_doctypes:
+			continue
 		blocks.append(
 			{
-				"type": "card",
+				"type": "header",
 				"data": {
-					"card_name": section_label,
-					"col": 4,
+					"text": f"<span class=\"h5\"><b>{section_label}</b></span>",
+					"col": 12,
 				},
 			}
 		)
+		for dt in valid_doctypes:
+			blocks.append(
+				{
+					"type": "shortcut",
+					"data": {
+						"shortcut_name": dt,
+						"col": 3,
+					},
+				}
+			)
 
 	doc.content = json.dumps(blocks)
 	doc.save(ignore_permissions=True)
