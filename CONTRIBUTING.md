@@ -94,10 +94,17 @@ Before opening a PR confirm:
 ### Test cases
 
 Add at least one test (unit or integration) per new function. Place tests under
-`apps/yam_agri_core/tests/`. Run with:
+`apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/` (Frappe convention: tests live inside the
+app module). Run from the repo root with:
 
 ```bash
-cd apps/yam_agri_core && python -m pytest tests/ -v
+python -m pytest apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/ -v
+```
+
+Or, inside a running bench:
+
+```bash
+bench --site <site> run-tests --app yam_agri_core
 ```
 
 ---
@@ -110,7 +117,7 @@ Key rules:
 
 ### Python
 
-- **Indentation**: 4 spaces (enforced by `ruff format`)
+- **Indentation**: Tabs (Frappe convention, enforced by `ruff format`)
 - **Line length**: 110 characters max
 - **Imports**: sorted by `ruff` (stdlib → third-party → local)
 - All user-facing strings must be wrapped in `frappe._("")`

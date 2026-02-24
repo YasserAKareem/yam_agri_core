@@ -25,6 +25,8 @@ after_install = "yam_agri_core.yam_agri_core.install.after_install"
 after_migrate = "yam_agri_core.yam_agri_core.install.after_migrate"
 before_uninstall = "yam_agri_core.yam_agri_core.uninstall.before_uninstall"
 
+# Fixtures exported/imported by `bench export-fixtures` / loaded on `bench migrate`
+fixtures = ["Workflow"]
 
 extend_bootinfo = "yam_agri_core.yam_agri_core.boot.extend_bootinfo"
 
@@ -82,6 +84,11 @@ has_permission = {
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
+	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_has_permission",
+	"YAM Soil Test": "yam_agri_core.yam_agri_core.site_permissions.yam_soil_test_has_permission",
+	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_has_permission",
+	"YAM Crop Variety": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_has_permission",
+	"YAM Crop Variety Recommendation": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_recommendation_has_permission",
 }
 
 # ERPNext-style global search registration — lets Desk's global search bar find these records.

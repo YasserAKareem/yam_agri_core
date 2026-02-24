@@ -420,3 +420,25 @@ def crop_cycle_has_permission(doc, user: str | None = None, permission_type: str
 			return True
 
 	return False
+
+
+def yam_plot_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
+def yam_soil_test_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
+def yam_plot_yield_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
+def yam_crop_variety_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
+def yam_crop_variety_recommendation_has_permission(
+	doc, user: str | None = None, permission_type: str | None = None
+) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
