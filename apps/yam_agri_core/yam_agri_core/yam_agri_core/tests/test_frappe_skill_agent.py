@@ -21,18 +21,31 @@ if _TOOLS_DIR not in sys.path:
 from frappe_skill_agent import (
 	TAXONOMY,
 	BugDefinition,
+	LearnedRule,
 	QCFinding,
 	QCReport,
 	_finding,
 	check_ai_writes_frappe,
+	check_auto_learn_patterns,
 	check_broad_except,
+	check_hardcoded_business_logic,
+	check_hardcoded_cloud_config,
+	check_hardcoded_credentials,
+	check_hardcoded_db_config,
 	check_hardcoded_emails,
+	check_hardcoded_feature_flags,
+	check_hardcoded_server_config,
+	check_master_doctype_audit_trail,
+	check_master_doctype_required_fields,
 	check_missing_cross_site_lot_validation,
 	check_missing_translations,
 	check_perm_query_has_permission_parity,
+	load_taxonomy_from_file,
 	print_text_report,
+	propose_bug_type,
 	register_bug_type,
 	run_qc,
+	save_learned_rules,
 )
 
 
@@ -53,6 +66,28 @@ class TestTaxonomyRegistry(unittest.TestCase):
 			"6.1.4",  # FS-004 title_field
 			"6.3.1",  # FS-001/002 translations
 			"10.1.1",  # FS-011 reverse parity
+			# New v3 codes
+			"11.1.1",  # FS-012 passwords
+			"11.1.2",  # FS-012 API keys
+			"11.1.3",  # FS-012 tokens
+			"11.2.1",  # FS-014 DB config
+			"11.2.2",  # FS-013 server config
+			"11.2.3",  # FS-016 cloud config
+			"11.3.1",  # FS-015 business logic
+			"11.3.2",  # hardcoded UI strings
+			"11.3.3",  # FS-019 feature flags
+			"12.1.1",  # missing master records
+			"12.1.2",  # FS-018 incomplete attributes
+			"12.1.3",  # orphan records
+			"12.2.1",  # incorrect values
+			"12.2.3",  # outdated data
+			"12.3.1",  # cross-system inconsistency
+			"12.3.3",  # duplication
+			"12.4.1",  # broken links
+			"12.4.3",  # FK violations
+			"12.5.1",  # policy violations
+			"12.5.2",  # FS-017 audit failures
+			"12.5.3",  # master data security
 		]
 		for code in required:
 			self.assertIn(code, TAXONOMY, f"Taxonomy code {code} missing from TAXONOMY registry")
@@ -376,3 +411,367 @@ class TestPrintTextReport(unittest.TestCase):
 		with redirect_stdout(buf_verbose):
 			print_text_report(report, verbose=True)
 		self.assertIn("Planned Response", buf_verbose.getvalue())
+
+
+class TestHardcodedChecks(unittest.TestCase):
+	"""Tests for the new hardcoded-bug detection checks (FS-012 to FS-019)."""
+
+	def _write_tmp(self, content: str, suffix: str = ".py") -> str:
+		fd, path = tempfile.mkstemp(suffix=suffix)
+		os.close(fd)
+		with open(path, "w", encoding="utf-8") as fh:
+			fh.write(content)
+		return path
+
+	# ── FS-012 / 11.1.x ──────────────────────────────────────────────────
+
+	def test_fs012_detects_hardcoded_password(self):
+		path = self._write_tmp('db_password = "SuperSecret123"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_credentials(report, path, "/tmp")
+		self.assertEqual(len(report.critical), 1)
+		f = report.critical[0]
+		self.assertEqual(f.rule_id, "FS-012")
+		self.assertEqual(f.bug_code, "11.1.1")
+		self.assertIn("Step", f.planned_response[0])
+		os.unlink(path)
+
+	def test_fs012_detects_hardcoded_api_key(self):
+		path = self._write_tmp('api_key = "abc123def456ghi789"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_credentials(report, path, "/tmp")
+		self.assertEqual(len(report.critical), 1)
+		self.assertEqual(report.critical[0].bug_code, "11.1.2")
+		os.unlink(path)
+
+	def test_fs012_detects_hardcoded_token(self):
+		path = self._write_tmp('auth_token = "eyJhbGciOiJIUzI1NiJ9.payload"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_credentials(report, path, "/tmp")
+		self.assertEqual(len(report.critical), 1)
+		self.assertEqual(report.critical[0].bug_code, "11.1.3")
+		os.unlink(path)
+
+	def test_fs012_ignores_env_var_read(self):
+		path = self._write_tmp('password = os.environ.get("DB_PASSWORD")\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_credentials(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+	def test_fs012_ignores_placeholder(self):
+		path = self._write_tmp('password = "CHANGE_ME"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_credentials(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+	# ── FS-013 / 11.2.2 ──────────────────────────────────────────────────
+
+	def test_fs013_detects_ip_address(self):
+		path = self._write_tmp('host = "192.168.1.100"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_server_config(report, path, "/tmp")
+		self.assertEqual(len(report.high), 1)
+		self.assertEqual(report.high[0].bug_code, "11.2.2")
+		os.unlink(path)
+
+	def test_fs013_detects_localhost(self):
+		path = self._write_tmp('db_host = "localhost"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_server_config(report, path, "/tmp")
+		self.assertEqual(len(report.high), 1)
+		os.unlink(path)
+
+	def test_fs013_skips_test_files(self):
+		fd, path = tempfile.mkstemp(prefix="test_", suffix=".py")
+		os.close(fd)
+		with open(path, "w") as fh:
+			fh.write('host = "192.168.1.1"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_server_config(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+	# ── FS-014 / 11.2.1 ──────────────────────────────────────────────────
+
+	def test_fs014_detects_db_url(self):
+		path = self._write_tmp('conn = "mysql://root:pass@localhost/mydb"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_db_config(report, path, "/tmp")
+		self.assertEqual(len(report.high), 1)
+		self.assertEqual(report.high[0].bug_code, "11.2.1")
+		os.unlink(path)
+
+	def test_fs014_detects_db_host_assignment(self):
+		path = self._write_tmp('db_host = "production.server.internal"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_db_config(report, path, "/tmp")
+		self.assertEqual(len(report.high), 1)
+		os.unlink(path)
+
+	# ── FS-015 / 11.3.1 ──────────────────────────────────────────────────
+
+	def test_fs015_detects_hardcoded_tax_rate(self):
+		path = self._write_tmp('tax_rate = 15\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_business_logic(report, path, "/tmp")
+		self.assertEqual(len(report.medium), 1)
+		self.assertEqual(report.medium[0].bug_code, "11.3.1")
+		os.unlink(path)
+
+	def test_fs015_detects_hardcoded_discount(self):
+		path = self._write_tmp('discount_pct = 10\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_business_logic(report, path, "/tmp")
+		self.assertEqual(len(report.medium), 1)
+		os.unlink(path)
+
+	# ── FS-016 / 11.2.3 ──────────────────────────────────────────────────
+
+	def test_fs016_detects_s3_bucket(self):
+		path = self._write_tmp('s3_bucket = "my-production-bucket"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_cloud_config(report, path, "/tmp")
+		self.assertEqual(len(report.medium), 1)
+		self.assertEqual(report.medium[0].bug_code, "11.2.3")
+		os.unlink(path)
+
+	def test_fs016_detects_aws_region(self):
+		path = self._write_tmp('region = "us-east-1"\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_cloud_config(report, path, "/tmp")
+		self.assertEqual(len(report.medium), 1)
+		os.unlink(path)
+
+	# ── FS-019 / 11.3.3 ──────────────────────────────────────────────────
+
+	def test_fs019_detects_hardcoded_feature_flag(self):
+		path = self._write_tmp('is_beta = False\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_feature_flags(report, path, "/tmp")
+		self.assertEqual(len(report.low), 1)
+		self.assertEqual(report.low[0].bug_code, "11.3.3")
+		os.unlink(path)
+
+	def test_fs019_detects_inline_user_check(self):
+		path = self._write_tmp('if frappe.session.user == "owner@company.com":\n    pass\n')
+		report = QCReport(app_path="/tmp")
+		check_hardcoded_feature_flags(report, path, "/tmp")
+		self.assertEqual(len(report.medium), 1)
+		self.assertEqual(report.medium[0].bug_code, "11.3.3")
+		os.unlink(path)
+
+
+class TestMasterDataChecks(unittest.TestCase):
+	"""Tests for FS-017 (master audit trail) and FS-018 (required fields)."""
+
+	def _write_doctype_json(self, data: dict) -> str:
+		fd, path = tempfile.mkstemp(suffix=".json")
+		os.close(fd)
+		with open(path, "w", encoding="utf-8") as fh:
+			json.dump(data, fh)
+		return path
+
+	def _base_master(self, **overrides) -> dict:
+		"""Minimal master DocType JSON (no naming_series, has site field)."""
+		base = {
+			"doctype": "DocType",
+			"name": "Test Master",
+			"fields": [
+				{"fieldname": "site", "fieldtype": "Link", "options": "Site"},
+				{"fieldname": "master_name", "fieldtype": "Data"},
+			],
+		}
+		base.update(overrides)
+		return base
+
+	# ── FS-017 / 12.5.2 ──────────────────────────────────────────────────
+
+	def test_fs017_master_missing_track_changes(self):
+		path = self._write_doctype_json(self._base_master())
+		report = QCReport(app_path="/tmp")
+		check_master_doctype_audit_trail(report, path, "/tmp")
+		self.assertEqual(len(report.medium), 1)
+		self.assertEqual(report.medium[0].bug_code, "12.5.2")
+		self.assertEqual(report.medium[0].rule_id, "FS-017")
+		os.unlink(path)
+
+	def test_fs017_master_with_track_changes_passes(self):
+		path = self._write_doctype_json(self._base_master(track_changes=1))
+		report = QCReport(app_path="/tmp")
+		check_master_doctype_audit_trail(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+	def test_fs017_skips_transaction_doctype(self):
+		"""DocTypes with naming_series are transaction DocTypes; FS-005 handles them."""
+		data = self._base_master()
+		data["fields"].append({"fieldname": "naming_series", "fieldtype": "Select"})
+		path = self._write_doctype_json(data)
+		report = QCReport(app_path="/tmp")
+		check_master_doctype_audit_trail(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+	# ── FS-018 / 12.1.2 ──────────────────────────────────────────────────
+
+	def test_fs018_master_missing_status_field(self):
+		path = self._write_doctype_json(self._base_master())
+		report = QCReport(app_path="/tmp")
+		check_master_doctype_required_fields(report, path, "/tmp")
+		self.assertEqual(len(report.low), 1)
+		self.assertEqual(report.low[0].bug_code, "12.1.2")
+		os.unlink(path)
+
+	def test_fs018_master_with_status_passes(self):
+		data = self._base_master()
+		data["fields"].append({"fieldname": "status", "fieldtype": "Select"})
+		path = self._write_doctype_json(data)
+		report = QCReport(app_path="/tmp")
+		check_master_doctype_required_fields(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+	def test_fs018_master_with_is_active_passes(self):
+		data = self._base_master()
+		data["fields"].append({"fieldname": "is_active", "fieldtype": "Check"})
+		path = self._write_doctype_json(data)
+		report = QCReport(app_path="/tmp")
+		check_master_doctype_required_fields(report, path, "/tmp")
+		self.assertEqual(len(report.findings), 0)
+		os.unlink(path)
+
+
+class TestAutoLearning(unittest.TestCase):
+	"""Tests for the auto-learning infrastructure."""
+
+	def test_propose_bug_type_creates_learned_rule(self):
+		rule = propose_bug_type(
+			observed_pattern="cors = '*'",
+			file="config.py",
+			line=10,
+			suggested_category="Hardcoded Bugs",
+			suggested_subcategory="Hardcoded Environment & Config",
+			suggested_bug_type="Server",
+			proposed_message="Wildcard CORS",
+			proposed_planned_response=["Step 1: Fix the CORS config", "Step 2: Test"],
+			confidence="high",
+		)
+		self.assertIsInstance(rule, LearnedRule)
+		self.assertTrue(rule.suggested_code.startswith("11.99."))
+		self.assertEqual(rule.suggested_category, "Hardcoded Bugs")
+		self.assertEqual(rule.confidence, "high")
+
+	def test_propose_bug_type_unknown_category(self):
+		rule = propose_bug_type(
+			observed_pattern="some odd pattern",
+			file="x.py",
+			line=1,
+			suggested_category="Completely New Category",
+			suggested_subcategory="Novel Sub",
+			suggested_bug_type="Novel Type",
+			proposed_message="A novel issue",
+			proposed_planned_response=["Step 1: Investigate"],
+		)
+		# Unknown categories get code 99.99.N
+		self.assertTrue(rule.suggested_code.startswith("99.99."))
+
+	def test_auto_learn_produces_learned_rule_for_novel_pattern(self):
+		"""threading.Thread() maps to Concurrency Bugs / Thread leaks — not in TAXONOMY."""
+		tmpdir = tempfile.mkdtemp()
+		path = os.path.join(tmpdir, "worker.py")
+		with open(path, "w") as fh:
+			fh.write("t = threading.Thread(target=my_task)\nt.start()\n")
+		report = QCReport(app_path=tmpdir)
+		check_auto_learn_patterns(report, path, tmpdir)
+		# Should produce a LearnedRule (not a QCFinding) because Concurrency Bugs is not in TAXONOMY
+		self.assertTrue(len(report.learned_rules) >= 1)
+		lr = report.learned_rules[0]
+		self.assertEqual(lr.suggested_category, "Concurrency Bugs")
+		self.assertEqual(lr.suggested_bug_type, "Thread leaks")
+		import shutil
+		shutil.rmtree(tmpdir)
+
+	def test_auto_learn_produces_finding_for_known_pattern(self):
+		"""cors_origins='*' maps to Hardcoded Bugs / Server — which IS in TAXONOMY."""
+		tmpdir = tempfile.mkdtemp()
+		path = os.path.join(tmpdir, "settings.py")
+		with open(path, "w") as fh:
+			fh.write('cors_origins = "*"\n')
+		report = QCReport(app_path=tmpdir)
+		check_auto_learn_patterns(report, path, tmpdir)
+		# Should produce a QCFinding (not a LearnedRule)
+		self.assertTrue(len(report.findings) >= 1)
+		self.assertEqual(len(report.learned_rules), 0)
+		import shutil
+		shutil.rmtree(tmpdir)
+
+	def test_save_and_load_learned_rules(self):
+		rule = propose_bug_type(
+			observed_pattern="debug = True",
+			file="app.py",
+			line=5,
+			suggested_category="Security Bugs",
+			suggested_subcategory="Data Protection",
+			suggested_bug_type="Debug mode active",
+			proposed_message="Debug mode may expose sensitive data",
+			proposed_planned_response=["Step 1: Set debug=False in production", "Step 2: Restart"],
+		)
+		fd, path = tempfile.mkstemp(suffix=".json")
+		os.close(fd)
+		try:
+			save_learned_rules([rule], path)
+			loaded = load_taxonomy_from_file(path)
+			self.assertEqual(len(loaded), 1)
+			defn = loaded[0]
+			self.assertEqual(defn.category, "Security Bugs")
+			self.assertEqual(defn.bug_type, "Debug mode active")
+			self.assertIn(defn.code, __import__("frappe_skill_agent").TAXONOMY)
+		finally:
+			os.unlink(path)
+
+	def test_qc_report_learned_rules_in_to_dict(self):
+		report = QCReport(app_path="/tmp")
+		rule = propose_bug_type(
+			observed_pattern="example pattern",
+			file="x.py",
+			line=1,
+			suggested_category="Hardcoded Bugs",
+			suggested_subcategory="Hardcoded Credentials",
+			suggested_bug_type="Passwords",
+			proposed_message="Test",
+			proposed_planned_response=["Step 1: Fix"],
+		)
+		report.add_learned(rule)
+		d = report.to_dict()
+		self.assertEqual(d["summary"]["learned_rules_proposed"], 1)
+		self.assertEqual(len(d["learned_rules"]), 1)
+		lr_dict = d["learned_rules"][0]
+		self.assertIn("suggested_code", lr_dict)
+		self.assertIn("proposed_planned_response", lr_dict)
+		self.assertIn("confidence", lr_dict)
+
+	def test_print_text_report_shows_learned_section(self):
+		import io
+		from contextlib import redirect_stdout
+
+		report = QCReport(app_path="/tmp")
+		rule = propose_bug_type(
+			observed_pattern="threading.Thread()",
+			file="worker.py",
+			line=3,
+			suggested_category="Concurrency Bugs",
+			suggested_subcategory="Threading",
+			suggested_bug_type="Thread leaks",
+			proposed_message="Unmanaged thread",
+			proposed_planned_response=["Step 1: Use a thread pool", "Step 2: Add join()"],
+		)
+		report.add_learned(rule)
+		buf = io.StringIO()
+		with redirect_stdout(buf):
+			print_text_report(report)
+		output = buf.getvalue()
+		self.assertIn("Auto-Learned", output)
+		self.assertIn("PROPOSED", output)
+		self.assertIn("Concurrency Bugs", output)
