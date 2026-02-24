@@ -297,3 +297,36 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   - Head SHA: `9c28f12e4e2c1879431edacf174662739dd170b2`
   - Conclusion: `success` (`completed`)
   - Job summary: `Python unit tests=success`, `YAML lint=success`, `Environment config sanity=success`, `Python lint (ruff)=success`, `Secret / credential scan=success`, `Docker Compose validate=success`
+
+### 2026-02-24 (Reliability implementation + partial-zero closure)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost`, docker bench wrapper)
+- Tester: Copilot (implementation + execution)
+- Commit SHA at run start: `67acfc6`
+- Implemented reliability fixes before run:
+  - Added executable `run_at01_automated_check` in `smoke.py` (AT-01 now callable and repeatable).
+  - Restored hook validator functions in `site_permissions.py` referenced by `hooks.py`:
+    - `enforce_qc_test_site_consistency`
+    - `enforce_certificate_site_consistency`
+  - Updated milestone mapping for closure handoff: `M3=✅ Done`, `M4=⬜ Pending`.
+- Executed commands:
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
+  - `python tools/refresh_wbs_milestones.py`
+  - `python tools/prefill_wbs_categories.py`
+  - `python tools/refresh_wbs_rows.py`
+- Results:
+  - `run_phase2_smoke`: `status=ok`
+  - `get_at10_readiness`: `status=ready`
+  - `run_at10_automated_check`: `status=pass`
+  - `run_at01_automated_check`: `status=pass`
+  - Cross-site invalid evidence now blocks as expected:
+    - `Lot site must match QCTest site`
+    - `Lot site must match Certificate site`
+- WBS closure objective:
+  - `docs/YAM_AGRI_WBS_GANTT.xlsx`: `Done=61`, `Partial=0`, `Not Started=75`
+  - `docs/planning/YAM_AGRI_WBS_GANTT.xlsx`: `Done=61`, `Partial=0`, `Not Started=75`
+  - Target achieved: **remaining Partial rows closed (0)**.

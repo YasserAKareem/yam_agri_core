@@ -13,7 +13,7 @@ STATUS_BY_MILESTONE = {
     "M0": "✅ Done",
     "M1": "✅ Done",
     "M2": "✅ Done",
-    "M3": "🟨 In Progress",
+    "M3": "✅ Done",
     "M4": "⬜ Pending",
     "M5": "⬜ Pending",
     "M6": "⬜ Pending",
