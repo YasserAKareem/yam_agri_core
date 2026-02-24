@@ -24,14 +24,15 @@
   // The main workspace instructions are in .github/copilot-instructions.md.
   // Copilot will use them automatically for code generation and chat.
   //
-  // BEGINNER TIP — pick the prompt that matches your role:
-  //   • App developer  → use prompt  .github/prompts/developer.prompt.md
-  //   • DevOps / infra → use prompt  .github/prompts/devops.prompt.md
-  //   • QA Manager     → use prompt  .github/prompts/qa-manager.prompt.md
-  //   • Platform owner → use prompt  .github/prompts/owner.prompt.md
+  // BEGINNER TIP — pick the prompt that matches your role or task:
+  //   • Frappe Skill Agent (QC scanner) → frappe-skill-agent  ← start here
+  //   • App developer  → developer
+  //   • DevOps / infra → devops
+  //   • QA Manager     → qa-manager
+  //   • Platform owner → owner
   //
-  // In Copilot Chat, click the 📎 "Attach" button → "Prompt…" to pick one,
-  // or type /developer, /devops, /qa-manager, /owner in the chat input.
+  // In Copilot Chat, click the 📎 "Attach" button → "Prompt…" to pick one.
+  // See docs/SETUP_LOCAL_VSCODE.md for a full beginner walkthrough.
   "chat.promptFilesLocations": {
     ".github/prompts": true
   },
