@@ -1,15 +1,20 @@
 # hooks for yam_agri_core
 
+from . import __version__ as app_version
+
 app_name = "yam_agri_core"
 app_title = "YAM Agri Core"
 app_publisher = "YAM Agri Co."
 app_description = "YAM Agri Core app (skeleton for tests and controllers)"
 app_email = ""
 app_license = "MIT"
+source_link = "https://github.com/YasserAKareem/yam_agri_core"
+app_logo_url = "/assets/yam_agri_core/images/logo.svg"
 
 
 after_install = "yam_agri_core.yam_agri_core.install.after_install"
 after_migrate = "yam_agri_core.yam_agri_core.install.after_migrate"
+after_uninstall = "yam_agri_core.uninstall.after_uninstall"
 
 
 extend_bootinfo = "yam_agri_core.yam_agri_core.boot.extend_bootinfo"
@@ -18,8 +23,8 @@ extend_bootinfo = "yam_agri_core.yam_agri_core.boot.extend_bootinfo"
 boot_session = "yam_agri_core.yam_agri_core.boot.boot_session"
 
 
-app_include_js = ["/assets/yam_agri_core/js/yam_agri_core.bundle.js"]
-desk_include_js = ["/assets/yam_agri_core/js/yam_agri_core.bundle.js"]
+app_include_js = ["assets/yam_agri_core/js/yam_agri_core.bundle.js"]
+desk_include_js = ["assets/yam_agri_core/js/yam_agri_core.bundle.js"]
 
 
 permission_query_conditions = {

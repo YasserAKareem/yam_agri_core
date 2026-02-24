@@ -1,0 +1,20 @@
+[build-system]
+requires = ["flit_core>=3.9,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "yam_agri_core"
+authors = [{ name = "YAM Agri Co." }]
+description = "YAM Agri Core app for Frappe/ERPNext"
+readme = "../../README.md"
+requires-python = ">=3.10"
+dynamic = ["version"]
+
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/YasserAKareem/yam_agri_core"
+Source = "https://github.com/YasserAKareem/yam_agri_core"
+
+[tool.flit.module]
+name = "yam_agri_core"

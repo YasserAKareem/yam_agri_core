@@ -1,1 +1,1 @@
-# yam_agri_core app package
+__version__ = "0.0.1"
