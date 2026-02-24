@@ -387,3 +387,14 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 - Notes:
   - M4 policy-gate baseline is now executable and repeatable on seeded data.
   - Core record target achieved/exceeded (`core_total=141` vs target `140`).
+
+### 2026-02-24 (CI metadata for M4 baseline commit)
+
+- Date: 2026-02-24
+- Commit SHA: `590d8a3161abf67f33c137ce8f15c6d19da49fc9`
+- Workflow: `CI` (main)
+- Run URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22343039945`
+- Run ID: `22343039945`
+- Overall conclusion: `success` (`completed`)
+- Note:
+  - Companion workflow `Packaging Metadata` on same SHA (`22343039944`) is outside this acceptance gate and reported separately.
