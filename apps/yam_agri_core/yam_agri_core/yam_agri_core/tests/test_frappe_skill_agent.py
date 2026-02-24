@@ -24,7 +24,10 @@ from frappe_skill_agent import (
 	LearnedRule,
 	QCFinding,
 	QCReport,
+	TrainingDataset,
+	_compute_coverage,
 	_finding,
+	_td,
 	check_ai_writes_frappe,
 	check_auto_learn_patterns,
 	check_broad_except,
@@ -40,6 +43,7 @@ from frappe_skill_agent import (
 	check_missing_cross_site_lot_validation,
 	check_missing_translations,
 	check_perm_query_has_permission_parity,
+	coverage_stats,
 	load_taxonomy_from_file,
 	print_text_report,
 	propose_bug_type,
@@ -720,6 +724,7 @@ class TestAutoLearning(unittest.TestCase):
 		)
 		fd, path = tempfile.mkstemp(suffix=".json")
 		os.close(fd)
+		registered_code = rule.suggested_code
 		try:
 			save_learned_rules([rule], path)
 			loaded = load_taxonomy_from_file(path)
@@ -730,6 +735,8 @@ class TestAutoLearning(unittest.TestCase):
 			self.assertIn(defn.code, __import__("frappe_skill_agent").TAXONOMY)
 		finally:
 			os.unlink(path)
+			# Always clean up the test-registered entry so coverage stats remain 100%
+			__import__("frappe_skill_agent").TAXONOMY.pop(registered_code, None)
 
 	def test_qc_report_learned_rules_in_to_dict(self):
 		report = QCReport(app_path="/tmp")
@@ -775,3 +782,285 @@ class TestAutoLearning(unittest.TestCase):
 		self.assertIn("Auto-Learned", output)
 		self.assertIn("PROPOSED", output)
 		self.assertIn("Concurrency Bugs", output)
+
+
+class TestTrainingDataFields(unittest.TestCase):
+	"""Tests for the v4 training-data fields on BugDefinition."""
+
+	def test_all_taxonomy_entries_have_training_data(self):
+		"""Every entry registered via _td() must have all 6 training-data fields."""
+		incomplete = []
+		for code, defn in TAXONOMY.items():
+			score = _compute_coverage(defn)
+			if score < 1.0:
+				incomplete.append((code, round(score, 2)))
+		self.assertEqual(
+			incomplete,
+			[],
+			f"Some taxonomy entries have incomplete training data (score < 1.0): {incomplete}",
+		)
+
+	def test_coverage_stats_full_coverage(self):
+		stats = coverage_stats()
+		self.assertEqual(stats["total"], len(TAXONOMY))
+		self.assertEqual(stats["coverage_pct"], 100.0, "Expected 100% full training coverage")
+		self.assertEqual(stats["avg_score"], 1.0)
+
+	def test_compute_coverage_all_fields_present(self):
+		defn = BugDefinition(
+			code="99.1.1",
+			category="Test",
+			subcategory="Test",
+			bug_type="Test",
+			predefined_message="msg",
+			planned_response=("Step 1",),
+			cwe_id="CWE-20",
+			cwe_name="Test CWE",
+			negative_example="bad code",
+			positive_example="good code",
+			telemetry_signatures=("log pattern",),
+			ast_diff="Replace X with Y",
+		)
+		self.assertEqual(_compute_coverage(defn), 1.0)
+
+	def test_compute_coverage_missing_training_fields(self):
+		defn = BugDefinition(
+			code="99.1.2",
+			category="Test",
+			subcategory="Test",
+			bug_type="Test",
+			predefined_message="msg",
+			planned_response=("Step 1",),
+			# cwe_id, negative_example, positive_example, telemetry_signatures, ast_diff all missing
+		)
+		# Only planned_response is present -> 1/6
+		self.assertAlmostEqual(_compute_coverage(defn), round(1 / 6, 2))
+
+	def test_cwe_ids_are_well_formed(self):
+		"""All non-empty CWE IDs must match 'CWE-NNN' or be the sentinel 'N/A'."""
+		import re
+		pattern = re.compile(r"^CWE-\d+$")
+		bad = []
+		for code, defn in TAXONOMY.items():
+			if defn.cwe_id and defn.cwe_id != "N/A" and not pattern.match(defn.cwe_id):
+				bad.append((code, defn.cwe_id))
+		self.assertEqual(bad, [], f"Malformed CWE IDs: {bad}")
+
+	def test_td_helper_registers_with_training_data(self):
+		"""_td() must register a BugDefinition with all training fields populated."""
+		_td(
+			"99.99.1", "Test Cat", "Test Sub", "Test Type",
+			"test message",
+			["Step 1"],
+			cwe_id="CWE-20",
+			cwe_name="Test CWE",
+			negative_example="bad()",
+			positive_example="good()",
+			telemetry_signatures=["log pattern"],
+			ast_diff="Call[bad] -> Call[good]",
+		)
+		defn = TAXONOMY["99.99.1"]
+		self.assertEqual(defn.cwe_id, "CWE-20")
+		self.assertEqual(defn.negative_example, "bad()")
+		self.assertEqual(defn.positive_example, "good()")
+		self.assertEqual(defn.telemetry_signatures, ("log pattern",))
+		self.assertEqual(defn.ast_diff, "Call[bad] -> Call[good]")
+		self.assertEqual(_compute_coverage(defn), 1.0)
+		# Clean up test entry
+		del TAXONOMY["99.99.1"]
+
+	def test_negative_and_positive_examples_differ(self):
+		"""Each taxonomy entry must have distinct negative and positive examples."""
+		same = []
+		for code, defn in TAXONOMY.items():
+			if defn.negative_example and defn.negative_example == defn.positive_example:
+				same.append(code)
+		self.assertEqual(same, [], f"negative_example == positive_example for: {same}")
+
+	def test_telemetry_signatures_are_non_empty_strings(self):
+		"""All telemetry signatures must be non-empty strings."""
+		bad = []
+		for code, defn in TAXONOMY.items():
+			for sig in defn.telemetry_signatures:
+				if not isinstance(sig, str) or not sig.strip():
+					bad.append((code, sig))
+		self.assertEqual(bad, [], f"Empty or non-string telemetry signatures: {bad}")
+
+
+class TestTrainingDataset(unittest.TestCase):
+	"""Tests for TrainingDataset JSON-LD export."""
+
+	def test_to_jsonld_returns_valid_structure(self):
+		data = TrainingDataset.to_jsonld()
+		self.assertIn("@context", data)
+		self.assertIn("@graph", data)
+		self.assertIn("yam:coverageStats", data)
+		self.assertEqual(data["schema:version"], "4.0")
+
+	def test_to_jsonld_context_has_required_namespaces(self):
+		ctx = TrainingDataset.to_jsonld()["@context"]
+		self.assertIn("yam", ctx)
+		self.assertIn("cwe", ctx)
+		self.assertIn("schema", ctx)
+		self.assertIn("xsd", ctx)
+
+	def test_to_jsonld_graph_contains_all_taxonomy_entries(self):
+		graph = TrainingDataset.to_jsonld()["@graph"]
+		self.assertEqual(len(graph), len(TAXONOMY))
+
+	def test_to_jsonld_node_has_required_fields(self):
+		graph = TrainingDataset.to_jsonld()["@graph"]
+		node = graph[0]
+		for field in (
+			"@type", "@id", "yam:code", "yam:category", "yam:subcategory",
+			"schema:name", "yam:predefinedMessage", "yam:plannedResponse",
+			"yam:negativeExample", "yam:positiveExample",
+			"yam:telemetrySignatures", "yam:astDiff", "yam:trainingCoverage",
+		):
+			self.assertIn(field, node, f"Missing field '{field}' in JSON-LD node")
+
+	def test_to_jsonld_node_coverage_value_is_decimal_1(self):
+		"""All nodes must report trainingCoverage 1.0 (100% coverage)."""
+		graph = TrainingDataset.to_jsonld()["@graph"]
+		bad_nodes = [
+			n["@id"] for n in graph
+			if n.get("yam:trainingCoverage", {}).get("@value") != "1.0"
+		]
+		self.assertEqual(bad_nodes, [], f"Nodes with coverage < 1.0: {bad_nodes}")
+
+	def test_to_jsonld_cwe_node_has_reference_link(self):
+		"""Nodes with a real CWE-NNN ID must include a cwe:reference @id link."""
+		import re
+		cwe_pattern = re.compile(r"^CWE-\d+$")
+		graph = TrainingDataset.to_jsonld()["@graph"]
+		# Only nodes with a proper CWE-NNN id (not N/A) should have a reference link
+		cwe_nodes = [n for n in graph if cwe_pattern.match(n.get("cwe:id", ""))]
+		self.assertGreater(len(cwe_nodes), 0, "Expected at least one node with a real CWE-NNN ID")
+		for node in cwe_nodes:
+			self.assertIn("cwe:reference", node)
+			self.assertIn("@id", node["cwe:reference"])
+			self.assertIn("cwe.mitre.org", node["cwe:reference"]["@id"])
+
+	def test_to_jsonld_subset_export(self):
+		"""A subset dict produces a smaller graph with correct coverage stats."""
+		subset = {k: v for k, v in TAXONOMY.items() if v.category == "Security Bugs"}
+		data = TrainingDataset.to_jsonld(subset)
+		self.assertEqual(len(data["@graph"]), len(subset))
+		self.assertEqual(data["yam:coverageStats"]["total"], len(subset))
+
+	def test_to_jsonld_file_round_trip(self):
+		"""to_jsonld_file() writes valid JSON that can be parsed back."""
+		fd, path = tempfile.mkstemp(suffix=".json")
+		os.close(fd)
+		try:
+			stats = TrainingDataset.to_jsonld_file(path)
+			self.assertIsInstance(stats, dict)
+			self.assertIn("coverage_pct", stats)
+			with open(path, encoding="utf-8") as fh:
+				reloaded = json.load(fh)
+			self.assertIn("@graph", reloaded)
+			self.assertEqual(len(reloaded["@graph"]), len(TAXONOMY))
+		finally:
+			os.unlink(path)
+
+	def test_coverage_stats_empty_taxonomy(self):
+		"""coverage_stats() with an empty dict returns zero values gracefully."""
+		stats = coverage_stats({})
+		self.assertEqual(stats["total"], 0)
+		self.assertEqual(stats["coverage_pct"], 0.0)
+		self.assertEqual(stats["avg_score"], 0.0)
+
+	def test_qc_report_to_dict_includes_taxonomy_coverage(self):
+		"""QCReport.to_dict() summary must include taxonomy_coverage with 100% stats."""
+		report = QCReport(app_path="/tmp")
+		d = report.to_dict()
+		cov = d["summary"].get("taxonomy_coverage")
+		self.assertIsNotNone(cov, "taxonomy_coverage missing from summary")
+		self.assertEqual(cov["coverage_pct"], 100.0)
+		self.assertEqual(cov["avg_score"], 1.0)
+
+	def test_qc_report_finding_includes_cwe_fields(self):
+		"""Each finding dict must include cwe_id, cwe_name, and training_coverage."""
+		report = QCReport(app_path="/tmp")
+		report.add(_finding(
+			severity="high",
+			rule_id="FS-001",
+			bug_code="6.3.1",
+			file="site.py",
+			line=10,
+			message="untranslated",
+		))
+		d = report.to_dict()
+		finding = d["findings"][0]
+		self.assertIn("cwe_id", finding)
+		self.assertIn("cwe_name", finding)
+		self.assertIn("training_coverage", finding)
+		self.assertEqual(finding["training_coverage"], 1.0)
+
+	def test_print_text_report_shows_training_coverage(self):
+		"""Text report header must include training coverage line."""
+		import io
+		from contextlib import redirect_stdout
+
+		report = QCReport(app_path="/tmp")
+		buf = io.StringIO()
+		with redirect_stdout(buf):
+			print_text_report(report)
+		output = buf.getvalue()
+		self.assertIn("Training", output)
+		self.assertIn("100.0%", output)
+
+	def test_print_text_report_shows_cwe_for_high_finding(self):
+		"""High-severity findings must show the CWE ID in text report."""
+		import io
+		from contextlib import redirect_stdout
+
+		report = QCReport(app_path="/tmp")
+		report.add(_finding(
+			severity="high",
+			rule_id="FS-009",
+			bug_code="5.2.4",
+			file="complaint.py",
+			line=42,
+			message="missing cross-site check",
+		))
+		buf = io.StringIO()
+		with redirect_stdout(buf):
+			print_text_report(report)
+		output = buf.getvalue()
+		self.assertIn("CWE-639", output)
+
+	def test_load_taxonomy_from_file_preserves_training_fields(self):
+		"""load_taxonomy_from_file() must round-trip all training-data fields."""
+		entry = {
+			"code": "99.50.1",
+			"category": "Test",
+			"subcategory": "Sub",
+			"bug_type": "Type",
+			"predefined_message": "msg",
+			"planned_response": ["Step 1"],
+			"cwe_id": "CWE-259",
+			"cwe_name": "Hardcoded Password",
+			"negative_example": "password = 'abc'",
+			"positive_example": "password = os.environ.get('PASS')",
+			"telemetry_signatures": ["grep: password= found"],
+			"ast_diff": "Replace Constant with Call[os.environ.get]",
+		}
+		fd, path = tempfile.mkstemp(suffix=".json")
+		os.close(fd)
+		try:
+			with open(path, "w") as fh:
+				json.dump([entry], fh)
+			loaded = load_taxonomy_from_file(path)
+			self.assertEqual(len(loaded), 1)
+			defn = loaded[0]
+			self.assertEqual(defn.cwe_id, "CWE-259")
+			self.assertEqual(defn.negative_example, "password = 'abc'")
+			self.assertEqual(defn.positive_example, "password = os.environ.get('PASS')")
+			self.assertEqual(defn.telemetry_signatures, ("grep: password= found",))
+			self.assertEqual(defn.ast_diff, "Replace Constant with Call[os.environ.get]")
+			self.assertEqual(_compute_coverage(defn), 1.0)
+		finally:
+			os.unlink(path)
+			TAXONOMY.pop("99.50.1", None)
+
