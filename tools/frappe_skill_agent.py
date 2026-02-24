@@ -2019,6 +2019,9 @@ _SAFE_CREDENTIAL_RE = re.compile(
 
 def check_hardcoded_credentials(report: QCReport, py_file: str, base: str) -> None:
 	"""FS-012 / 11.1.x: Hard-coded password, API key, or token in Python source."""
+	# Skip test files — they intentionally contain fake credentials to validate detection
+	if os.path.basename(py_file).startswith("test_"):
+		return
 	lines = _read_lines(py_file)
 	rel = _rel(py_file, base)
 	for lineno, line in enumerate(lines, 1):
@@ -2333,6 +2336,9 @@ _AUTO_LEARN_PATTERNS: list[tuple[re.Pattern, str, str, str, str]] = [
 
 def check_auto_learn_patterns(report: QCReport, py_file: str, base: str) -> None:
 	"""FS-020: Detect suspicious patterns not covered by other rules and propose new types."""
+	# Skip test files — they intentionally contain bad patterns to validate detection
+	if os.path.basename(py_file).startswith("test_"):
+		return
 	lines = _read_lines(py_file)
 	rel = _rel(py_file, base)
 	for lineno, line in enumerate(lines, 1):

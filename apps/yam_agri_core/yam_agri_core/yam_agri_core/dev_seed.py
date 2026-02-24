@@ -508,10 +508,10 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 	"""
 
 	if int(confirm) != 1:
-		frappe.throw("Set confirm=1 to execute sample-data generation")
+		frappe.throw(_("Set confirm=1 to execute sample-data generation"))
 
 	if int(target_records) < 20:
-		frappe.throw("target_records must be at least 20")
+		frappe.throw(_("target_records must be at least 20"))
 
 	for dt in (
 		"Site",
@@ -525,7 +525,7 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 		"Season Policy",
 	):
 		if not frappe.db.exists("DocType", dt):
-			frappe.throw(f"Missing DocType: {dt}")
+			frappe.throw(_("Missing DocType: {0}").format(dt))
 
 	sites = frappe.get_all("Site", fields=["name"], limit_page_length=10)
 	if not sites:

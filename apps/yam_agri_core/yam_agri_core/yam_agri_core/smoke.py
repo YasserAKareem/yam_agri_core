@@ -557,9 +557,9 @@ def run_at02_automated_check() -> dict:
 	site_a = None
 	site_b = None
 	for permission_entry in readiness["site_permissions"]["entries"]:
-		if permission_entry["user"] == "qa_manager_a@example.com":
+		if permission_entry["user"] == _AT10_USER_A:
 			site_a = permission_entry["for_value"]
-		elif permission_entry["user"] == "qa_manager_b@example.com":
+		elif permission_entry["user"] == _AT10_USER_B:
 			site_b = permission_entry["for_value"]
 
 	if not site_a or not site_b:
@@ -723,9 +723,9 @@ def run_at06_automated_check() -> dict:
 	site_a = None
 	site_b = None
 	for permission_entry in readiness["site_permissions"]["entries"]:
-		if permission_entry["user"] == "qa_manager_a@example.com":
+		if permission_entry["user"] == _AT10_USER_A:
 			site_a = permission_entry["for_value"]
-		elif permission_entry["user"] == "qa_manager_b@example.com":
+		elif permission_entry["user"] == _AT10_USER_B:
 			site_b = permission_entry["for_value"]
 
 	if not site_a or not site_b:
