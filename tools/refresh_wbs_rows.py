@@ -15,6 +15,14 @@ STATUS_DONE = "Done"
 STATUS_PARTIAL = "Partial"
 STATUS_NOT_STARTED = "Not Started"
 
+CATEGORY_COLUMNS = [
+    "Schema",
+    "Validation",
+    "Permissions/Isolation",
+    "Workflow",
+    "Evidence",
+]
+
 MILESTONE_TO_PHASE = {
     "M0": "0",
     "M1": "1",
@@ -96,6 +104,32 @@ def _extract_phase_from_wbs_id(raw: object) -> str | None:
     return text.split(".")[0]
 
 
+def _is_done_token(value: object) -> bool:
+    text = str(value or "").strip().lower()
+    return text in {"✅", "done", "complete", "completed", "yes", "y", "true", "1"}
+
+
+def _is_not_applicable_token(value: object) -> bool:
+    text = str(value or "").strip().lower()
+    return text in {"n/a", "na", "not applicable", "-"}
+
+
+def _row_categories_allow_done(ws_wbs, row: int, category_cols: dict[str, int]) -> bool:
+    applicable_count = 0
+    completed_count = 0
+
+    for category_name, col_idx in category_cols.items():
+        value = ws_wbs.cell(row=row, column=col_idx).value
+        if _is_not_applicable_token(value):
+            continue
+
+        applicable_count += 1
+        if _is_done_token(value):
+            completed_count += 1
+
+    return applicable_count > 0 and applicable_count == completed_count
+
+
 def _apply_row_level_statuses(path: Path) -> None:
     wb = load_workbook(path)
     ws_wbs = wb["WBS"]
@@ -112,6 +146,7 @@ def _apply_row_level_statuses(path: Path) -> None:
     col_status_updated = _ensure_column(ws_wbs, headers, "Status Updated On")
     col_started = _ensure_column(ws_wbs, headers, "Started On")
     col_completed = _ensure_column(ws_wbs, headers, "Completed On")
+    category_cols = {name: _ensure_column(ws_wbs, headers, name) for name in CATEGORY_COLUMNS}
 
     today = date.today()
 
@@ -123,6 +158,9 @@ def _apply_row_level_statuses(path: Path) -> None:
         phase_info = phase_map.get(phase, {"status": STATUS_NOT_STARTED, "target_date": None})
         status = str(phase_info["status"])
         target_date = phase_info.get("target_date")
+
+        if status == STATUS_DONE and not _row_categories_allow_done(ws_wbs, r, category_cols):
+            status = STATUS_PARTIAL
 
         ws_wbs.cell(row=r, column=col_exec_status).value = status
         ws_wbs.cell(row=r, column=col_status_updated).value = today

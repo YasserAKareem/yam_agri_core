@@ -45,6 +45,19 @@ When updating WBS row columns:
 - `Completed On`
   - Set only when status is `Done`; clear when not `Done`.
 
+## Category Column Policy (automation)
+
+The row-level refresh script (`tools/refresh_wbs_rows.py`) enforces `Done` with category gating.
+
+- Required WBS columns (auto-created if missing):
+  - `Schema`, `Validation`, `Permissions/Isolation`, `Workflow`, `Evidence`
+- A row can be `Done` only when **all applicable category cells** are marked complete.
+- Accepted complete tokens (case-insensitive):
+  - `✅`, `Done`, `Complete`, `Completed`, `Yes`, `Y`, `True`, `1`
+- Accepted not-applicable tokens:
+  - `N/A`, `NA`, `Not Applicable`, `-`
+- If milestone says `Done` but categories are incomplete, automation downgrades the row to `Partial`.
+
 ## Consistency Notes
 
 - Do not mark `Done` if evidence is stale or missing.

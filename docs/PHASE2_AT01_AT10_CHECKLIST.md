@@ -272,3 +272,28 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 - CI Evidence Note:
   - This log captures local gating evidence for WBS transition.
   - Attach latest GitHub Actions `ci.yml` successful run URL in the next update to complete remote CI-on-main proof.
+
+### 2026-02-24 (M2 closeout consolidated evidence bundle)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` via docker bench wrapper + GitHub Actions)
+- Tester: Copilot (automated evidence consolidation)
+- Commit SHA: `9c28f12` (main)
+- AT-01: PASS
+  - Latest validated AT-01 entry in this checklist: **2026-02-24 (AT-01 automated execution)** with `status=pass` and cross-site block evidence.
+- AT-10: PASS (fresh run)
+  - Command: `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+  - Result: `{"status":"pass", ...}` with list scoping + direct-read denial checks passing for Site A/Site B users.
+- Smoke / readiness outputs (fresh runs)
+  - `run_phase2_smoke`: `status=ok`
+  - `get_at10_readiness`: `status=ready`
+- Artifact paths
+  - Evidence report: `artifacts/evidence/phase2_at01_at10/evidence_report.json`
+  - Screenshots: `artifacts/evidence/phase2_at01_at10/screenshots/`
+  - Collector run command: `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.at01_at10.json`
+- CI green evidence (main, `ci.yml`)
+  - Run URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22339072227`
+  - Run ID: `22339072227`
+  - Head SHA: `9c28f12e4e2c1879431edacf174662739dd170b2`
+  - Conclusion: `success` (`completed`)
+  - Job summary: `Python unit tests=success`, `YAML lint=success`, `Environment config sanity=success`, `Python lint (ruff)=success`, `Secret / credential scan=success`, `Docker Compose validate=success`
