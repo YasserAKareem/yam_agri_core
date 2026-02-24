@@ -325,3 +325,21 @@ def _ensure_custom_field(
 
 	doc.save(ignore_permissions=True)
 	frappe.db.commit()
+
+
+def check_app_permission() -> bool:
+	"""Guard for add_to_apps_screen.
+
+	Returns True if the current user should see YAM Agri in the Apps launcher.
+	- Administrator always has access.
+	- Website users (no desk access) are excluded.
+	"""
+	if frappe.session.user == "Administrator":
+		return True
+
+	from frappe.utils.user import is_website_user
+
+	if is_website_user():
+		return False
+
+	return True

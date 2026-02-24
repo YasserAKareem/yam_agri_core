@@ -10,14 +10,14 @@ def test_check_certificates_for_dispatch_raises_on_expired(monkeypatch):
 		frappe, "throw", lambda msg, exc=None: (_ for _ in ()).throw(exc(msg) if exc else Exception(msg))
 	)
 
-	from yam_agri_core.doctype.lot.lot import check_certificates_for_dispatch
+	from yam_agri_core.yam_agri_core.doctype.lot.lot import check_certificates_for_dispatch
 
 	with pytest.raises(frappe.ValidationError):
 		check_certificates_for_dispatch("LOT-1", "For Dispatch")
 
 
 def test_qc_test_freshness(monkeypatch):
-	from yam_agri_core.doctype.qc_test.qc_test import QCTest
+	from yam_agri_core.yam_agri_core.doctype.qc_test.qc_test import QCTest
 
 	doc = QCTest()
 	# no date -> not fresh
@@ -33,7 +33,7 @@ def test_qc_test_freshness(monkeypatch):
 				return date(2026, 2, 15)
 			return date(2026, 2, 22)
 
-	monkeypatch.setattr("yam_agri_core.doctype.qc_test.qc_test.utils", utils)
+	monkeypatch.setattr("yam_agri_core.yam_agri_core.doctype.qc_test.qc_test.utils", utils)
 
 	doc.test_date = "2026-02-15"
 	assert doc.days_since_test() == 7
@@ -41,7 +41,7 @@ def test_qc_test_freshness(monkeypatch):
 
 
 def test_only_qa_manager_can_accept_lot(monkeypatch):
-	from yam_agri_core.doctype.lot.lot import Lot
+	from yam_agri_core.yam_agri_core.doctype.lot.lot import Lot
 
 	# simulate old status = Draft in DB
 	class DB:

@@ -11,6 +11,15 @@ source_link = "https://github.com/YasserAKareem/yam_agri_core"
 app_logo_url = "/assets/yam_agri_core/images/yam-agri-logo.svg"
 required_apps = ["frappe/erpnext"]
 
+add_to_apps_screen = [
+	{
+		"name": "yam_agri_core",
+		"logo": "/assets/yam_agri_core/images/yam-agri-logo.svg",
+		"title": "YAM Agri",
+		"route": "/app/lot",
+		"has_permission": "yam_agri_core.yam_agri_core.install.check_app_permission",
+	}
+]
 
 after_install = "yam_agri_core.yam_agri_core.install.after_install"
 after_migrate = "yam_agri_core.yam_agri_core.install.after_migrate"
@@ -26,6 +35,12 @@ boot_session = "yam_agri_core.yam_agri_core.boot.boot_session"
 # app_include_css = "yam_agri_core.bundle.css"
 app_include_js = ["yam_agri_core.bundle.js"]
 
+# Per-doctype client-side JS (relative to the app's module directory)
+doctype_js = {
+	"Lot": "yam_agri_core/doctype/lot/lot.js",
+	"Site": "yam_agri_core/doctype/site/site.js",
+	"QCTest": "yam_agri_core/doctype/qc_test/qc_test.js",
+}
 
 permission_query_conditions = {
 	"Site": "yam_agri_core.yam_agri_core.site_permissions.site_query_conditions",
@@ -67,4 +82,21 @@ has_permission = {
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
+}
+
+# ERPNext-style global search registration — lets Desk's global search bar find these records.
+global_search_doctypes = {
+	"Default": [
+		{"doctype": "Lot", "index": 0},
+		{"doctype": "Site", "index": 1},
+		{"doctype": "QCTest", "index": 2},
+		{"doctype": "Certificate", "index": 3},
+		{"doctype": "StorageBin", "index": 4},
+		{"doctype": "Transfer", "index": 5},
+		{"doctype": "ScaleTicket", "index": 6},
+		{"doctype": "Observation", "index": 7},
+		{"doctype": "Nonconformance", "index": 8},
+		{"doctype": "EvidencePack", "index": 9},
+		{"doctype": "Complaint", "index": 10},
+	],
 }

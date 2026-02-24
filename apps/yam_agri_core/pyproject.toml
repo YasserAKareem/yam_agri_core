@@ -1,0 +1,20 @@
+[project]
+name = "yam_agri_core"
+authors = [{ name = "YAM Agri Co.", email = "dev@yam-agri.com" }]
+description = "YAM Agri Core — cereal supply chain quality and traceability platform"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=15.0.0-dev"
+erpnext = ">=15.0.0-dev"
+
+[project.urls]
+Homepage = "https://github.com/YasserAKareem/yam_agri_core"
+Repository = "https://github.com/YasserAKareem/yam_agri_core.git"
+"Bug Reports" = "https://github.com/YasserAKareem/yam_agri_core/issues"

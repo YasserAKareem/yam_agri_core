@@ -1,14 +1,8 @@
-[project]
-name = "yam_agri_core"
-authors = [{ name = "YAM Agri Co.", email = "dev@yam-agri.com" }]
-description = "YAM Agri Core — cereal supply chain quality and traceability platform"
-requires-python = ">=3.10"
-readme = "apps/yam_agri_core/README.md"
-dynamic = ["version"]
-
-[build-system]
-requires = ["flit_core >=3.4,<4"]
-build-backend = "flit_core.buildapi"
+# Root pyproject.toml — monorepo tooling configuration only.
+# This file configures ruff (linting/formatting) and pytest for the whole repo.
+#
+# The actual Frappe app packaging lives in apps/yam_agri_core/pyproject.toml
+# (what bench pip-installs when adding the app to a bench).
 
 [tool.ruff]
 line-length = 110
@@ -55,12 +49,6 @@ section-order = [
 
 [tool.pytest.ini_options]
 testpaths = [
-    "apps/yam_agri_core/tests",
     "apps/yam_agri_core/yam_agri_core/yam_agri_core/tests",
 ]
 python_files = ["test_*.py"]
-
-[project.urls]
-Homepage = "https://github.com/YasserAKareem/yam_agri_core"
-Repository = "https://github.com/YasserAKareem/yam_agri_core.git"
-"Bug Reports" = "https://github.com/YasserAKareem/yam_agri_core/issues"

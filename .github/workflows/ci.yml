@@ -146,3 +146,30 @@ jobs:
             echo "Add .env.example templates to each environment directory."
           fi
           exit 0
+
+  # ── 6. Python unit tests (pure-Python, no live Frappe server needed) ───
+  python-tests:
+    name: Python unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest
+          # Install the app itself in editable mode so imports resolve correctly.
+          # --no-deps avoids pulling in frappe/erpnext which require a full bench.
+          pip install -e apps/yam_agri_core --no-deps
+
+      - name: Run pure-Python tests
+        run: |
+          pytest apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/ \
+            -v --tb=short \
+            --ignore=apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_doc_validations.py
+        # test_doc_validations.py requires a live frappe.db; run via `bench run-tests` instead.
+        # test_agr_cereal_001.py is pure Python and runs here.
