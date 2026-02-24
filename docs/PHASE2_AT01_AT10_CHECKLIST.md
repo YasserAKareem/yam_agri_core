@@ -18,7 +18,7 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 
 ## AT-01: Site -> StorageBin -> Lot flow
 
-### Steps
+### AT-01 Steps
 
 1. Create `Site A` if missing.
 2. Create `StorageBin` with:
@@ -32,21 +32,21 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 4. Create a `Transfer` within Site A and verify lot-site consistency checks.
 5. Create `ScaleTicket` referencing Site A lot and optional device at Site A.
 
-### Expected Results
+### AT-01 Expected Results
 
 - Cannot save `StorageBin`, `Lot`, `Transfer`, or `ScaleTicket` without `site`.
 - `Lot.crop` must resolve to an existing `Crop` record.
 - Cross-site link mismatches are blocked (e.g., Site B lot on Site A transfer).
 - Quantities enforce non-negative and domain constraints.
 
-### Evidence to capture
+### AT-01 Evidence to capture
 
 - Screenshots or record IDs for created Site/StorageBin/Lot/Transfer/ScaleTicket.
 - Any validation error messages encountered and their conditions.
 
 ## AT-10: Site isolation (Site A user cannot see Site B)
 
-### Steps
+### AT-10 Steps
 
 1. Login as `qa_manager_a` (Site A only permission).
 2. Open list views for: `Site`, `Lot`, `StorageBin`, `Transfer`, `ScaleTicket`, `QCTest`, `Certificate`, `Nonconformance`, `EvidencePack`, `Complaint`, `Device`, `Observation`.
@@ -54,13 +54,13 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 4. Attempt direct access by URL/name of a Site B document.
 5. Repeat key checks as `qa_manager_b` for inverse isolation.
 
-### Expected Results
+### AT-10 Expected Results
 
 - Query-level filtering hides other-site records in list/report/search.
 - Record-level checks deny direct open/update when site is unauthorized.
 - Administrator/System Manager can still access all sites.
 
-### Evidence to capture
+### AT-10 Evidence to capture
 
 - User + role mapping used for test.
 - Record IDs attempted for cross-site access.
