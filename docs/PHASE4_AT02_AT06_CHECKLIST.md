@@ -146,3 +146,15 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
   - `run_at06_automated_check`: `status=pass`
 - Notes:
   - This rerun confirms the updated seed creation path executes with additional record generation (`created_records=19`).
+
+### 2026-02-24 (CI metadata for M4 implementation commits)
+
+- Implementation commit SHA: `33866dbde2db899584b6e1d42ff5c908e6fa977f`
+  - `CI` run: `22343716476` -> `failure`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22343716476`
+    - Job summary: `Python lint (ruff)=failure`, all other CI jobs success.
+  - `Packaging Metadata` run: `22343716609` -> `failure` (non-gating for this acceptance flow)
+- Remediation commit SHA: `b6b5b6ea34f5bd1e149968192be16e7f42b6d9bf`
+  - `CI` run: `22343761795` -> `success`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22343761795`
+  - `Packaging Metadata` run: `22343761861` -> `failure` (tracked separately)
