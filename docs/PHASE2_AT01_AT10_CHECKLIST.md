@@ -237,3 +237,18 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
   1. Execute manual AT-01 flow and attach evidence IDs/screenshots.
   2. Run one-time data enrichment to populate `Lot.crop` for legacy lots where source is known.
   3. Keep AT-10 automated check in routine smoke run before each push to staging.
+
+### 2026-02-24 (AT-01 automated execution)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (`localhost` site)
+- Tester: Copilot (automated execution)
+- Executed Command:
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
+- Expected Result: `status=pass`
+- Evidence fields captured:
+  - `sites.site_a`, `sites.site_b`
+  - `records.device_a`, `records.storage_bin_a`, `records.lot_a`, `records.transfer_a`, `records.ticket_a`
+  - `cross_site_invalid_blocked=true` with validation error text
+- Notes:
+  - This closes AT-01 from manual-only/partial to repeatable automated acceptance.

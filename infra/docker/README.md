@@ -50,6 +50,75 @@ Notes:
 - `run.sh` detects `FRAPPE_SERVICE` from `.env` (defaults to `backend`).
 - `accept_phase01.sh` writes `phase01_acceptance_report.json` with pass/fail per check.
 
+## Offline init (exact steps)
+
+Use this flow for low-connectivity deployments (field/offline laptop).
+
+1. On a machine with internet, prefetch and archive all required images:
+
+```bash
+cd infra/docker
+cp .env.example .env   # if not present
+bash run.sh prefetch
+```
+
+Expected output:
+
+- pulls all images from compose
+- writes archive at `./offline-images.tar` (default)
+
+1. Transfer archive to target machine (USB/network share):
+
+```bash
+# copy this file to target machine under infra/docker/
+infra/docker/offline-images.tar
+```
+
+1. On target machine (no internet), load images and start services:
+
+```bash
+cd infra/docker
+cp .env.example .env   # if not present
+bash run.sh offline-init
+```
+
+Expected output:
+
+- `docker load` completes from archive
+- stack starts without pull/build
+
+1. Initialize site/apps (first run on that machine):
+
+```bash
+bash run.sh init
+```
+
+1. Verify health and logs:
+
+```bash
+bash run.sh status
+bash run.sh logs
+```
+
+1. Create a local recovery point:
+
+```bash
+bash run.sh backup
+```
+
+### Optional: custom archive path
+
+Override archive location with `OFFLINE_IMAGES_ARCHIVE`:
+
+```bash
+OFFLINE_IMAGES_ARCHIVE=/mnt/usb/yam/offline-images.tar bash run.sh prefetch
+OFFLINE_IMAGES_ARCHIVE=/mnt/usb/yam/offline-images.tar bash run.sh offline-init
+```
+
+Default archive path (when not overridden):
+
+- `./offline-images.tar`
+
 Windows note:
 
 - Do not publish HTTP on host port `80` (often reserved by HTTP.sys). This stack publishes on `HTTP_PUBLISH_PORT` (default `8000`).

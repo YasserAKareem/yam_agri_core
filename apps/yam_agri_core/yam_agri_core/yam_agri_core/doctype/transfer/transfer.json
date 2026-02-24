@@ -4,22 +4,24 @@
   "module": "YAM Agri Core",
   "custom": 1,
   "fields": [
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {
       "fieldname": "transfer_type",
       "fieldtype": "Select",
       "options": "Split\nMerge\nBlend\nMove",
-      "label": "Transfer Type"
+      "label": "Transfer Type",
+      "reqd": 1
     },
     {"fieldname": "from_lot", "fieldtype": "Link", "options": "Lot", "label": "From Lot"},
     {"fieldname": "to_lot", "fieldtype": "Link", "options": "Lot", "label": "To Lot"},
-    {"fieldname": "qty_kg", "fieldtype": "Float", "label": "Quantity (kg)"},
+    {"fieldname": "qty_kg", "fieldtype": "Float", "label": "Quantity (kg)", "reqd": 1},
     {"fieldname": "transfer_datetime", "fieldtype": "Datetime", "label": "Transfer Datetime"},
     {
       "fieldname": "status",
       "fieldtype": "Select",
       "options": "Draft\nSubmitted\nApproved\nRejected",
-      "label": "Status"
+      "label": "Status",
+      "reqd": 1
     },
     {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
   ],

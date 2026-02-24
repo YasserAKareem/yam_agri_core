@@ -288,3 +288,174 @@ def run_at10_automated_check() -> dict:
         "status": "pass" if pass_checks else "fail",
         "evidence": evidence,
     }
+
+
+def run_at01_automated_check() -> dict:
+    """Execute automated AT-01 checks for Site -> StorageBin -> Lot flow.
+
+    Validates:
+    - creation/get of Site-A records (Device, StorageBin, Lot, Transfer, ScaleTicket)
+    - cross-site mismatch is blocked by validation
+    """
+
+    sites = frappe.get_all("Site", fields=["name"], limit_page_length=500)
+    if len(sites) < 2:
+        return {
+            "status": "blocked",
+            "reason": "Need at least two Site records for cross-site validation",
+            "sites_count": len(sites),
+        }
+
+    site_a = sites[0]["name"]
+    site_b = sites[1]["name"]
+
+    original_user = frappe.session.user
+    evidence: dict[str, object] = {
+        "sites": {"site_a": site_a, "site_b": site_b},
+        "records": {},
+        "cross_site_invalid_blocked": False,
+        "cross_site_error": None,
+    }
+
+    try:
+        frappe.set_user("Administrator")
+
+        device_a = frappe.db.exists("Device", {"device_name": "AT01-DEVICE-A"})
+        if not device_a:
+            device_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "Device",
+                        "device_name": "AT01-DEVICE-A",
+                        "site": site_a,
+                        "device_type": "Other",
+                        "serial_number": "AT01-DEVICE-A",
+                        "status": "Active",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
+
+        bin_a = frappe.db.exists("StorageBin", {"storage_bin_name": "AT01-BIN-A"})
+        if not bin_a:
+            bin_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "StorageBin",
+                        "storage_bin_name": "AT01-BIN-A",
+                        "site": site_a,
+                        "status": "Active",
+                        "capacity_kg": 1000,
+                        "current_qty_kg": 100,
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
+
+        lot_a = frappe.db.exists("Lot", {"lot_number": "AT01-LOT-A", "site": site_a})
+        if not lot_a:
+            lot_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "Lot",
+                        "lot_number": "AT01-LOT-A",
+                        "site": site_a,
+                        "qty_kg": 100,
+                        "status": "Draft",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
+
+        lot_b = (
+            frappe.get_doc(
+                {
+                    "doctype": "Lot",
+                    "lot_number": f"AT01-LOT-B-{frappe.generate_hash(length=6)}",
+                    "site": site_b,
+                    "qty_kg": 100,
+                    "status": "Draft",
+                }
+            )
+            .insert(ignore_permissions=True)
+            .name
+        )
+
+        transfer_a = frappe.db.exists("Transfer", {"site": site_a, "notes": "AT01-XFER-A"})
+        if not transfer_a:
+            transfer_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "Transfer",
+                        "site": site_a,
+                        "transfer_type": "Move",
+                        "from_lot": lot_a,
+                        "to_lot": lot_a,
+                        "qty_kg": 1,
+                        "status": "Draft",
+                        "notes": "AT01-XFER-A",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
+
+        ticket_a = frappe.db.exists("ScaleTicket", {"ticket_number": "AT01-TICKET-A"})
+        if not ticket_a:
+            ticket_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "ScaleTicket",
+                        "ticket_number": "AT01-TICKET-A",
+                        "site": site_a,
+                        "device": device_a,
+                        "lot": lot_a,
+                        "ticket_datetime": frappe.utils.now_datetime(),
+                        "gross_kg": 100,
+                        "tare_kg": 10,
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
+
+        evidence["records"] = {
+            "device_a": device_a,
+            "storage_bin_a": bin_a,
+            "lot_a": lot_a,
+            "transfer_a": transfer_a,
+            "ticket_a": ticket_a,
+        }
+
+        # Invalid operation: create Transfer under Site A with Site B lot.
+        try:
+            frappe.get_doc(
+                {
+                    "doctype": "Transfer",
+                    "site": site_a,
+                    "transfer_type": "Move",
+                    "from_lot": lot_b,
+                    "to_lot": lot_b,
+                    "qty_kg": 1,
+                    "status": "Draft",
+                    "notes": f"AT01-INVALID-A-B-{frappe.utils.now_datetime()}",
+                }
+            ).insert(ignore_permissions=True)
+            evidence["cross_site_invalid_blocked"] = False
+        except Exception as exc:
+            evidence["cross_site_invalid_blocked"] = True
+            evidence["cross_site_error"] = str(exc)
+
+    finally:
+        frappe.set_user(original_user)
+
+    required_created = all(bool(v) for v in (evidence.get("records") or {}).values())
+    passed = bool(required_created and evidence.get("cross_site_invalid_blocked"))
+
+    return {
+        "status": "pass" if passed else "fail",
+        "evidence": evidence,
+    }

@@ -13,6 +13,12 @@ class QCTest(Document):
 
         assert_site_access(self.get("site"))
 
+        lot = self.get("lot")
+        if lot:
+            lot_site = frappe.db.get_value("Lot", lot, "site")
+            if lot_site and lot_site != self.get("site"):
+                frappe.throw(_("Lot site must match QCTest site"), frappe.ValidationError)
+
     def days_since_test(self):
         """Return integer days since the `test_date` if present, else None."""
         test_date = self.get("test_date")

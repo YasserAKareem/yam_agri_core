@@ -4,9 +4,9 @@
   "module": "YAM Agri Core",
   "custom": 1,
   "fields": [
-    {"fieldname": "cert_type", "fieldtype": "Data", "label": "Certificate Type"},
-    {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "cert_type", "fieldtype": "Data", "label": "Certificate Type", "reqd": 1},
+    {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot", "reqd": 1},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "expiry_date", "fieldtype": "Date", "label": "Expiry Date"}
   ],
   "permissions": [

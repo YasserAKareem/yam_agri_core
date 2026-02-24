@@ -4,11 +4,11 @@
   "module": "YAM Agri Core",
   "custom": 1,
   "fields": [
-    {"fieldname": "lot_number", "fieldtype": "Data", "label": "Lot Number"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "lot_number", "fieldtype": "Data", "label": "Lot Number", "reqd": 1},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "crop", "fieldtype": "Link", "options": "Crop", "label": "Crop"},
-    {"fieldname": "qty_kg", "fieldtype": "Float", "label": "Quantity (kg)"},
-    {"fieldname": "status", "fieldtype": "Select", "options": "Draft\nAccepted\nRejected\nFor Dispatch\nDispatched", "label": "Status"}
+    {"fieldname": "qty_kg", "fieldtype": "Float", "label": "Quantity (kg)", "reqd": 1},
+    {"fieldname": "status", "fieldtype": "Select", "options": "Draft\nAccepted\nRejected\nFor Dispatch\nDispatched", "label": "Status", "reqd": 1}
   ],
   "permissions": [
     {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 0},

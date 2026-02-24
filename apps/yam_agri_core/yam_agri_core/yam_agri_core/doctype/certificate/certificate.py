@@ -13,6 +13,12 @@ class Certificate(Document):
 
         assert_site_access(self.get("site"))
 
+        lot = self.get("lot")
+        if lot:
+            lot_site = frappe.db.get_value("Lot", lot, "site")
+            if lot_site and lot_site != self.get("site"):
+                frappe.throw(_("Lot site must match Certificate site"), frappe.ValidationError)
+
     def is_expired(self):
         expiry = self.get("expiry_date")
         if not expiry:
