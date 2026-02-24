@@ -253,3 +253,22 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 - Notes:
   - Runtime evidence confirms cross-site mismatch is blocked (`Lot site must match QCTest site`).
   - AT-01 is now repeatable and eligible to move from partial to done in WBS tracking.
+
+### 2026-02-24 (M2 closure + M3 kickoff evidence)
+
+- Date: 2026-02-24
+- Environment (dev/staging): dev (workspace evidence update)
+- Tester: Copilot (automation + documentation)
+- Commit SHA: `29cdaf1`
+- Executed Commands:
+  - `python tools/refresh_wbs_milestones.py`
+  - `python tools/refresh_wbs_rows.py`
+  - `python -c "import pandas as pd; m=pd.read_excel('docs/YAM_AGRI_WBS_GANTT.xlsx', sheet_name='Milestones'); ..."`
+- Result:
+  - Milestone transition applied in both workbook copies:
+    - `M2 = ✅ Done`
+    - `M3 = 🟨 In Progress`
+  - Milestone-weighted progress updated to `35.0%` (`done=3`, `in_progress=1`, `total=10`)
+- CI Evidence Note:
+  - This log captures local gating evidence for WBS transition.
+  - Attach latest GitHub Actions `ci.yml` successful run URL in the next update to complete remote CI-on-main proof.
