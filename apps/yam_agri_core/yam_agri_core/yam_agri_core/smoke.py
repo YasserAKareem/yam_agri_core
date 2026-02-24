@@ -54,3 +54,80 @@ def run_phase2_smoke() -> dict:
     ]) else "needs_attention"
 
     return checks
+
+
+def get_at10_readiness() -> dict:
+    """Readiness report for manual AT-10 execution.
+
+    Safe to run via:
+    - bench --site <site> execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness
+    """
+
+    sites = frappe.get_all("Site", fields=["name"], limit_page_length=500)
+    qa_users = ["qa_manager_a@example.com", "qa_manager_b@example.com"]
+
+    existing_users = frappe.get_all(
+        "User",
+        filters={"name": ["in", qa_users]},
+        fields=["name", "enabled"],
+        limit_page_length=20,
+    )
+
+    has_roles = frappe.get_all(
+        "Has Role",
+        filters={"parent": ["in", qa_users]},
+        fields=["parent", "role"],
+        limit_page_length=200,
+    )
+
+    site_permissions = frappe.get_all(
+        "User Permission",
+        filters={"allow": "Site"},
+        fields=["user", "for_value"],
+        limit_page_length=500,
+    )
+
+    locations = []
+    location_site_field = False
+    if frappe.db.exists("DocType", "Location"):
+        location_site_field = frappe.get_meta("Location").has_field("site")
+        if location_site_field:
+            locations = frappe.get_all("Location", fields=["name", "site"], limit_page_length=500)
+
+    mapped_locations = [loc for loc in locations if (loc.get("site") or "").strip()]
+
+    readiness = {
+        "sites": {
+            "count": len(sites),
+            "names": [s["name"] for s in sites],
+            "ok": len(sites) >= 2,
+        },
+        "qa_users": {
+            "expected": qa_users,
+            "existing": existing_users,
+            "ok": len(existing_users) == 2,
+        },
+        "qa_roles": {
+            "entries": has_roles,
+            "ok": len(has_roles) > 0,
+        },
+        "site_permissions": {
+            "entries": site_permissions,
+            "ok": len(site_permissions) > 0,
+        },
+        "location_bridge": {
+            "site_field_present": location_site_field,
+            "mapped_locations_count": len(mapped_locations),
+            "ok": location_site_field and len(mapped_locations) > 0,
+        },
+    }
+
+    readiness["status"] = "ready" if all([
+        readiness["sites"]["ok"],
+        readiness["qa_users"]["ok"],
+        readiness["qa_roles"]["ok"],
+        readiness["site_permissions"]["ok"],
+        readiness["location_bridge"]["ok"],
+    ]) else "not_ready"
+
+    return readiness
