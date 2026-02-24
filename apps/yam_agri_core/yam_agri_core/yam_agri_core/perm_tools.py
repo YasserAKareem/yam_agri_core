@@ -15,69 +15,69 @@ from typing import Any
 
 
 def set_export_permission(
-    *,
-    doctype: str,
-    role: str = "Administrator",
-    permlevel: int = 0,
-    enable: int = 1,
+	*,
+	doctype: str,
+	role: str = "Administrator",
+	permlevel: int = 0,
+	enable: int = 1,
 ) -> dict[str, Any]:
-    """Toggle the DocPerm.export flag for a role on a given DocType.
+	"""Toggle the DocPerm.export flag for a role on a given DocType.
 
-    This updates existing DocPerm rows in-place (no Custom DocPerm), so it is easy to revert.
+	This updates existing DocPerm rows in-place (no Custom DocPerm), so it is easy to revert.
 
-    Args:
-        doctype: Target DocType name (e.g. "DocType").
-        role: Role to modify.
-        permlevel: Permission level to target (usually 0).
-        enable: 1 to grant Export, 0 to revoke.
-    """
+	Args:
+	    doctype: Target DocType name (e.g. "DocType").
+	    role: Role to modify.
+	    permlevel: Permission level to target (usually 0).
+	    enable: 1 to grant Export, 0 to revoke.
+	"""
 
-    import frappe
+	import frappe
 
-    target = 1 if int(enable) else 0
+	target = 1 if int(enable) else 0
 
-    rows = frappe.get_all(
-        "DocPerm",
-        filters={"parent": doctype, "role": role, "permlevel": int(permlevel)},
-        fields=["name", "export"],
-        order_by="permlevel asc",
-    )
+	rows = frappe.get_all(
+		"DocPerm",
+		filters={"parent": doctype, "role": role, "permlevel": int(permlevel)},
+		fields=["name", "export"],
+		order_by="permlevel asc",
+	)
 
-    if not rows:
-        return {
-            "ok": False,
-            "doctype": doctype,
-            "role": role,
-            "permlevel": int(permlevel),
-            "message": "No matching DocPerm rows found",
-        }
+	if not rows:
+		return {
+			"ok": False,
+			"doctype": doctype,
+			"role": role,
+			"permlevel": int(permlevel),
+			"message": "No matching DocPerm rows found",
+		}
 
-    before = [{"name": r["name"], "export": int(r.get("export") or 0)} for r in rows]
+	before = [{"name": r["name"], "export": int(r.get("export") or 0)} for r in rows]
 
-    for r in rows:
-        frappe.db.set_value(
-            "DocPerm",
-            r["name"],
-            "export",
-            target,
-            update_modified=False,
-        )
+	for r in rows:
+		frappe.db.set_value(
+			"DocPerm",
+			r["name"],
+			"export",
+			target,
+			update_modified=False,
+		)
 
-    frappe.db.commit()
+	frappe.db.commit()
 
-    after_rows = frappe.get_all(
-        "DocPerm",
-        filters={"parent": doctype, "role": role, "permlevel": int(permlevel)},
-        fields=["name", "export"],
-        order_by="permlevel asc",
-    )
-    after = [{"name": r["name"], "export": int(r.get("export") or 0)} for r in after_rows]
+	after_rows = frappe.get_all(
+		"DocPerm",
+		filters={"parent": doctype, "role": role, "permlevel": int(permlevel)},
+		fields=["name", "export"],
+		order_by="permlevel asc",
+	)
+	after = [{"name": r["name"], "export": int(r.get("export") or 0)} for r in after_rows]
 
-    return {
-        "ok": True,
-        "doctype": doctype,
-        "role": role,
-        "permlevel": int(permlevel),
-        "before": before,
-        "after": after,
-    }
+	return {
+		"ok": True,
+		"doctype": doctype,
+		"role": role,
+		"permlevel": int(permlevel),
+		"before": before,
+		"after": after,
+	}

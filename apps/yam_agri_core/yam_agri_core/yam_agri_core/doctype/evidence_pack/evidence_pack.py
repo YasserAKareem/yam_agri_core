@@ -1,7 +1,6 @@
 import frappe
-from frappe import _
+from frappe import _, utils
 from frappe.model.document import Document
-from frappe import utils
 
 from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
 
@@ -28,6 +27,8 @@ class EvidencePack(Document):
 			if old_status != new_status:
 				if not frappe.has_role("QA Manager"):
 					frappe.throw(
-						_("Only a user with role 'QA Manager' may set EvidencePack status to {0}").format(new_status),
+						_("Only a user with role 'QA Manager' may set EvidencePack status to {0}").format(
+							new_status
+						),
 						frappe.PermissionError,
 					)

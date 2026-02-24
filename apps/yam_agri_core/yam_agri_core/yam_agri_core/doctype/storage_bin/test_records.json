@@ -1,0 +1,18 @@
+[
+  {
+    "doctype": "StorageBin",
+    "storage_bin_name": "_Test Bin A1",
+    "site": "_Test Site A",
+    "capacity_kg": 5000.0,
+    "current_qty_kg": 0.0,
+    "status": "Active"
+  },
+  {
+    "doctype": "StorageBin",
+    "storage_bin_name": "_Test Bin B1",
+    "site": "_Test Site B",
+    "capacity_kg": 3000.0,
+    "current_qty_kg": 0.0,
+    "status": "Active"
+  }
+]

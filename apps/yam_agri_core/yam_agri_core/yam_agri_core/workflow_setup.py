@@ -59,7 +59,11 @@ def ensure_workflow_states_from_active_workflows() -> dict:
 
 def get_workflow_state_status() -> dict:
 	"""Diagnostic helper for bench execute."""
-	existing = frappe.get_all("Workflow State", pluck="name") if frappe.db.exists("DocType", "Workflow State") else []
+	existing = (
+		frappe.get_all("Workflow State", pluck="name")
+		if frappe.db.exists("DocType", "Workflow State")
+		else []
+	)
 	return {
 		"workflow_state_count": len(existing),
 		"workflow_states": sorted(existing),

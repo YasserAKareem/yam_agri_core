@@ -1,105 +1,601 @@
-# Copilot Instructions for YAM Agri Core
+# Copilot Instructions — YAM Agri Core
 
-## Project Overview
-This repository is the infrastructure and configuration layer for the **YAM Agri Platform** — a cereal-crop supply chain quality and traceability system. It is built on top of **Frappe Framework** and **ERPNext**, with the **Frappe Agriculture** app installed.
+> **Read this file first. It is the single authoritative context for every AI
+> coding session on this repository.**
+>
+> Specialised agents live in `.github/agents/`. Select the one that matches
+> your role for deeper, role-specific guidance:
+> - `developer.md` — Frappe app developer (Python / JavaScript)
+> - `devops.md` — Infrastructure / DevOps engineer (Docker, CI, k3s)
+> - `qa-manager.md` — QA / Food-safety compliance engineer
+> - `owner.md` — Platform owner / product lead (Yasser)
 
-The platform manages:
-- Lot traceability across splits, merges, and blends
-- QA/QC tests and certificates (FAO GAP Middle East + HACCP/ISO 22000)
-- Scale tickets (weights) and sensor evidence (bins, refrigerators)
-- Evidence packs for audits and customers
-- Hybrid AI assistance (assistive only — AI never executes risky actions automatically)
+---
 
-## Repository Structure
+## 1. What this Platform Does
+
+**YAM Agri** is a cereal-crop supply chain **quality and traceability system**
+for Yemen. It tracks grain lots from farm harvest through silo storage to
+final shipment, enforces food safety standards (FAO GAP + HACCP/ISO 22000),
+and supports donor/auditor evidence reporting.
+
+### Nine Personas (Users)
+
+| ID | Persona | Channel | Key action |
+|----|---------|---------|-----------|
+| U1 | Smallholder Farmer | 2G SMS (Nokia feature phone) | Register harvest lots; receive alerts |
+| U2 | Farm Supervisor | Mobile PWA (Android, offline) | Create lots, capture GPS, crew scheduling |
+| U3 | QA / Food Safety Inspector | Frappe Desk (tablet/laptop) | Record QC tests, approve high-risk actions |
+| U4 | Silo / Store Operator | Frappe Desk (desktop, LAN) | Monitor bins, import scale tickets |
+| U5 | Logistics Coordinator | Mobile PWA + maps | Manage shipment lots, dispatch trucks |
+| U6 | Agri-Business Owner (Yasser) | Web dashboard | KPI dashboards, AI suggestions, final approval |
+| U7 | System Admin / IT (Ibrahim) | Frappe Desk + CLI via WireGuard VPN | Docker/k3s, users, backups |
+| U8 | External Auditor / Donor | Read-only web portal | Download evidence packs |
+| U9 | AI Copilot (non-human) | Internal AI Gateway API | Suggest compliance checks, CAPA drafts (never autonomous) |
+
+### Supply Chain Stages
+
+A: Seed & Input Procurement → B: Land Prep & Planting → C: Crop Monitoring →
+D: Harvest & Post-Harvest → **E: Storage & Quality** ← V1.1 primary focus →
+F: Processing & Milling → G: Packaging & Labelling → H: Transport & Logistics →
+**I: Sales & Customer** ← V1.1 secondary focus
+
+---
+
+## 2. Non-Negotiable Rules (apply to every code change)
+
+1. **Every record must belong to a Site** — raise `frappe.ValidationError` if `site` is blank
+2. **Site isolation is mandatory** — register BOTH `permission_query_conditions` AND `has_permission` in `hooks.py` for every DocType with a `site` field
+3. **QA Manager approves high-risk transitions** — Lot accept/reject, Transfer approval, EvidencePack approval require the `QA Manager` role (enforced server-side via `frappe.has_role`, never client-side only)
+4. **AI is assistive only** — AI components may only return suggestion text; they must never call any Frappe write API, submit workflows, or take autonomous action
+5. **Never commit secrets** — `.env.example` only; real credentials via environment variables (`frappe.conf` or `os.environ`)
+6. **Defence in depth** — every client-side check must be backed by server-side validation in the Python controller
+7. **Arabic/RTL first** — all user-facing strings must be wrapped in `__("…")` (JS) or `_("…")` (Python)
+
+---
+
+## 3. Repository Layout
 
 ```
-yam_agri_core/
-├── .github/                  # GitHub configuration (this file, workflows, etc.)
-├── docs/                     # Playbooks and design documents
-├── environments/             # Per-environment configs (dev, staging, production)
-│   ├── dev/
-│   ├── staging/
-│   └── production/
+yam_agri_core/                        ← repo root
+├── .github/
+│   ├── copilot-instructions.md       ← THIS FILE
+│   ├── agents/                       ← role-specific Copilot agents
+│   │   ├── developer.md
+│   │   ├── devops.md
+│   │   ├── owner.md
+│   │   └── qa-manager.md
+│   └── workflows/                    ← CI/CD (ci.yml, pr_review.yml, …)
+├── apps/
+│   └── yam_agri_core/                ← Frappe app root
+│       ├── pyproject.toml            ← flit_core packaging (bench pip install)
+│       ├── setup.py
+│       └── yam_agri_core/            ← Python package (app-level)
+│           ├── hooks.py              ← ALL Frappe hooks live here
+│           ├── modules.txt
+│           ├── patches.txt
+│           ├── fixtures/             ← lot_workflow.json (registered via fixtures=[…])
+│           ├── translations/ar.csv   ← Arabic translations
+│           └── yam_agri_core/        ← Module package (business logic)
+│               ├── ai/               ← Pure-Python AI modules (no Frappe DB)
+│               ├── api/              ← @frappe.whitelist() RPC endpoints
+│               ├── doctype/          ← One folder per DocType
+│               │   ├── lot/          ← lot.py, lot.json, lot.js, test_records.json
+│               │   └── …
+│               ├── seed/             ← Demo data (confirm=1 safety gate)
+│               ├── tests/            ← pytest + Frappe unit tests
+│               │   ├── test_agr_cereal_001.py   ← pure-Python (runs in CI)
+│               │   └── test_doc_validations.py  ← requires bench run-tests
+│               ├── workspace/        ← Frappe Workspace JSON definitions
+│               ├── boot.py           ← extend_bootinfo / boot_session hooks
+│               ├── install.py        ← after_install / after_migrate hooks
+│               ├── site_permissions.py ← all site isolation functions
+│               ├── uninstall.py
+│               └── workflow_setup.py
+├── docs/
+│   ├── C4 model Architecture v1.1/   ← C4 L1–L3 diagrams (Mermaid)
+│   ├── arc42 Architecture v1.1/      ← arc42 §1–13 (ADRs in §9)
+│   ├── Docs v1.1/                    ← SDLC docs (data model, RBAC, test plan…)
+│   ├── AGENTS_AND_MCP_BLUEPRINT.md
+│   ├── PERSONA_JOURNEY_MAP.md
+│   └── TOUCHPOINT_APP_BLUEPRINT.md
+├── environments/
+│   ├── dev/config.yaml
+│   ├── staging/config.yaml + k3s-manifest.yaml
+│   └── production/config.yaml
 ├── infra/
-│   ├── compose/              # Docker Compose files for dev
-│   ├── docker/               # Docker configs and run scripts
-│   └── frappe_docker/        # Frappe-specific Docker setup
-└── compose_rendered.yml      # Rendered compose for reference
+│   ├── docker/
+│   │   ├── docker-compose.yml        ← dev stack definition
+│   │   ├── run.sh                    ← dev ops script (see §7)
+│   │   ├── preflight.sh
+│   │   └── .env.example              ← copy → .env; never commit .env
+│   └── frappe_docker/                ← git submodule (frappe/frappe_docker)
+├── pyproject.toml                    ← ruff + pytest config for the monorepo
+└── .pre-commit-config.yaml           ← ruff, pre-commit-hooks, prettier
 ```
 
-## Technology Stack
-- **Framework**: [Frappe](https://frappeframework.com/) (Python/JavaScript)
-- **ERP**: ERPNext v16
-- **Agriculture Module**: Frappe Agriculture app
-- **Database**: MariaDB 10.6
-- **Cache/Queue**: Redis
-- **Container Runtime**: Docker + Docker Compose (dev), Kubernetes/k3s (staging/production)
-- **Web Server**: nginx
+**Important:** the Frappe app module is three directories deep:
+`apps/yam_agri_core/yam_agri_core/yam_agri_core/`
 
-## Key Domain Concepts
+Python import prefix: `yam_agri_core.yam_agri_core.<module>`
+Example: `from yam_agri_core.yam_agri_core.site_permissions import assert_site_access`
 
-### Core DocTypes (V1.1)
-- **Site** — farm, silo, store, or office location
-- **StorageBin** — physical bin within a site
-- **Device** — IoT sensor or scale device
-- **Lot** — harvest, storage, or shipment lot (primary traceability unit)
-- **Transfer** — split, merge, or blend operation between lots
-- **ScaleTicket** — weight measurement record
-- **QCTest** — quality control test result
-- **Certificate** — compliance certificate (expiry-checked)
-- **Nonconformance** — CAPA (Corrective and Preventive Action) record
-- **EvidencePack** — audit evidence bundle
-- **Complaint** — customer complaint record
-- **Observation** — universal model for sensor/derived signals (bins, refrigerators, weather, irrigation, remote sensing)
+---
 
-### Non-Negotiable Business Rules
-1. Every record **must** belong to a Site
-2. Users should **not** see other sites' data by default (site isolation)
-3. High-risk actions **require approval** from QA Manager
-4. AI is **assistive only** — no automatic lot accept/reject, no automatic recalls, no unsupervised customer communications
-5. **Never commit secrets** — use `.env.example` files only, never `.env` with real credentials
+## 4. Technology Stack (exact versions)
 
-## Development Guidelines
+### Core Platform
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Framework | Frappe | v16 |
+| ERP | ERPNext | v16 |
+| Agriculture module | Frappe Agriculture | latest compatible |
+| Custom app | yam_agri_core | 1.1.0-dev |
+| Database | MariaDB (InnoDB — crash recovery) | 10.6 |
+| App server | Gunicorn | 2 workers × 4 threads |
+| Python | Python | 3.11 |
 
-### Frappe Development
-- Custom DocTypes live in the `yam_agri_core` Frappe app (mounted into the Frappe bench)
-- Follow [Frappe coding standards](https://frappeframework.com/docs/user/en/guides/app-development)
-- Use `bench` commands inside the container for migrations, fixtures, and app management
-- Server-side scripts: Python (Frappe controllers)
-- Client-side scripts: JavaScript (Frappe client scripts / Form scripts)
+### Infrastructure (Docker Compose — dev)
+| Service | Image | Purpose |
+|---------|-------|---------|
+| `db` | `mariadb:10.6` | Primary DB; `restart: always` |
+| `redis-cache` | `redis:6.2-alpine` | Session + page cache |
+| `redis-queue` | `redis:6.2-alpine` | RQ job broker |
+| `redis-socketio` | `redis:6.2-alpine` | WebSocket pub/sub |
+| `backend` | `frappe/erpnext:v16.5.0` | Gunicorn app server |
+| `frontend` | `frappe/erpnext:v16.5.0` | nginx entrypoint |
+| `websocket` | `frappe/erpnext:v16.5.0` | Node.js socketio |
+| `queue-short` | `frappe/erpnext:v16.5.0` | RQ short worker |
+| `queue-long` | `frappe/erpnext:v16.5.0` | RQ long worker |
+| `scheduler` | `frappe/erpnext:v16.5.0` | bench schedule |
 
-### Docker / Infrastructure
-- Dev environment uses Docker Compose; run via `infra/docker/run.sh`
-- Supported `run.sh` commands: `up`, `down`, `logs`, `shell`, `init`, `reset`
-- Do **not** start with Kubernetes until the Docker Compose dev environment works
-- Do **not** commit `.env` files with real passwords or tokens
+### Planned V1.2 Infrastructure
+| Component | Technology | Notes |
+|-----------|-----------|-------|
+| Object storage | MinIO (self-hosted S3) | Certificate PDFs, EvidencePack ZIPs |
+| Vector store | Qdrant OSS | RAG for AI (FAO GAP, HACCP docs) |
+| AI Gateway | FastAPI | PII redaction + LLM routing |
+| Local LLM | Ollama + Llama 3.2 3B Q4 | Offline inference (fits 4 GB RAM) |
+| IoT Gateway | Python + Mosquitto MQTT | Sensor → Observation records |
+| SMS Handler | Python + FastAPI | Africa's Talking webhook |
+| Field Hub | Raspberry Pi 4 + frappe-bench (minimal) | Offline edge node per site |
+| VPN | WireGuard | IT admin remote access |
 
-### Environment Variables
-- Always use `.env.example` as a template; copy to `.env` locally and fill in values
-- Key variables: `DB_ROOT_PASSWORD`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SITE_NAME`, `ADMIN_PASSWORD`
+### Tooling
+| Tool | Version | Purpose |
+|------|---------|---------|
+| ruff | v0.11.2 | Lint + format (tabs, 110-char lines) |
+| pytest | latest | Pure-Python unit tests |
+| yamllint | latest | CI YAML lint |
+| pre-commit | v4.6.0 hooks | Ruff, trailing-ws, check-yaml, prettier |
+| docker compose | v2 | Dev stack |
+| k3s | latest | Staging/production |
 
-### Security
-- Enforce site-level data isolation via Frappe's permission system
-- Use approval workflows for any destructive or high-risk operations
-- AI gateway must redact PII, pricing, and customer IDs before sending to any external LLM
-- Log AI interaction hashes and record references for auditability
+---
 
-### Testing & Acceptance
-Before marking a feature complete, verify these acceptance scenarios manually:
-1. Create Site → StorageBin → Lot
-2. Create QCTest and attach Certificate to a Lot
-3. Transfer: split a Lot into a shipment Lot
-4. Trace backward from shipment Lot (shows QC/certs/bin history)
-5. Trace forward from storage Lot (shows impacted shipments and quantities)
-6. Block a shipment when mandatory QC/cert is missing (season policy enforcement)
-7. Import a ScaleTicket CSV — quantities update and mismatches flag as Nonconformance
-8. Post a sensor Observation — invalid data is quarantined (quality_flag set)
-9. Generate an EvidencePack for a date range and site
-10. Confirm Site A user cannot see Site B data
+## 5. DocType Reference (V1.1)
 
-## What NOT to Do
-- Do **not** integrate many sensor vendors at once — use the universal Observation model
-- Do **not** let AI execute risky actions (accepts, recalls, customer comms) in V1.1
-- Do **not** commit secrets to GitHub
-- Do **not** start Kubernetes before Docker Compose dev works
-- Do **not** modify production until staging passes acceptance tests
+All DocTypes are in `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/`.
+All use `autoname: "naming_series:"` with series `YAM-[ABBREV]-.YYYY.-`.
+
+### Naming Series Convention
+| DocType | Series |
+|---------|--------|
+| Site | *(user-defined name — master)* |
+| StorageBin | `YAM-SB-.YYYY.-` |
+| Device | `YAM-DEV-.YYYY.-` |
+| Lot | `YAM-LOT-.YYYY.-` |
+| Transfer | `YAM-TRF-.YYYY.-` |
+| ScaleTicket | `YAM-ST-.YYYY.-` |
+| QCTest | `YAM-QCT-.YYYY.-` |
+| Certificate | `YAM-CERT-.YYYY.-` |
+| Nonconformance | `YAM-NC-.YYYY.-` |
+| EvidencePack | `YAM-EP-.YYYY.-` |
+| Complaint | `YAM-COMP-.YYYY.-` |
+| Observation | `YAM-OBS-.YYYY.-` |
+
+### DocType Field Summary
+
+#### Site (master — user-defined name)
+Fields: `site_name` (Data), `site_type` (Farm/Silo/Warehouse/Store/Market/Office), `description`, `geo_location` (Geolocation), `boundary_geojson` (Code/JSON).
+The `geo_location` and `boundary_geojson` fields are added as Custom Fields by `install.py` if not already present.
+
+#### StorageBin
+Fields: `storage_bin_name`, `site` → Site, `warehouse` → Warehouse (ERPNext), `capacity_kg` (Float), `current_qty_kg` (Float), `status` (Active/Maintenance/Closed), `notes`.
+Validation: `capacity_kg >= 0`, `current_qty_kg >= 0`, `current_qty_kg <= capacity_kg`.
+
+#### Device
+Fields: `device_name`, `site` → Site, `device_type` (Scale/Temperature Sensor/Humidity Sensor/Other), `serial_number`, `model`, `status` (Active/Inactive), `notes`.
+
+#### Lot (primary traceability unit)
+Fields: `lot_number`, `site` → Site, `crop` → Crop (Frappe Agriculture), `qty_kg` (Float), `status` (Draft/Accepted/Rejected/For Dispatch/Dispatched).
+**Workflow**: `lot_workflow.json` — `Lot QA Approval`; states: Draft → Accepted → For Dispatch → Dispatched; Rejected at any stage.
+Validation rules in `lot.py`:
+- `site` required
+- `crop` validated against existing Crop records (text alias lookup via `_resolve_crop_name`)
+- Status → `Accepted` or `Rejected`: requires `QA Manager` role (server-side check)
+- Status → `For Dispatch`: calls `check_certificates_for_dispatch()` — blocks if any linked Certificate is expired
+
+#### Transfer
+Fields: `site` → Site, `transfer_type` (Split/Merge/Blend/Move), `from_lot` → Lot, `to_lot` → Lot, `qty_kg`, `transfer_datetime`, `status` (Draft/Submitted/Approved/Rejected), `notes`.
+Validation: `qty_kg > 0`; from/to lot site must match transfer site; `Approved`/`Rejected` requires QA Manager role.
+
+#### ScaleTicket
+Fields: `ticket_number`, `site` → Site, `device` → Device, `lot` → Lot, `ticket_datetime`, `gross_kg`, `tare_kg`, `net_kg` (computed = gross − tare), `vehicle`, `driver`, `notes`.
+Validation: `net_kg >= 0`; device.site and lot.site must match ticket site.
+
+#### QCTest
+Fields: `lot` → Lot, `site` → Site, `test_type` (Select), `test_date`, `result_value` (Float), `pass_fail` (Pass/Fail), `notes`.
+Methods: `days_since_test()` → int|None; `is_fresh_for_season(max_days)` → bool.
+
+#### Certificate
+Fields: `cert_type` (Data), `lot` → Lot, `site` → Site, `expiry_date` (Date).
+Method: `is_expired()` → bool (expiry_date < today).
+
+#### Nonconformance
+Fields: `site` → Site, `lot` → Lot, `capa_description` (Small Text), `status` (Open/Under Review/Closed).
+Validation: `status` defaults to `Open` via `before_insert` (not `on_update`).
+
+#### EvidencePack
+Fields: `title`, `site` → Site, `from_date`, `to_date`, `status` (Draft/Prepared/Approved/Rejected), `notes`.
+Validation: `from_date <= to_date`; setting `Approved`/`Rejected` requires QA Manager role.
+
+#### Complaint
+Fields: `site` → Site, `complaint_date`, `customer_name`, `lot` → Lot, `description`, `status` (Open/Investigating/Closed/Escalated), `resolution`.
+Validation: lot.site must match complaint.site.
+
+#### Observation (universal sensor model)
+Fields: `site` → Site, `device` → Device, `observed_at` (Datetime), `observation_type`, `value` (Float), `unit`, `quality_flag` (OK/Quarantine/Invalid), `raw_payload` (Long Text), `notes`.
+Validation: `quality_flag` defaults to `OK` in `validate()` if not set; device.site must match observation.site.
+
+#### YAM Plot, YAM Soil Test, YAM Plot Yield, YAM Crop Variety, YAM Crop Variety Recommendation
+All: `site` → Site required. Plot has `area_ha`, `plot_name`. Soil Test has `organic_matter_pct`, `ph`. Yield has `season`, `crop`, `yield_kg_per_ha`. Crop Variety has `variety_name`, `maturity_days`, `drought_tolerance` (0–5). Recommendation has `season`, `crop`, `variety`, `plot` → YAM Plot.
+
+---
+
+## 6. Site Isolation — Implementation Pattern
+
+Site isolation is enforced at **two independent layers**. Both must be
+implemented for every DocType with a `site` field:
+
+```python
+# hooks.py — BOTH entries required for complete isolation:
+permission_query_conditions = {
+    "Lot": "yam_agri_core.yam_agri_core.site_permissions.lot_query_conditions",
+    # … all site-bearing DocTypes
+}
+has_permission = {
+    "Lot": "yam_agri_core.yam_agri_core.site_permissions.lot_has_permission",
+    # … all site-bearing DocTypes
+}
+```
+
+Layer 1 — `permission_query_conditions`: applied to SQL `WHERE` on every list query (prevents list-view leakage).
+Layer 2 — `has_permission`: called on every direct document read (prevents single-record bypass by known name).
+
+Standard helpers in `site_permissions.py`:
+- `get_allowed_sites(user)` — returns list from User Permission records; `[]` for System Manager/Administrator (full access)
+- `build_site_query_condition(doctype, user)` — returns `None` (full access) or `WHERE site IN (…)` or `"1=0"` (no sites)
+- `assert_site_access(site)` — throws `PermissionError` if denied; call in every controller `validate()`
+- `_doctype_has_site_permission(doc, user)` — standard `has_permission` implementation for all site-bearing DocTypes
+
+All site isolation is bypassed for `Administrator` and users with `System Manager` role.
+
+---
+
+## 7. Hooks in `hooks.py`
+
+The Frappe app's entry-point file. Complete list of active hooks:
+
+```python
+# App identity
+app_name = "yam_agri_core"
+app_title = "YAM Agri Core"
+app_version = "1.1.0-dev"
+required_apps = ["frappe/erpnext"]
+
+# Apps screen + boot
+add_to_apps_screen = [{ "name": "yam_agri_core", "route": "/app/lot", … }]
+after_install = "yam_agri_core.yam_agri_core.install.after_install"
+after_migrate = "yam_agri_core.yam_agri_core.install.after_migrate"
+before_uninstall = "yam_agri_core.yam_agri_core.uninstall.before_uninstall"
+fixtures = ["Workflow"]           # loads lot_workflow.json on bench migrate
+extend_bootinfo = "…boot.extend_bootinfo"
+boot_session   = "…boot.boot_session"   # compatibility alias
+
+# Client-side JS per DocType
+app_include_js = ["yam_agri_core.bundle.js"]
+doctype_js = { "Lot": "…/lot.js", "Site": "…/site.js", "QCTest": "…/qc_test.js" }
+
+# Site isolation (must be in sync — every DocType needs BOTH)
+permission_query_conditions = { … }   # list filtering
+has_permission = { … }                # direct-read guard
+
+# Desk search
+global_search_doctypes = { "Default": [{"doctype": "Lot"}, …] }
+```
+
+**Do not use `ignore_permissions=True`** unless the code is in a scheduled
+background job and the reason is documented in a comment.
+
+---
+
+## 8. Python Controller Pattern
+
+Every DocType controller must follow this pattern:
+
+```python
+# apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/my_doctype/my_doctype.py
+import frappe
+from frappe import _
+from frappe.model.document import Document
+from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
+
+class MyDoctype(Document):
+    def before_insert(self):
+        # Set default values that must be committed (NOT on_update)
+        if not self.get("status"):
+            self.status = "Open"
+
+    def validate(self):
+        # 1. Non-negotiable site check
+        if not self.get("site"):
+            frappe.throw(_("Every record must belong to a Site"), frappe.ValidationError)
+        assert_site_access(self.get("site"))
+
+        # 2. High-risk state transition guard
+        new_status = (self.get("status") or "").strip()
+        if new_status in ("Approved", "Rejected"):
+            old_status = frappe.db.get_value("MyDoctype", self.name, "status") if self.name else None
+            if old_status != new_status and not frappe.has_role("QA Manager"):
+                frappe.throw(
+                    _("Only a user with role 'QA Manager' may set status to {0}").format(new_status),
+                    frappe.PermissionError,
+                )
+
+        # 3. Cross-site consistency checks
+        linked_lot = self.get("lot")
+        if linked_lot:
+            lot_site = frappe.db.get_value("Lot", linked_lot, "site")
+            if lot_site and lot_site != self.get("site"):
+                frappe.throw(_("Lot site must match this record's site"), frappe.ValidationError)
+```
+
+**Critical:** Default values that must persist to the database belong in
+`before_insert`, **not** `on_update` (which fires after the DB write).
+
+---
+
+## 9. JavaScript Client Pattern
+
+```javascript
+// apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/lot/lot.js
+frappe.ui.form.on("Lot", {
+    refresh(frm) {
+        // Use __() for all user-visible strings (Arabic/RTL translation)
+        if (frm.doc.status === "For Dispatch") {
+            frm.add_custom_button(__("Verify Certificates"), () => {
+                frappe.call({
+                    method: "yam_agri_core.yam_agri_core.api.lot.check_dispatch_readiness",
+                    args: { lot: frm.doc.name },
+                    callback(r) {
+                        if (r.message?.ok) {
+                            frappe.show_alert({ message: __("All certificates valid"), indicator: "green" });
+                        }
+                    }
+                });
+            });
+        }
+    },
+    site(frm) {
+        // Auto-fill child records when site changes
+        if (frm.doc.site) {
+            frm.set_query("storage_bin", () => ({ filters: { site: frm.doc.site } }));
+        }
+    }
+});
+```
+
+Business logic must live in the Python controller. JavaScript is **UX only**.
+
+---
+
+## 10. AI Module Pattern
+
+The AI recommender (`ai/agr_cereal_001.py`) is **pure Python** — no Frappe
+imports, no DB access. This allows it to run in CI without a live Frappe bench.
+
+The API wrapper (`api/agr_cereal_001.py`) handles:
+1. `@frappe.whitelist()` decoration
+2. `assert_site_access(site)` check
+3. Reads from DB (`frappe.get_all`)
+4. Calls the pure AI function
+5. Returns serialised JSON — **no writes to DB**
+
+AI suggestions stored in DocType fields must be in **read-only** fields.
+No AI code path may call `frappe.get_doc(…).save()` or `frappe.new_doc(…).insert()`.
+
+Future AI Gateway (V1.2) must:
+- Redact PII (names, phones, prices, GPS coords) before any external LLM call
+- Log every interaction: `(timestamp, user, record_type, record_name, task, SHA-256(prompt), SHA-256(response))`
+- Route to Ollama (local) first; fall back to cloud LLM only if local is unavailable
+- Return suggestion text only — never DocType write instructions
+
+---
+
+## 11. RBAC — Roles and Role Profiles
+
+Use **ERPNext standard roles** only. Do not create custom role names.
+Map job functions to **Role Profiles** (bundles of standard roles):
+
+| Role Profile | Standard roles | Personas |
+|-------------|---------------|---------|
+| YAM Farm Ops | `Agriculture Manager`, `Stock User` | U2 Farm Supervisor |
+| YAM QA Manager | `Quality Manager` | U3 QA/Food Safety Inspector |
+| YAM Warehouse | `Stock User`, `Stock Manager`* | U4 Silo/Store Operator |
+| YAM Logistics | `Delivery User` | U5 Logistics Coordinator |
+| YAM Owner | `System Manager` (prod: read-only dashboards) | U6 Owner (Yasser) |
+| YAM IT Admin | `System Manager` | U7 IT Admin (Ibrahim) |
+| YAM Auditor | `Auditor` (read-only) | U8 External Auditor |
+
+*`Stock Manager` only when workflow step requires it.
+
+**In Frappe controllers, check roles using `frappe.has_role("Quality Manager")` or
+`frappe.has_role("QA Manager")` (where `QA Manager` is the role name used in
+DocType permission rows).** Never hard-code role names as string literals in
+business logic — use named constants.
+
+---
+
+## 12. Coding Standards
+
+### Python
+- **Indentation**: Tabs (Frappe convention — `ruff format` enforces this)
+- **Line length**: 110 characters (ruff config in `pyproject.toml`)
+- **Imports**: sorted by ruff (stdlib → third-party → frappe → yam_agri_core → local)
+- **ORM**: always use `frappe.get_all`, `frappe.db.get_value`, `frappe.get_doc` — never `frappe.db.sql` with f-strings
+- **Translations**: `_("…")` for Python user-facing strings
+- **Secrets**: use `frappe.conf.get("key")` or `os.environ.get("KEY")` — never literals
+
+### DocType JSON
+- DocType names: **Title Case Singular** (e.g., `"Scale Ticket"`, not `"ScaleTickets"`)
+- Transaction DocTypes: `"autoname": "naming_series:"` with series `YAM-[ABBREV]-.YYYY.-`
+- Master DocTypes (Site, Device): user-defined name (no autoname)
+- Must have `"title_field"` set to the most human-readable field
+- Every record must have a `"site"` Link field → `"options": "Site"`
+
+### JavaScript
+- `camelCase` for variables and functions
+- Wrap all user-visible strings in `__("…")`
+- Never implement business logic in JS — server-side Python only
+
+---
+
+## 13. Testing
+
+### Pure-Python tests (run in CI without bench)
+Location: `apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_agr_cereal_001.py`
+
+```bash
+# From repo root:
+python -m pytest apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_agr_cereal_001.py -v
+```
+
+### Frappe integration tests (require running bench)
+Location: `apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_doc_validations.py`
+(Uses `monkeypatch` to stub `frappe.db`, `frappe.has_role`, etc.)
+
+```bash
+# Inside a running bench:
+bench --site yam.localhost run-tests --app yam_agri_core
+```
+
+### CI test command (`.github/workflows/ci.yml`)
+```bash
+pytest apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/ -v --tb=short \
+  --ignore=…/test_doc_validations.py   # Frappe-db tests excluded from CI
+```
+
+### `test_records.json` (per DocType)
+Frappe uses `test_records.json` to seed the test DB before `bench run-tests`.
+File location: `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/<name>/test_records.json`
+
+---
+
+## 14. Dev Environment (`infra/docker/run.sh`)
+
+```bash
+cd infra/docker
+cp .env.example .env          # fill in values (never commit .env)
+
+bash run.sh up                 # start Docker Compose stack
+bash run.sh init               # create site + install apps (first time only)
+bash run.sh logs               # stream logs
+bash run.sh shell              # bash shell inside frappe container
+bash run.sh bench migrate      # run bench commands (any bench subcommand)
+bash run.sh down               # stop stack
+bash run.sh reset              # wipe volumes + rebuild (destructive)
+
+# Yemen offline/resilience helpers:
+bash run.sh prefetch           # pull + save all images to offline-images.tar
+bash run.sh offline-init       # load images from tar + start (no internet)
+bash run.sh backup             # backup site DB + files → ./backups/<timestamp>/
+bash run.sh restore            # restore from latest backup
+bash run.sh status             # show container health + recent logs
+```
+
+Inside the container, run `bench` commands directly:
+```bash
+bench --site localhost migrate
+bench --site localhost run-tests --app yam_agri_core
+bench --site localhost execute yam_agri_core.yam_agri_core.install.get_lot_crop_link_status
+bench export-fixtures --app yam_agri_core          # exports fixtures = ["Workflow"]
+```
+
+---
+
+## 15. CI / Lint / Pre-commit
+
+```bash
+# Lint (must pass before opening a PR):
+pip install ruff
+ruff check apps/yam_agri_core
+ruff format apps/yam_agri_core --check
+
+# YAML lint:
+pip install yamllint
+yamllint -d "{extends: relaxed, rules: {line-length: {max: 160}}}" $(git ls-files '*.yml' '*.yaml')
+
+# Pre-commit (runs ruff, check-yaml, check-json, prettier on commit):
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files
+```
+
+CI workflows (`.github/workflows/`):
+- `ci.yml` — secret scan, YAML lint, Docker Compose validate, Python lint (ruff), env config check, pure-Python tests
+- `pr_review.yml` — PR title format (Conventional Commits), size warning, auto-label
+- `stale.yml` — stale issue/PR management
+- `compose-validation.yml` — runs `preflight.sh` on infra changes
+
+---
+
+## 16. Key Architecture Decisions (from arc42 §9)
+
+| ADR | Decision | Implication |
+|-----|---------|------------|
+| ADR-001 | Use Frappe + ERPNext as core platform | MariaDB-only; no raw SQL; Frappe ORM for everything |
+| ADR-002 | All custom code in `yam_agri_core` app | Never patch `frappe`, `erpnext`, or `agriculture` source files |
+| ADR-003 | AI is assistive only via AI Gateway | AI Gateway is mandatory; no Frappe write API exposed to AI |
+| ADR-004 | Docker Compose dev → k3s staging/prod | Don't start k3s work until Docker Compose dev is stable |
+
+---
+
+## 17. Yemen-Specific Constraints
+
+These constraints shape every design decision:
+
+| Constraint | Impact |
+|-----------|--------|
+| **Daily power outages (2–8 h)** | All Docker services `restart: always`; MariaDB InnoDB for crash recovery; daily `bench backup` scheduled |
+| **2G/3G only at farms** | SMS-based U1 interface (TP-01 FarmerSMS); offline PWA for U2 (7-day queue); Field Hub Raspberry Pi per site |
+| **8 GB RAM laptops** | Docker Compose dev stack must use < 3 GB total |
+| **Intermittent internet** | `run.sh prefetch` pre-pulls all images; `offline-init` restores offline; Ollama local LLM for offline AI |
+| **Arabic/RTL users** | All Frappe Desk labels, messages, and custom JS must be in RTL-safe Arabic/English bilingual |
+| **Field site connectivity** | Field Hub RPi4 runs minimal frappe-bench; syncs to central via Frappe REST API when online |
+
+---
+
+## 18. What NOT to Do
+
+- **Do not** patch `frappe`, `erpnext`, or `agriculture` source files
+- **Do not** create custom Frappe roles — use standard ERPNext roles via Role Profiles
+- **Do not** add `permission_query_conditions` without also adding `has_permission` (both required)
+- **Do not** put default values in `on_update` — use `before_insert` for new records
+- **Do not** use `frappe.db.sql` with string interpolation — use Frappe ORM or parameterised queries
+- **Do not** write AI code that calls `frappe.get_doc(…).save()` or submits workflows
+- **Do not** commit `.env` files with real credentials — `.env.example` only
+- **Do not** set `restart: no` on any database or cache service
+- **Do not** expose MariaDB port 3306 externally in staging/production
+- **Do not** start Kubernetes work before Docker Compose dev is stable and all ATs pass
+- **Do not** modify `environments/production/` without QA Manager review and staging test evidence

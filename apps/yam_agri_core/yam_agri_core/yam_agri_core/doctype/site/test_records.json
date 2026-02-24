@@ -1,0 +1,12 @@
+[
+  {
+    "doctype": "Site",
+    "site_name": "_Test Site A",
+    "site_type": "Farm"
+  },
+  {
+    "doctype": "Site",
+    "site_name": "_Test Site B",
+    "site_type": "Silo"
+  }
+]

@@ -252,7 +252,7 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 		{
 			"type": "header",
 			"data": {
-				"text": "<span class=\"h4\"><b>Reports &amp; Masters</b></span>",
+				"text": '<span class="h4"><b>Reports &amp; Masters</b></span>',
 				"col": 12,
 			},
 		}
@@ -266,7 +266,7 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 			{
 				"type": "header",
 				"data": {
-					"text": f"<span class=\"h5\"><b>{section_label}</b></span>",
+					"text": f'<span class="h5"><b>{section_label}</b></span>',
 					"col": 12,
 				},
 			}
@@ -663,7 +663,7 @@ def _ensure_shortcuts(*, workspace: str, shortcuts: list[tuple[str, str, str, st
 		_unset_workspace_app(workspace)
 
 	existing = set()
-	for s in (doc.shortcuts or []):
+	for s in doc.shortcuts or []:
 		existing.add(
 			(
 				(s.type or "").strip(),
@@ -741,7 +741,7 @@ def _ensure_workspace_content_from_shortcuts(*, workspace: str, header_text: str
 	]
 
 	seen_labels: set[str] = set()
-	for shortcut in (doc.shortcuts or []):
+	for shortcut in doc.shortcuts or []:
 		label = (shortcut.label or shortcut.link_to or "").strip()
 		if not label:
 			continue
@@ -868,12 +868,16 @@ def _ensure_workspace_sidebar() -> None:
 	]
 
 	existing = set()
-	for it in (doc.items or []):
+	for it in doc.items or []:
 		existing.add(((it.type or "").strip(), (it.label or "").strip(), (it.link_to or "").strip()))
 
 	changed = False
 	for item in desired_items:
-		key = ((item.get("type") or "").strip(), (item.get("label") or "").strip(), (item.get("link_to") or "").strip())
+		key = (
+			(item.get("type") or "").strip(),
+			(item.get("label") or "").strip(),
+			(item.get("link_to") or "").strip(),
+		)
 		if key in existing:
 			continue
 		if item.get("type") == "Link" and item.get("link_type") == "Workspace":

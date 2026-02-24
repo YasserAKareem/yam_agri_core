@@ -5,7 +5,6 @@ from typing import Any
 import frappe
 from frappe import utils
 
-
 BASELINE_DOCTYPES = (
 	"Site",
 	"StorageBin",
@@ -314,7 +313,7 @@ def _ensure_demo_observation(site: str, device: str) -> None:
 			"value": 1.0,
 			"unit": "count",
 			"quality_flag": "OK",
-			"raw_payload": "{\"seed\": true}",
+			"raw_payload": '{"seed": true}',
 		}
 	).insert(ignore_permissions=True)
 

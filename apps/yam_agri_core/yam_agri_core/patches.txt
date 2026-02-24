@@ -1,3 +1,7 @@
-[pre_model_sync]
-
-[post_model_sync]
+# YAM Agri Core — migration patches
+#
+# Format: one patch per line, using the full Python dotted path.
+# Patches run in order; executed once per site on bench migrate.
+#
+# Example:
+#   yam_agri_core.patches.v1_1.normalize_lot_crop_links

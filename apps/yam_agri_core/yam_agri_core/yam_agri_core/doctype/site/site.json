@@ -3,6 +3,7 @@
   "name": "Site",
   "module": "YAM Agri Core",
   "custom": 1,
+  "title_field": "site_name",
   "fields": [
     {"fieldname": "site_name", "fieldtype": "Data", "label": "Site Name"},
     {

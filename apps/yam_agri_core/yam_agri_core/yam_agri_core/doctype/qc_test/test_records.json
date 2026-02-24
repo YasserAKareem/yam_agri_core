@@ -1,0 +1,10 @@
+[
+  {
+    "doctype": "QCTest",
+    "lot": "_Test Lot 001",
+    "site": "_Test Site A",
+    "test_type": "Aflatoxin",
+    "result_value": 2.0,
+    "pass_fail": "Pass"
+  }
+]

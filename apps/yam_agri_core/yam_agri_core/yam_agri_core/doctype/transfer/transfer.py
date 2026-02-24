@@ -36,6 +36,8 @@ class Transfer(Document):
 			if old_status != new_status:
 				if not frappe.has_role("QA Manager"):
 					frappe.throw(
-						_("Only a user with role 'QA Manager' may set Transfer status to {0}").format(new_status),
+						_("Only a user with role 'QA Manager' may set Transfer status to {0}").format(
+							new_status
+						),
 						frappe.PermissionError,
 					)

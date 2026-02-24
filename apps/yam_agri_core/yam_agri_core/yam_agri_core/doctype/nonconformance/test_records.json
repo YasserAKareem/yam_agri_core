@@ -1,0 +1,9 @@
+[
+  {
+    "doctype": "Nonconformance",
+    "site": "_Test Site A",
+    "lot": "_Test Lot 001",
+    "capa_description": "_Test CAPA — moisture above threshold",
+    "status": "Open"
+  }
+]

@@ -1,31 +1,48 @@
 # hooks for yam_agri_core
 
-from . import __version__ as app_version
-
 app_name = "yam_agri_core"
 app_title = "YAM Agri Core"
 app_publisher = "YAM Agri Co."
-app_description = "YAM Agri Core app (skeleton for tests and controllers)"
-app_email = ""
+app_description = "YAM Agri Core — cereal supply chain quality and traceability platform"
+app_email = "dev@yam-agri.com"
 app_license = "MIT"
+app_version = "1.1.0-dev"
 source_link = "https://github.com/YasserAKareem/yam_agri_core"
-app_logo_url = "/assets/yam_agri_core/images/logo.svg"
+app_logo_url = "/assets/yam_agri_core/images/yam-agri-logo.svg"
+required_apps = ["frappe/erpnext"]
 
+add_to_apps_screen = [
+	{
+		"name": "yam_agri_core",
+		"logo": "/assets/yam_agri_core/images/yam-agri-logo.svg",
+		"title": "YAM Agri",
+		"route": "/app/lot",
+		"has_permission": "yam_agri_core.yam_agri_core.install.check_app_permission",
+	}
+]
 
 after_install = "yam_agri_core.yam_agri_core.install.after_install"
 after_migrate = "yam_agri_core.yam_agri_core.install.after_migrate"
-after_uninstall = "yam_agri_core.uninstall.after_uninstall"
+before_uninstall = "yam_agri_core.yam_agri_core.uninstall.before_uninstall"
 
+# Fixtures exported/imported by `bench export-fixtures` / loaded on `bench migrate`
+fixtures = ["Workflow"]
 
 extend_bootinfo = "yam_agri_core.yam_agri_core.boot.extend_bootinfo"
 
 # Fallback for Frappe variants that use `boot_session` instead of `extend_bootinfo`.
 boot_session = "yam_agri_core.yam_agri_core.boot.boot_session"
 
+# Include JS / CSS files in the Frappe desk header
+# app_include_css = "yam_agri_core.bundle.css"
+app_include_js = ["yam_agri_core.bundle.js"]
 
-app_include_js = ["assets/yam_agri_core/js/yam_agri_core.bundle.js"]
-desk_include_js = ["assets/yam_agri_core/js/yam_agri_core.bundle.js"]
-
+# Per-doctype client-side JS (relative to the app's module directory)
+doctype_js = {
+	"Lot": "yam_agri_core/doctype/lot/lot.js",
+	"Site": "yam_agri_core/doctype/site/site.js",
+	"QCTest": "yam_agri_core/doctype/qc_test/qc_test.js",
+}
 
 permission_query_conditions = {
 	"Site": "yam_agri_core.yam_agri_core.site_permissions.site_query_conditions",
@@ -67,6 +84,28 @@ has_permission = {
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
+	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_has_permission",
+	"YAM Soil Test": "yam_agri_core.yam_agri_core.site_permissions.yam_soil_test_has_permission",
+	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_has_permission",
+	"YAM Crop Variety": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_has_permission",
+	"YAM Crop Variety Recommendation": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_recommendation_has_permission",
+}
+
+# ERPNext-style global search registration — lets Desk's global search bar find these records.
+global_search_doctypes = {
+	"Default": [
+		{"doctype": "Lot", "index": 0},
+		{"doctype": "Site", "index": 1},
+		{"doctype": "QCTest", "index": 2},
+		{"doctype": "Certificate", "index": 3},
+		{"doctype": "StorageBin", "index": 4},
+		{"doctype": "Transfer", "index": 5},
+		{"doctype": "ScaleTicket", "index": 6},
+		{"doctype": "Observation", "index": 7},
+		{"doctype": "Nonconformance", "index": 8},
+		{"doctype": "EvidencePack", "index": 9},
+		{"doctype": "Complaint", "index": 10},
+	],
 }
 
 

@@ -1,0 +1,9 @@
+[
+  {
+    "doctype": "Certificate",
+    "cert_type": "FAO GAP",
+    "lot": "_Test Lot 001",
+    "site": "_Test Site A",
+    "expiry_date": "2027-12-31"
+  }
+]

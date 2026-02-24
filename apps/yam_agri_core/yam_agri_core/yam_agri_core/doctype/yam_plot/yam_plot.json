@@ -3,6 +3,7 @@
   "name": "YAM Plot",
   "module": "YAM Agri Core",
   "custom": 1,
+  "title_field": "plot_name",
   "fields": [
     {"fieldname": "plot_name", "fieldtype": "Data", "label": "Plot Name"},
     {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},

@@ -11,7 +11,7 @@ list views, custom dashboards) for the `yam_agri_core` Frappe app.
 
 ## Platform context
 
-- Framework: **Frappe v15/v16** + **ERPNext v16** + **Frappe Agriculture**
+- Framework: **Frappe v16** + **ERPNext v16** + **Frappe Agriculture**
 - Database: **MariaDB 10.6** — use Frappe ORM (`frappe.get_doc`, `frappe.db.*`), never raw SQL unless explicitly needed
 - Container runtime: **Docker Compose** (dev), k3s (staging/production)
 - Language support: **Arabic/RTL first**, English second; all user-facing strings must be wrapped in `__("...")` for translation
@@ -38,7 +38,7 @@ list views, custom dashboards) for the `yam_agri_core` Frappe app.
 2. **Site isolation**: use `frappe.has_permission` and document-level permissions; never bypass with `ignore_permissions=True` except in scheduled jobs (and document why)
 3. **High-risk actions** (lot accept/reject, recall, certificate revocation) must go through a Frappe **Workflow** with QA Manager approval — never auto-execute
 4. **Secrets**: never hard-code passwords, API keys, or tokens; use `frappe.conf` or environment variables
-5. **Tests**: write Frappe unit tests in `tests/test_*.py`; cover happy path + validation errors
+5. **Tests**: write Frappe unit tests in `yam_agri_core/yam_agri_core/tests/test_*.py`; cover happy path + validation errors
 6. **Naming**: follow Frappe naming conventions — `snake_case` for Python, `camelCase` for JavaScript
 7. **Translations**: wrap all user-visible strings in `__("...")` (JS) or `_("...")` (Python)
 
@@ -53,4 +53,6 @@ list views, custom dashboards) for the `yam_agri_core` Frappe app.
 ## Local dev environment
 
 Start with `cd infra/docker && bash run.sh up` then `bash run.sh init`.
+Full command reference: `up`, `down`, `logs`, `shell`, `bench`, `init`, `reset`,
+`prefetch`, `offline-init`, `backup`, `restore`, `status`.
 See `docs/AGENTS_AND_MCP_BLUEPRINT.md` Section 3 for Yemen-specific offline setup.

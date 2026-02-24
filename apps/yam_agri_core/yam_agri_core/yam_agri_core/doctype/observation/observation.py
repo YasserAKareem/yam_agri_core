@@ -13,6 +13,10 @@ class Observation(Document):
 
 		assert_site_access(self.get("site"))
 
+		# Default quality flag to OK; invalid data is quarantined explicitly
+		if not self.get("quality_flag"):
+			self.quality_flag = "OK"
+
 		device = self.get("device")
 		if device:
 			device_site = frappe.db.get_value("Device", device, "site")

@@ -1,1 +1,12 @@
-# Add commit SHAs for bulk formatting/chore-only changes to ignore in blame.
+# git-blame-ignore-revs
+#
+# Commits in this file are excluded from `git blame` output.
+# These are typically bulk formatting or linting passes.
+#
+# Usage:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Reference: https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt
+
+# 2026-02-24 — initial ruff format pass (contribution guidelines compliance)
+50ae34f3c3dfc58b62dd4e71bbfabfe6e11ac09f

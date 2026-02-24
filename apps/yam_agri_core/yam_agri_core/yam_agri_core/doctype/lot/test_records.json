@@ -1,0 +1,16 @@
+[
+  {
+    "doctype": "Lot",
+    "lot_number": "_Test Lot 001",
+    "site": "_Test Site A",
+    "qty_kg": 1000.0,
+    "status": "Draft"
+  },
+  {
+    "doctype": "Lot",
+    "lot_number": "_Test Lot 002",
+    "site": "_Test Site B",
+    "qty_kg": 500.0,
+    "status": "Draft"
+  }
+]

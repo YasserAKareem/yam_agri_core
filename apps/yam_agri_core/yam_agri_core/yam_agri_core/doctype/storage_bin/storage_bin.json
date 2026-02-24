@@ -10,8 +10,8 @@
       "fieldname": "naming_series",
       "fieldtype": "Select",
       "label": "Naming Series",
-      "options": "SB-.YYYY.-",
-      "default": "SB-.YYYY.-"
+      "options": "YAM-SB-.YYYY.-",
+      "default": "YAM-SB-.YYYY.-"
     },
     {
       "fieldname": "storage_bin_name",
