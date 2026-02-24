@@ -606,30 +606,72 @@ These constraints shape every design decision:
 
 The repository includes an automated QC agent at `tools/frappe_skill_agent.py` that checks
 all Python, JavaScript, and JSON source files for Frappe best-practice violations.
+Full documentation: `docs/FRAPPE_SKILL_AGENT.md`.
 
-**Run before every PR:**
+### How to run
+
+**VS Code (quickest):** Press **Ctrl+Shift+B** (Win/Linux) or **Cmd+Shift+B** (macOS) →
+select **"Frappe Skill Agent: Run (text report)"**.
+
+**Terminal (all options):**
 ```bash
-python tools/frappe_skill_agent.py                    # text report (default)
-python tools/frappe_skill_agent.py --format json      # JSON for CI integration
+python tools/frappe_skill_agent.py                              # text report (default)
+python tools/frappe_skill_agent.py --verbose                    # include code pairs for each finding
+python tools/frappe_skill_agent.py --format json                # machine-readable JSON
+python tools/frappe_skill_agent.py --save-learned proposals.json   # export auto-learned rule proposals
+python tools/frappe_skill_agent.py --export-training-data /tmp/training.jsonld.json
 ```
+
+**Run before every PR** and fix all critical/high findings before opening.
 
 **Exit codes:** `0` = passed (no critical or high findings); `1` = failed; `2` = configuration error.
 
-### Frappe Skill Rule Set
+### How to read the output
 
-| Rule ID | Severity | Check |
-|---------|----------|-------|
-| FS-001 | Critical | `frappe.throw()` called with raw string not wrapped in `_()` |
-| FS-002 | High | User-visible JS string not wrapped in `__()` |
-| FS-003 | Medium | DocType JSON: `site` field not marked `reqd: 1` |
-| FS-004 | Low | DocType JSON: missing `title_field` |
-| FS-005 | Medium | DocType JSON: transaction DocType missing `track_changes: 1` |
-| FS-006 | High | Hardcoded email address in non-test Python (extract to constant) |
-| FS-007 | Medium | Default field value set in `validate()` without a `before_insert()` |
-| FS-008 | Medium | Broad `except Exception: return []` that silently swallows errors |
-| FS-009 | High | DocType with `lot` field but no cross-site `lot.site` consistency check |
-| FS-010 | Critical | AI module (`ai/`) calls a Frappe write API (save/insert/submit) |
-| FS-011 | Critical | DocType in `permission_query_conditions` but NOT in `has_permission` (or vice versa) |
+```
+Result   : ❌ FAILED
+Findings : 12 total  (critical:2  high:3  medium:5  low:2)
+```
+
+Each finding shows the Rule ID, file + line, and the exact problem. With `--verbose`, negative
+and positive code examples are printed for every finding.
+
+### Frappe Skill Rule Set (FS-001 – FS-020)
+
+| Rule ID | Severity | File | Check |
+|---------|----------|------|-------|
+| FS-001 | Critical | `.py` | `frappe.throw()` called with raw string not wrapped in `_()` |
+| FS-002 | High | `.js` | User-visible JS string not wrapped in `__()` |
+| FS-003 | Medium | `.json` | DocType JSON: `site` field not marked `reqd: 1` |
+| FS-004 | Low | `.json` | DocType JSON: missing `title_field` |
+| FS-005 | Medium | `.json` | Transaction DocType missing `track_changes: 1` |
+| FS-006 | High | `.py` | Hardcoded email address in non-test Python (extract to constant) |
+| FS-007 | Medium | `.py` | Default field value set in `validate()` without a `before_insert()` |
+| FS-008 | Medium | `.py` | Broad `except Exception: return []` that silently swallows errors |
+| FS-009 | High | `.py` | DocType with `lot` field but no cross-site `lot.site` consistency check |
+| FS-010 | Critical | `.py` | AI module (`ai/`) calls a Frappe write API (save/insert/submit) |
+| FS-011 | Critical | `hooks.py` | DocType in `permission_query_conditions` but NOT in `has_permission` (or vice versa) |
+| FS-012 | Critical | `.py` | Hardcoded password, API key, or token in source |
+| FS-013 | High | `.py` | Hardcoded IP address, hostname, or URL |
+| FS-014 | High | `.py` | Hardcoded database connection string or host |
+| FS-015 | Medium | `.py` | Hardcoded business-rule value (tax rate, discount, trial period) |
+| FS-016 | Medium | `.py` | Hardcoded cloud resource identifier (S3 bucket, region, ARN) |
+| FS-017 | Medium | `.json` | Master DocType without `track_changes` (no `naming_series`) |
+| FS-018 | Low | `.json` | Master DocType with `site` field but no `status` / `is_active` field |
+| FS-019 | Medium | `.py` | Hardcoded feature flag or inline `frappe.session.user ==` check |
+| FS-020 | High | `.py` | Auto-learned: suspicious pattern not covered by FS-001 to FS-019 |
+
+### Quick-fix cheat sheet
+
+| Rule | Problem | Fix |
+|------|---------|-----|
+| FS-001 | `frappe.throw("raw string")` | `frappe.throw(_("raw string"), frappe.ValidationError)` |
+| FS-002 | `frappe.msgprint("text")` | `frappe.msgprint(__("text"))` |
+| FS-003 | `site` field, `reqd` missing or `0` | Add `"reqd": 1` to the `site` field in the DocType JSON |
+| FS-006 | Hardcoded email | Extract to a module-level constant |
+| FS-009 | No `lot.site` check | Add `lot_site = frappe.db.get_value("Lot", self.lot, "site"); if lot_site != self.site: frappe.throw(…)` |
+| FS-011 | PQC/has_permission out of sync | Add both entries to `hooks.py` for every site-bearing DocType |
+| FS-012 | Hard-coded token/password | Move to `frappe.conf.get()` or `os.environ.get()` |
 
 ### QC Rules Derived from Bug Audit (2026-02-24)
 
