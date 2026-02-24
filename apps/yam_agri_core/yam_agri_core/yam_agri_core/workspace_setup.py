@@ -241,9 +241,8 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 			doc.append(
 				"shortcuts",
 				{
-					"type": "DocType",
-					"link_to": dt,
-					"doc_view": "List",
+					"type": "URL",
+					"url": f"/app/{frappe.scrub(dt)}",
 					"label": dt,
 				},
 			)
