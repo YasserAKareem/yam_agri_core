@@ -707,3 +707,212 @@ original findings and how each was fixed.
 The full bug catalogue is maintained at **`docs/BUG_AUDIT_REPORT.md`**.
 All future bugs discovered by the Frappe Skill agent or code reviews should be appended there
 following the same format: Category, Rule ID, File, Problem, Before/After, Status.
+
+---
+
+## 21. Known CI Failure Patterns & Quick Fixes
+
+This section is the **living registry** of every CI job failure that has been diagnosed and
+resolved in this repository. Each entry provides a diagnostic command, root cause, and the
+minimal fix so future agents resolve the same failure in minutes without re-investigation.
+
+**Agents: when you resolve a NEW type of CI failure, add a row here before closing the PR.**
+
+---
+
+### CI / Packaging Metadata / Check packaging consistency
+
+**Script:** `python tools/check_packaging_consistency.py`
+
+| Symptom | Root cause | Minimal fix |
+|---------|-----------|-------------|
+| `setup.py version (X.Y.Z.devN) != package __version__ (X.Y.Z-dev)` | Python PEP 440 normalizes the hyphen form `X.Y.Z-dev` → `X.Y.Z.devN` when evaluated through `setup.py --version`. A plain string comparison then fails. | Use the canonical PEP 440 form everywhere: `X.Y.Z.devN` in `__init__.py` **and** `setup.py`. Never use `X.Y.Z-dev`. |
+| `pyproject missing [tool.flit.module] name = yam_agri_core` | The `pyproject.toml` lacked the `[tool.flit.module]` TOML table that `flit_core` requires to locate the top-level package. | Add the section before `[tool.bench.frappe-dependencies]`: `[tool.flit.module]` / `name = "yam_agri_core"` |
+| `setup.py version failed: …` | `setup.py` is missing or broken. | Verify `apps/yam_agri_core/setup.py` exists and is importable. |
+
+**Diagnostic commands:**
+```bash
+python tools/check_packaging_consistency.py          # full check — exits 0 on success
+python apps/yam_agri_core/setup.py --version         # raw version from setuptools
+grep "__version__" apps/yam_agri_core/yam_agri_core/__init__.py
+```
+
+---
+
+### CI / Frappe Skill Agent QC
+
+**Script:** `python tools/frappe_skill_agent.py`  
+**Exit code meaning:** `0` = pass (0 critical, 0 high); `1` = fail; `2` = config error
+
+**Note:** The job uses `continue-on-error: true` so it never blocks merges, but the owner
+expects 0 critical and 0 high findings before a PR is approved.
+
+| Symptom | Root cause | Minimal fix |
+|---------|-----------|-------------|
+| `FS-001 CRITICAL dev_seed.py / smoke.py / seed/*.py` — raw `frappe.throw()` strings | `frappe.throw()` called with a plain string, not wrapped in `_()`. Breaks Arabic translations. | `frappe.throw(_("message"))` or `frappe.throw(_("msg: {0}").format(var))`. `from frappe import _` must be present. |
+| `FS-006 HIGH smoke.py` — hardcoded email in non-test code | Inline `"user@example.com"` literal duplicated in production code instead of using the module-level constant. | Replace with the existing `_AT10_USER_A` / `_AT10_USER_B` constants (defined at top of `smoke.py`). |
+| `FS-012 CRITICAL tests/test_frappe_skill_agent.py` — fake credentials flagged | `check_hardcoded_credentials()` lacked a test-file skip, so intentional test fixtures (`password = "…"`) triggered false positives. | Add `if os.path.basename(py_file).startswith("test_"): return` at the top of `check_hardcoded_credentials()`. Pattern: same as FS-013/015/016. |
+| `FS-020 HIGH tests/test_frappe_skill_agent.py` — auto-learn patterns in test code | `check_auto_learn_patterns()` also lacked a test-file skip. | Same fix: add `startswith("test_")` guard at the top of `check_auto_learn_patterns()`. |
+| `FS-011 CRITICAL hooks.py` — PQC/has_permission out of sync | New DocType added to `permission_query_conditions` but not `has_permission` (or vice versa). | Add BOTH entries in `hooks.py` for every DocType with a `site` field. See §6. |
+| `FS-009 HIGH *.py` — missing lot-site cross-check | Controller has a `lot` link field but never validates `lot.site == self.site`. | Add cross-site check inside `validate()` (pattern in §8). |
+
+**Quick diagnostic:**
+```bash
+python tools/frappe_skill_agent.py                   # text summary
+python tools/frappe_skill_agent.py --format json | python -m json.tool | grep '"severity"'
+python tools/frappe_skill_agent.py --verbose         # full code pairs for each finding
+```
+
+---
+
+### CI / Python lint (ruff)
+
+**Commands:** `ruff check apps/yam_agri_core` · `ruff format apps/yam_agri_core --check`
+
+| Symptom | Root cause | Minimal fix |
+|---------|-----------|-------------|
+| `Would reformat: …` (format check fails) | Code was added/edited without running `ruff format`. | `ruff format apps/yam_agri_core` (run once, commit the diff). |
+| `E501 Line too long` | Line exceeds 110 chars (configured in `pyproject.toml`). | Break the line or use a continuation. Never change `line-length` in config. |
+| `F401 imported but unused` | Import left after refactor. | Remove the unused import. |
+| Tabs vs spaces conflict | ruff enforces **tabs** (Frappe convention). Do not convert to spaces. | `ruff format` auto-corrects; do not override with `# noqa`. |
+
+**Diagnostic:**
+```bash
+ruff check apps/yam_agri_core --output-format=github  # annotations in CI format
+ruff format apps/yam_agri_core --check --diff          # show exact diff before applying
+ruff format apps/yam_agri_core                         # auto-fix formatting
+```
+
+---
+
+### CI / Python unit tests
+
+**Command:** `pytest apps/yam_agri_core/…/tests/ -v --tb=short --ignore=…/test_doc_validations.py`
+
+| Symptom | Root cause | Minimal fix |
+|---------|-----------|-------------|
+| `ImportError: No module named 'frappe'` | Test imports a Frappe symbol that requires a live bench. | Move the test to `test_doc_validations.py` (bench-only); keep CI tests pure-Python. |
+| `AssertionError` in `test_agr_cereal_001.py` | AI recommender logic change broke an assertion. | Check the recommender output for ranking/score change; update the assertion or the logic. |
+| `ModuleNotFoundError: yam_agri_core` | Package not installed in the test environment. | `pip install -e apps/yam_agri_core --no-deps` before running pytest. |
+
+---
+
+### CI / YAML lint
+
+**Command:** `yamllint -d "{extends: relaxed, rules: {line-length: {max: 160}, …}}" $(git ls-files '*.yml' '*.yaml')`
+
+| Symptom | Root cause | Minimal fix |
+|---------|-----------|-------------|
+| `wrong indentation` | Tabs used in YAML (YAML requires spaces). | Replace tabs with 2-space indentation in the affected file. |
+| `too many spaces after …` | Extra spaces after `{` or `:` in inline flow mappings. | Remove extra whitespace. |
+| `truthy value` | `yes`/`no`/`on`/`off` not in the allowed-values list. | Use `true`/`false` or the string form `"yes"`. |
+
+---
+
+### CI / Secret scan
+
+**Command:** `git grep -riP "password\s*=\s*['\"]…"` (pattern varies — see `ci.yml`)
+
+| Symptom | Root cause | Minimal fix |
+|---------|-----------|-------------|
+| Pattern match on test fixture string | Test file contains realistic-looking credentials to test detection logic. | `check_hardcoded_credentials()` and similar checks must skip `test_*` files via `startswith("test_")` guard. |
+| Real secret committed | Actual password/token in source. | **Rotate the credential immediately.** Remove from source. Use `frappe.conf.get()` / `os.environ.get()`. |
+
+---
+
+## 22. Auto-Update Protocol
+
+This section defines the **mandatory process** every Copilot coding agent must follow after
+resolving a CI failure or discovering a new class of defect. The goal is that each fixed issue
+permanently improves the instructions so the same problem never recurs.
+
+### When to update these instructions
+
+Update this file (`copilot-instructions.md`) whenever you:
+
+1. **Fix a CI failure that isn't already listed in §21** — add it to the matching table.
+2. **Fix a new FS rule violation** — if the fix required a change to `frappe_skill_agent.py`,
+   update the rule table in §19 and add the pattern to the quick-fix cheat sheet.
+3. **Discover a new "never do this" pattern** — add it to §18 (What NOT to Do).
+4. **Resolve a recurrent packaging or versioning issue** — update the relevant §21 entry with
+   the exact version string or constraint that caused it.
+
+### How to update — step-by-step
+
+```
+1.  Fix the bug / CI failure as normal (code changes, tests).
+2.  Run the affected CI check locally to confirm it passes:
+      python tools/check_packaging_consistency.py
+      python tools/frappe_skill_agent.py
+      ruff check apps/yam_agri_core && ruff format apps/yam_agri_core --check
+      pytest apps/…/tests/ -v --tb=short --ignore=…/test_doc_validations.py
+3.  Open .github/copilot-instructions.md.
+4.  Add or update the appropriate row in §21 (CI failure registry).
+5.  If a new QC rule was added or modified in frappe_skill_agent.py:
+      a. Update the rule table in §19.
+      b. Update the quick-fix cheat sheet.
+      c. Add the rule to §19 "QC Rules Derived from Bug Audit" if it was
+         codified from a real defect found in this codebase.
+6.  Append the bug to docs/BUG_AUDIT_REPORT.md following the existing template.
+7.  Keep the documentation changes in the same PR as the code fix so that the
+    fix and the lesson learned land together. Use a separate commit for docs if
+    you want an independent revert path: `fix(scope): …` + `docs(ci): update §21 …`.
+```
+
+### Auto-Learn → Permanent Rule promotion pipeline
+
+The Frappe Skill Agent proposes new rules via `--save-learned`. Follow this pipeline to promote
+a proposed rule to a permanent FS rule:
+
+```
+frappe_skill_agent.py (--save-learned proposals.json)
+        │
+        ▼  review proposals.json; confirm pattern is real and actionable
+register_bug_type(BugDefinition(…)) in frappe_skill_agent.py
+        │
+        ▼  add to FS rule table in §19 above
+add row to "Frappe Skill Rule Set" table (new FS-0NN entry)
+        │
+        ▼  add automated check function check_XXX() to agent
+check_XXX() skips test files via os.path.basename(f).startswith("test_")
+        │
+        ▼  document fix pattern in §21 quick-fix table + §19 cheat sheet
+update copilot-instructions.md §19, §21
+        │
+        ▼  append to bug audit report
+docs/BUG_AUDIT_REPORT.md — new entry with Before/After/Status
+```
+
+### Test-file skip rule (mandatory for all new FS checks)
+
+Every new check function added to `frappe_skill_agent.py` that scans for patterns that are
+intentionally present in test fixtures **must** skip test files:
+
+```python
+def check_my_new_rule(report: QCReport, py_file: str, base: str) -> None:
+    """FS-0NN / X.Y.Z: Description."""
+    # Skip test files — they intentionally contain bad patterns to validate detection
+    if os.path.basename(py_file).startswith("test_"):
+        return
+    …
+```
+
+This is the pattern used by FS-001, FS-006, FS-012, FS-013, FS-015, FS-016, FS-019, FS-020.
+**Do not add a new check without this guard** if the check targets patterns also used in test
+fixtures (credentials, IPs, feature flags, CORS wildcards).
+
+### Version string convention (packaging)
+
+Always use **PEP 440 canonical form** for the app version. Never use the hyphen form.
+
+| ❌ Non-canonical (breaks packaging check) | ✅ Canonical PEP 440 |
+|---|---|
+| `1.1.0-dev` | `1.1.0.dev0` |
+| `1.1.0-alpha` | `1.1.0a0` |
+| `1.1.0-beta.1` | `1.1.0b1` |
+| `1.1.0-rc.1` | `1.1.0rc1` |
+
+All three locations must agree:
+- `apps/yam_agri_core/yam_agri_core/__init__.py` → `__version__ = "X.Y.Z.devN"`
+- `apps/yam_agri_core/setup.py` → `version="X.Y.Z.devN"`
+- Run `python tools/check_packaging_consistency.py` — must exit 0 before opening PR.
