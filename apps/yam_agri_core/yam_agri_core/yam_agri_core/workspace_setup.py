@@ -202,6 +202,7 @@ def ensure_agriculture_workspace_modernized() -> None:
 		return
 
 	_set_agriculture_workspace_links_and_content(workspace="Agriculture")
+	_ensure_agriculture_workspace_sidebar()
 
 
 def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
@@ -242,7 +243,7 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 				"shortcuts",
 				{
 					"type": "URL",
-					"url": f"/app/{frappe.scrub(dt)}",
+					"url": _get_app_route_for_doctype(dt),
 					"label": dt,
 				},
 			)
@@ -284,6 +285,151 @@ def _set_agriculture_workspace_links_and_content(*, workspace: str) -> None:
 	doc.content = json.dumps(blocks)
 	doc.save(ignore_permissions=True)
 	_unset_workspace_app(workspace)
+
+
+def _get_app_route_for_doctype(doctype_name: str) -> str:
+	"""Return canonical /app route for a DocType label/name."""
+	return f"/app/{frappe.scrub(doctype_name).replace('_', '-')}"
+
+
+def _ensure_agriculture_workspace_sidebar() -> None:
+	"""Create Manufacturing-style Agriculture sidebar with stable app routes."""
+	if not frappe.db.exists("DocType", "Workspace Sidebar"):
+		return
+
+	title = "Agriculture"
+	module = "Agriculture"
+
+	if frappe.db.exists("Workspace Sidebar", title):
+		doc = frappe.get_doc("Workspace Sidebar", title)
+	else:
+		doc = frappe.get_doc(
+			{
+				"doctype": "Workspace Sidebar",
+				"title": title,
+				"module": module,
+				"header_icon": "agriculture",
+				"standard": 0,
+			}
+		)
+		doc.insert(ignore_permissions=True)
+
+	changed = False
+	if (doc.module or "") != module:
+		doc.module = module
+		changed = True
+	if (doc.header_icon or "") != "agriculture":
+		doc.header_icon = "agriculture"
+		changed = True
+	if doc.get("for_user"):
+		doc.for_user = None
+		changed = True
+
+	desired_items: list[dict] = [
+		{
+			"label": "Home",
+			"link_type": "Workspace",
+			"type": "Link",
+			"link_to": "Agriculture",
+			"child": 0,
+		},
+		{
+			"label": "Crops & Lands",
+			"link_type": "DocType",
+			"type": "Section Break",
+			"child": 0,
+		},
+		{
+			"label": "Crop",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Crop"),
+			"child": 1,
+		},
+		{
+			"label": "Crop Cycle",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Crop Cycle"),
+			"child": 1,
+		},
+		{
+			"label": "Analytics",
+			"link_type": "DocType",
+			"type": "Section Break",
+			"child": 0,
+		},
+		{
+			"label": "Plant Analysis",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Plant Analysis"),
+			"child": 1,
+		},
+		{
+			"label": "Soil Analysis",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Soil Analysis"),
+			"child": 1,
+		},
+		{
+			"label": "Water Analysis",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Water Analysis"),
+			"child": 1,
+		},
+		{
+			"label": "Soil Texture",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Soil Texture"),
+			"child": 1,
+		},
+		{
+			"label": "Weather",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Weather"),
+			"child": 1,
+		},
+		{
+			"label": "Agriculture Analysis Criteria",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Agriculture Analysis Criteria"),
+			"child": 1,
+		},
+		{
+			"label": "Diseases & Fertilizers",
+			"link_type": "DocType",
+			"type": "Section Break",
+			"child": 0,
+		},
+		{
+			"label": "Disease",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Disease"),
+			"child": 1,
+		},
+		{
+			"label": "Fertilizer",
+			"link_type": "URL",
+			"type": "Link",
+			"url": _get_app_route_for_doctype("Fertilizer"),
+			"child": 1,
+		},
+	]
+
+	doc.set("items", [])
+	for item in desired_items:
+		doc.append("items", item)
+		changed = True
+
+	if changed:
+		doc.save(ignore_permissions=True)
 
 
 def _ensure_desktop_icon_for_workspace_sidebar(*, label: str, app_name: str) -> None:

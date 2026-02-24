@@ -19,6 +19,7 @@ boot_session = "yam_agri_core.yam_agri_core.boot.boot_session"
 
 
 app_include_js = ["/assets/yam_agri_core/js/yam_agri_core.bundle.js"]
+desk_include_js = ["/assets/yam_agri_core/js/yam_agri_core.bundle.js"]
 
 
 permission_query_conditions = {
