@@ -12,8 +12,8 @@ FILES = [
 STATUS_BY_MILESTONE = {
     "M0": "✅ Done",
     "M1": "✅ Done",
-    "M2": "🟨 In Progress",
-    "M3": "⬜ Pending",
+    "M2": "✅ Done",
+    "M3": "🟨 In Progress",
     "M4": "⬜ Pending",
     "M5": "⬜ Pending",
     "M6": "⬜ Pending",
