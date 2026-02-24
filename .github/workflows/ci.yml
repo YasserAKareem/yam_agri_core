@@ -125,3 +125,32 @@ jobs:
             echo "Add .env.example templates to each environment directory."
           fi
           exit 0
+
+  # ── 5. Python lint + pytest (app layer) ──────────────────────────────
+  python-quality:
+    name: Python lint + pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ruff pytest
+
+      - name: Ruff lint
+        run: |
+          ruff check \
+            apps/yam_agri_core/yam_agri_core/yam_agri_core/ai \
+            apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_agr_cereal_001.py
+
+      - name: Pytest unit check
+        env:
+          PYTHONPATH: apps/yam_agri_core
+        run: |
+          pytest -q apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/test_agr_cereal_001.py

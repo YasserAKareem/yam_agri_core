@@ -1,0 +1,26 @@
+{
+  "name": "YAM Agri Core (Frappe)",
+  "dockerComposeFile": [
+    "../infra/docker/docker-compose.yml"
+  ],
+  "service": "backend",
+  "workspaceFolder": "/home/frappe/frappe-bench/apps/yam_agri_core",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "frappe",
+  "postCreateCommand": "bench --version",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/home/frappe/frappe-bench/env/bin/python",
+        "python.analysis.extraPaths": [
+          "/home/frappe/frappe-bench/apps/yam_agri_core"
+        ]
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

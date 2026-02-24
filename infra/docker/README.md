@@ -33,6 +33,9 @@ bash run.sh bench --site localhost reload-doc yam_agri_core
 # run tests (if configured)
 bash run.sh bench --site localhost run-tests
 
+# deterministic Phase 0/1 acceptance (setup + restart + build smoke)
+bash accept_phase01.sh
+
 # stop and remove containers
 bash run.sh down
 
@@ -45,6 +48,7 @@ Notes:
 - Ensure `infra/docker/.env` exists (copy `infra/docker/.env.example` and fill secrets).
 - On Windows use WSL or Git Bash; `run.ps1` is available for PowerShell users that prefer a wrapper.
 - `run.sh` detects `FRAPPE_SERVICE` from `.env` (defaults to `backend`).
+- `accept_phase01.sh` writes `phase01_acceptance_report.json` with pass/fail per check.
 
 Windows note:
 
