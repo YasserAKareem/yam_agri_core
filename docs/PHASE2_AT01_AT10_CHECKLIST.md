@@ -245,10 +245,11 @@ This checklist is the repeatable validation baseline for Phase 2 traceability re
 - Tester: Copilot (automated execution)
 - Executed Command:
   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
-- Expected Result: `status=pass`
+- Result: `status=pass`
 - Evidence fields captured:
   - `sites.site_a`, `sites.site_b`
   - `records.device_a`, `records.storage_bin_a`, `records.lot_a`, `records.transfer_a`, `records.ticket_a`
   - `cross_site_invalid_blocked=true` with validation error text
 - Notes:
-  - This closes AT-01 from manual-only/partial to repeatable automated acceptance.
+  - Runtime evidence confirms cross-site mismatch is blocked (`Lot site must match QCTest site`).
+  - AT-01 is now repeatable and eligible to move from partial to done in WBS tracking.

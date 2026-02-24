@@ -68,3 +68,13 @@ has_permission = {
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
 }
+
+
+doc_events = {
+	"QCTest": {
+		"validate": "yam_agri_core.yam_agri_core.site_permissions.enforce_qc_test_site_consistency",
+	},
+	"Certificate": {
+		"validate": "yam_agri_core.yam_agri_core.site_permissions.enforce_certificate_site_consistency",
+	},
+}

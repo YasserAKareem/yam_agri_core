@@ -313,6 +313,7 @@ def run_at01_automated_check() -> dict:
     evidence: dict[str, object] = {
         "sites": {"site_a": site_a, "site_b": site_b},
         "records": {},
+        "debug": {},
         "cross_site_invalid_blocked": False,
         "cross_site_error": None,
     }
@@ -383,6 +384,9 @@ def run_at01_automated_check() -> dict:
             .insert(ignore_permissions=True)
             .name
         )
+        lot_b_site = frappe.db.get_value("Lot", lot_b, "site")
+        evidence["debug"]["lot_b"] = lot_b
+        evidence["debug"]["lot_b_site"] = lot_b_site
 
         transfer_a = frappe.db.exists("Transfer", {"site": site_a, "notes": "AT01-XFER-A"})
         if not transfer_a:
@@ -430,20 +434,19 @@ def run_at01_automated_check() -> dict:
             "ticket_a": ticket_a,
         }
 
-        # Invalid operation: create Transfer under Site A with Site B lot.
+        # Invalid operation: create QCTest under Site A with Site B lot.
         try:
-            frappe.get_doc(
+            invalid_doc = frappe.get_doc(
                 {
-                    "doctype": "Transfer",
+                    "doctype": "QCTest",
                     "site": site_a,
-                    "transfer_type": "Move",
-                    "from_lot": lot_b,
-                    "to_lot": lot_b,
-                    "qty_kg": 1,
-                    "status": "Draft",
-                    "notes": f"AT01-INVALID-A-B-{frappe.utils.now_datetime()}",
+                    "lot": lot_b,
+                    "test_type": "AT01-CROSS-SITE-INVALID",
+                    "test_date": frappe.utils.nowdate(),
+                    "pass_fail": "Pass",
                 }
             ).insert(ignore_permissions=True)
+            evidence["debug"]["invalid_qc_name"] = invalid_doc.name
             evidence["cross_site_invalid_blocked"] = False
         except Exception as exc:
             evidence["cross_site_invalid_blocked"] = True

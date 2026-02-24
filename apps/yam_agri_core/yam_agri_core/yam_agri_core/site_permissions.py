@@ -422,3 +422,31 @@ def crop_cycle_has_permission(doc, user: str | None = None, permission_type: str
             return True
 
     return False
+
+
+def enforce_qc_test_site_consistency(doc, method: str | None = None) -> None:
+    site = (getattr(doc, "site", None) or "").strip()
+    if not site:
+        frappe.throw("Every record must belong to a Site", frappe.ValidationError)
+
+    assert_site_access(site)
+
+    lot = (getattr(doc, "lot", None) or "").strip()
+    if lot:
+        lot_site = frappe.db.get_value("Lot", lot, "site")
+        if lot_site and str(lot_site).strip() != site:
+            frappe.throw("Lot site must match QCTest site", frappe.ValidationError)
+
+
+def enforce_certificate_site_consistency(doc, method: str | None = None) -> None:
+    site = (getattr(doc, "site", None) or "").strip()
+    if not site:
+        frappe.throw("Every record must belong to a Site", frappe.ValidationError)
+
+    assert_site_access(site)
+
+    lot = (getattr(doc, "lot", None) or "").strip()
+    if lot:
+        lot_site = frappe.db.get_value("Lot", lot, "site")
+        if lot_site and str(lot_site).strip() != site:
+            frappe.throw("Lot site must match Certificate site", frappe.ValidationError)
