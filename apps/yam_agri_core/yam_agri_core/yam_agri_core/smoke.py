@@ -505,7 +505,9 @@ def run_at01_automated_check() -> dict:
 		if invalid_qc_doc:
 			frappe.delete_doc("QCTest", invalid_qc_doc.name, force=True, ignore_permissions=True)
 		if invalid_certificate_doc:
-			frappe.delete_doc("Certificate", invalid_certificate_doc.name, force=True, ignore_permissions=True)
+			frappe.delete_doc(
+				"Certificate", invalid_certificate_doc.name, force=True, ignore_permissions=True
+			)
 
 	finally:
 		frappe.set_user(original_user)
