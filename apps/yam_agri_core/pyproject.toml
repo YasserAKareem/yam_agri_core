@@ -5,10 +5,18 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "yam_agri_core"
 authors = [{ name = "YAM Agri Co." }]
+maintainers = [{ name = "YAM Agri Co." }]
 description = "YAM Agri Core app for Frappe/ERPNext"
-readme = "../../README.md"
+readme = "README.md"
 requires-python = ">=3.10"
 dynamic = ["version"]
+license = { text = "MIT" }
+keywords = ["frappe", "erpnext", "agriculture", "traceability"]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+]
 
 dependencies = []
 
