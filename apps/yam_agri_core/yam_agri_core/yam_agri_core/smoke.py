@@ -3,6 +3,11 @@ from __future__ import annotations
 import frappe
 from frappe.exceptions import PermissionError
 
+# AT-10 test user emails — used by get_at10_readiness() and run_at10_automated_check().
+# These are well-known dev/staging accounts; change here to update all references.
+_AT10_USER_A = "qa_manager_a@example.com"
+_AT10_USER_B = "qa_manager_b@example.com"
+_AT10_QA_USERS = [_AT10_USER_A, _AT10_USER_B]
 
 def run_phase2_smoke() -> dict:
 	"""Minimal post-migrate smoke for Phase 2 integration.
@@ -71,7 +76,7 @@ def get_at10_readiness() -> dict:
 	"""
 
 	sites = frappe.get_all("Site", fields=["name"], limit_page_length=500)
-	qa_users = ["qa_manager_a@example.com", "qa_manager_b@example.com"]
+	qa_users = _AT10_QA_USERS
 
 	existing_users = frappe.get_all(
 		"User",
@@ -165,9 +170,9 @@ def run_at10_automated_check() -> dict:
 	site_a = None
 	site_b = None
 	for p in readiness["site_permissions"]["entries"]:
-		if p["user"] == "qa_manager_a@example.com":
+		if p["user"] == _AT10_USER_A:
 			site_a = p["for_value"]
-		elif p["user"] == "qa_manager_b@example.com":
+		elif p["user"] == _AT10_USER_B:
 			site_b = p["for_value"]
 
 	if not site_a or not site_b:
@@ -251,7 +256,7 @@ def run_at10_automated_check() -> dict:
 			)
 
 		# User A visibility and cross-site denial
-		frappe.set_user("qa_manager_a@example.com")
+		frappe.set_user(_AT10_USER_A)
 		try:
 			visible_lots_a = frappe.get_list("Lot", fields=["name", "site"], limit_page_length=200)
 			visible_bins_a = frappe.get_list("StorageBin", fields=["name", "site"], limit_page_length=200)
@@ -260,7 +265,7 @@ def run_at10_automated_check() -> dict:
 			visible_lots_a = []
 			visible_bins_a = []
 			list_error_a = str(exc)
-		evidence["list_checks"]["qa_manager_a@example.com"] = {
+		evidence["list_checks"][_AT10_USER_A] = {
 			"lots_only_site_a": all((r.get("site") == site_a) for r in visible_lots_a),
 			"bins_only_site_a": all((r.get("site") == site_a) for r in visible_bins_a),
 			"lot_count": len(visible_lots_a),
@@ -269,13 +274,13 @@ def run_at10_automated_check() -> dict:
 		}
 		lot_b_doc = frappe.get_doc("Lot", lot_b)
 		bin_b_doc = frappe.get_doc("StorageBin", bin_b)
-		evidence["direct_read_checks"]["qa_manager_a@example.com"] = {
+		evidence["direct_read_checks"][_AT10_USER_A] = {
 			"lot_b_read_allowed": bool(frappe.has_permission("Lot", "read", lot_b_doc)),
 			"bin_b_read_allowed": bool(frappe.has_permission("StorageBin", "read", bin_b_doc)),
 		}
 
 		# User B visibility and cross-site denial
-		frappe.set_user("qa_manager_b@example.com")
+		frappe.set_user(_AT10_USER_B)
 		try:
 			visible_lots_b = frappe.get_list("Lot", fields=["name", "site"], limit_page_length=200)
 			visible_bins_b = frappe.get_list("StorageBin", fields=["name", "site"], limit_page_length=200)
@@ -284,7 +289,7 @@ def run_at10_automated_check() -> dict:
 			visible_lots_b = []
 			visible_bins_b = []
 			list_error_b = str(exc)
-		evidence["list_checks"]["qa_manager_b@example.com"] = {
+		evidence["list_checks"][_AT10_USER_B] = {
 			"lots_only_site_b": all((r.get("site") == site_b) for r in visible_lots_b),
 			"bins_only_site_b": all((r.get("site") == site_b) for r in visible_bins_b),
 			"lot_count": len(visible_lots_b),
@@ -293,7 +298,7 @@ def run_at10_automated_check() -> dict:
 		}
 		lot_a_doc = frappe.get_doc("Lot", lot_a)
 		bin_a_doc = frappe.get_doc("StorageBin", bin_a)
-		evidence["direct_read_checks"]["qa_manager_b@example.com"] = {
+		evidence["direct_read_checks"][_AT10_USER_B] = {
 			"lot_a_read_allowed": bool(frappe.has_permission("Lot", "read", lot_a_doc)),
 			"bin_a_read_allowed": bool(frappe.has_permission("StorageBin", "read", bin_a_doc)),
 		}
@@ -303,14 +308,14 @@ def run_at10_automated_check() -> dict:
 
 	pass_checks = all(
 		[
-			evidence["list_checks"]["qa_manager_a@example.com"]["lots_only_site_a"],
-			evidence["list_checks"]["qa_manager_a@example.com"]["bins_only_site_a"],
-			evidence["list_checks"]["qa_manager_b@example.com"]["lots_only_site_b"],
-			evidence["list_checks"]["qa_manager_b@example.com"]["bins_only_site_b"],
-			not evidence["direct_read_checks"]["qa_manager_a@example.com"]["lot_b_read_allowed"],
-			not evidence["direct_read_checks"]["qa_manager_a@example.com"]["bin_b_read_allowed"],
-			not evidence["direct_read_checks"]["qa_manager_b@example.com"]["lot_a_read_allowed"],
-			not evidence["direct_read_checks"]["qa_manager_b@example.com"]["bin_a_read_allowed"],
+			evidence["list_checks"][_AT10_USER_A]["lots_only_site_a"],
+			evidence["list_checks"][_AT10_USER_A]["bins_only_site_a"],
+			evidence["list_checks"][_AT10_USER_B]["lots_only_site_b"],
+			evidence["list_checks"][_AT10_USER_B]["bins_only_site_b"],
+			not evidence["direct_read_checks"][_AT10_USER_A]["lot_b_read_allowed"],
+			not evidence["direct_read_checks"][_AT10_USER_A]["bin_b_read_allowed"],
+			not evidence["direct_read_checks"][_AT10_USER_B]["lot_a_read_allowed"],
+			not evidence["direct_read_checks"][_AT10_USER_B]["bin_a_read_allowed"],
 		]
 	)
 
@@ -339,9 +344,9 @@ def run_at01_automated_check() -> dict:
 	site_a = None
 	site_b = None
 	for permission_entry in readiness["site_permissions"]["entries"]:
-		if permission_entry["user"] == "qa_manager_a@example.com":
+		if permission_entry["user"] == _AT10_USER_A:
 			site_a = permission_entry["for_value"]
-		elif permission_entry["user"] == "qa_manager_b@example.com":
+		elif permission_entry["user"] == _AT10_USER_B:
 			site_b = permission_entry["for_value"]
 
 	if not site_a or not site_b:

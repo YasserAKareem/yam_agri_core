@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import frappe
+from frappe import _
 
 
 def _user_has_role(role: str, user: str | None = None) -> bool:
@@ -106,7 +107,7 @@ def resolve_site(site_identifier: str | None) -> str:
 	if not site_identifier:
 		site_name = frappe.db.get_value("Site", {}, "name")
 		if not site_name:
-			frappe.throw("No Site records exist; create a Site first.")
+			frappe.throw(_("No Site records exist; create a Site first."))
 		return site_name
 
 	site_identifier = site_identifier.strip()
@@ -119,13 +120,13 @@ def resolve_site(site_identifier: str | None) -> str:
 		if by_site_name:
 			return by_site_name
 
-	frappe.throw(f"Site not found: {site_identifier}")
+	frappe.throw(_("Site not found: {0}").format(site_identifier))
 
 
 def assert_site_access(site: str, user: str | None = None) -> None:
 	user = user or frappe.session.user
 	if not has_site_permission(site, user=user):
-		frappe.throw("Not permitted for this Site", frappe.PermissionError)
+		frappe.throw(_("Not permitted for this Site"), frappe.PermissionError)
 
 
 def site_query_conditions(user: str) -> str | None:

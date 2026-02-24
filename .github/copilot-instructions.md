@@ -599,3 +599,69 @@ These constraints shape every design decision:
 - **Do not** expose MariaDB port 3306 externally in staging/production
 - **Do not** start Kubernetes work before Docker Compose dev is stable and all ATs pass
 - **Do not** modify `environments/production/` without QA Manager review and staging test evidence
+
+---
+
+## 19. Automated QC — Frappe Skill Agent
+
+The repository includes an automated QC agent at `tools/frappe_skill_agent.py` that checks
+all Python, JavaScript, and JSON source files for Frappe best-practice violations.
+
+**Run before every PR:**
+```bash
+python tools/frappe_skill_agent.py                    # text report (default)
+python tools/frappe_skill_agent.py --format json      # JSON for CI integration
+```
+
+**Exit codes:** `0` = passed (no critical or high findings); `1` = failed; `2` = configuration error.
+
+### Frappe Skill Rule Set
+
+| Rule ID | Severity | Check |
+|---------|----------|-------|
+| FS-001 | Critical | `frappe.throw()` called with raw string not wrapped in `_()` |
+| FS-002 | High | User-visible JS string not wrapped in `__()` |
+| FS-003 | Medium | DocType JSON: `site` field not marked `reqd: 1` |
+| FS-004 | Low | DocType JSON: missing `title_field` |
+| FS-005 | Medium | DocType JSON: transaction DocType missing `track_changes: 1` |
+| FS-006 | High | Hardcoded email address in non-test Python (extract to constant) |
+| FS-007 | Medium | Default field value set in `validate()` without a `before_insert()` |
+| FS-008 | Medium | Broad `except Exception: return []` that silently swallows errors |
+| FS-009 | High | DocType with `lot` field but no cross-site `lot.site` consistency check |
+| FS-010 | Critical | AI module (`ai/`) calls a Frappe write API (save/insert/submit) |
+| FS-011 | Critical | DocType in `permission_query_conditions` but NOT in `has_permission` (or vice versa) |
+
+### QC Rules Derived from Bug Audit (2026-02-24)
+
+These rules were codified after a full codebase audit. See `docs/BUG_AUDIT_REPORT.md` for the
+original findings and how each was fixed.
+
+1. **Always wrap `frappe.throw` messages in `_()`** — even in seed, smoke, and utility files.
+   Violations break `bench update-translations` discovery and display untranslated text to Arabic users.
+
+2. **Every DocType with a `lot` field must validate `lot.site == self.site`** in `validate()`.
+   The pattern is used by Complaint, ScaleTicket, Transfer — it must be applied consistently.
+
+3. **`before_insert()` for new-record defaults; `validate()` as fallback only.**
+   Nonconformance correctly sets `status = "Open"` in `before_insert()`. Follow this for all
+   new-record defaults (e.g. `quality_flag = "OK"` in Observation).
+
+4. **Never hardcode test-user emails inline in non-test code.** Extract them to module-level
+   constants so a single change propagates everywhere (see `smoke.py` `_AT10_USER_A/_B`).
+
+5. **AI modules must have zero Frappe imports.** The `ai/` directory is pure Python. All DB reads
+   and site-permission checks live in the `api/` wrapper.
+
+6. **DocType JSONs must include `reqd: 1` on the `site` field.** Python validation is the
+   security gate, but the JSON schema drives the Frappe form UX (red asterisk, client validation).
+
+7. **Transaction DocTypes should set `track_changes: 1`.** For a HACCP/ISO 22000 platform, every
+   field change on Lot, Transfer, EvidencePack, etc. must be journalled for audit evidence.
+
+---
+
+## 20. Bug Report Reference
+
+The full bug catalogue is maintained at **`docs/BUG_AUDIT_REPORT.md`**.
+All future bugs discovered by the Frappe Skill agent or code reviews should be appended there
+following the same format: Category, Rule ID, File, Problem, Before/After, Status.

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import frappe
-from frappe import utils
+from frappe import _, utils
 
 BASELINE_DOCTYPES = (
 	"Site",
@@ -106,7 +106,7 @@ def seed_baseline_demo_data_force() -> None:
 	# Require our baseline DocTypes.
 	for dt in BASELINE_DOCTYPES:
 		if not frappe.db.exists("DocType", dt):
-			frappe.throw(f"Missing DocType: {dt}")
+			frappe.throw(_("Missing DocType: {0}").format(dt))
 
 	site = _ensure_default_site()
 	_ensure_demo_storage_bin(site)
