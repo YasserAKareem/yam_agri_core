@@ -3,7 +3,16 @@
   "name": "Transfer",
   "module": "YAM Agri Core",
   "custom": 1,
+  "autoname": "naming_series:",
+  "title_field": "transfer_type",
   "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Naming Series",
+      "options": "YAM-TRF-.YYYY.-",
+      "default": "YAM-TRF-.YYYY.-"
+    },
     {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
     {
       "fieldname": "transfer_type",

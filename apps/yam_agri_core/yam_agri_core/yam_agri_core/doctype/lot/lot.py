@@ -1,7 +1,6 @@
 import frappe
-from frappe import _
+from frappe import _, utils
 from frappe.model.document import Document
-from frappe import utils
 
 from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
 
@@ -20,9 +19,7 @@ def check_certificates_for_dispatch(lot_name, status):
     if status.lower() not in DISPATCH_STATUSES:
         return
 
-    certs = frappe.get_all(
-        "Certificate", filters={"lot": lot_name}, fields=["name", "expiry_date"]
-    )
+    certs = frappe.get_all("Certificate", filters={"lot": lot_name}, fields=["name", "expiry_date"])
     for c in certs:
         expiry = c.get("expiry_date")
         if expiry:

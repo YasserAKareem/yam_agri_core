@@ -46,13 +46,19 @@ def run_phase2_smoke() -> dict:
         "Crop Cycle": "Crop Cycle" in (frappe.get_hooks("permission_query_conditions") or {}),
     }
 
-    checks["status"] = "ok" if all([
-        all(checks["apps"].values()),
-        all(checks["doctypes"].values()),
-        checks["bridge"]["location_site_field"],
-        all(checks["workspace"].values()),
-        all(checks["permission_hooks"].values()),
-    ]) else "needs_attention"
+    checks["status"] = (
+        "ok"
+        if all(
+            [
+                all(checks["apps"].values()),
+                all(checks["doctypes"].values()),
+                checks["bridge"]["location_site_field"],
+                all(checks["workspace"].values()),
+                all(checks["permission_hooks"].values()),
+            ]
+        )
+        else "needs_attention"
+    )
 
     return checks
 
@@ -123,13 +129,19 @@ def get_at10_readiness() -> dict:
         },
     }
 
-    readiness["status"] = "ready" if all([
-        readiness["sites"]["ok"],
-        readiness["qa_users"]["ok"],
-        readiness["qa_roles"]["ok"],
-        readiness["site_permissions"]["ok"],
-        readiness["location_bridge"]["ok"],
-    ]) else "not_ready"
+    readiness["status"] = (
+        "ready"
+        if all(
+            [
+                readiness["sites"]["ok"],
+                readiness["qa_users"]["ok"],
+                readiness["qa_roles"]["ok"],
+                readiness["site_permissions"]["ok"],
+                readiness["location_bridge"]["ok"],
+            ]
+        )
+        else "not_ready"
+    )
 
     return readiness
 
@@ -178,49 +190,65 @@ def run_at10_automated_check() -> dict:
 
         lot_a = frappe.db.exists("Lot", {"lot_number": "AT10-LOT-A"})
         if not lot_a:
-            lot_a = frappe.get_doc(
-                {
-                    "doctype": "Lot",
-                    "lot_number": "AT10-LOT-A",
-                    "site": site_a,
-                    "qty_kg": 100,
-                    "status": "Draft",
-                }
-            ).insert(ignore_permissions=True).name
+            lot_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "Lot",
+                        "lot_number": "AT10-LOT-A",
+                        "site": site_a,
+                        "qty_kg": 100,
+                        "status": "Draft",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
 
         lot_b = frappe.db.exists("Lot", {"lot_number": "AT10-LOT-B"})
         if not lot_b:
-            lot_b = frappe.get_doc(
-                {
-                    "doctype": "Lot",
-                    "lot_number": "AT10-LOT-B",
-                    "site": site_b,
-                    "qty_kg": 100,
-                    "status": "Draft",
-                }
-            ).insert(ignore_permissions=True).name
+            lot_b = (
+                frappe.get_doc(
+                    {
+                        "doctype": "Lot",
+                        "lot_number": "AT10-LOT-B",
+                        "site": site_b,
+                        "qty_kg": 100,
+                        "status": "Draft",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
 
         bin_a = frappe.db.exists("StorageBin", {"storage_bin_name": "AT10-BIN-A"})
         if not bin_a:
-            bin_a = frappe.get_doc(
-                {
-                    "doctype": "StorageBin",
-                    "storage_bin_name": "AT10-BIN-A",
-                    "site": site_a,
-                    "status": "Active",
-                }
-            ).insert(ignore_permissions=True).name
+            bin_a = (
+                frappe.get_doc(
+                    {
+                        "doctype": "StorageBin",
+                        "storage_bin_name": "AT10-BIN-A",
+                        "site": site_a,
+                        "status": "Active",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
 
         bin_b = frappe.db.exists("StorageBin", {"storage_bin_name": "AT10-BIN-B"})
         if not bin_b:
-            bin_b = frappe.get_doc(
-                {
-                    "doctype": "StorageBin",
-                    "storage_bin_name": "AT10-BIN-B",
-                    "site": site_b,
-                    "status": "Active",
-                }
-            ).insert(ignore_permissions=True).name
+            bin_b = (
+                frappe.get_doc(
+                    {
+                        "doctype": "StorageBin",
+                        "storage_bin_name": "AT10-BIN-B",
+                        "site": site_b,
+                        "status": "Active",
+                    }
+                )
+                .insert(ignore_permissions=True)
+                .name
+            )
 
         # User A visibility and cross-site denial
         frappe.set_user("qa_manager_a@example.com")
@@ -273,16 +301,18 @@ def run_at10_automated_check() -> dict:
     finally:
         frappe.set_user(original_user)
 
-    pass_checks = all([
-        evidence["list_checks"]["qa_manager_a@example.com"]["lots_only_site_a"],
-        evidence["list_checks"]["qa_manager_a@example.com"]["bins_only_site_a"],
-        evidence["list_checks"]["qa_manager_b@example.com"]["lots_only_site_b"],
-        evidence["list_checks"]["qa_manager_b@example.com"]["bins_only_site_b"],
-        not evidence["direct_read_checks"]["qa_manager_a@example.com"]["lot_b_read_allowed"],
-        not evidence["direct_read_checks"]["qa_manager_a@example.com"]["bin_b_read_allowed"],
-        not evidence["direct_read_checks"]["qa_manager_b@example.com"]["lot_a_read_allowed"],
-        not evidence["direct_read_checks"]["qa_manager_b@example.com"]["bin_a_read_allowed"],
-    ])
+    pass_checks = all(
+        [
+            evidence["list_checks"]["qa_manager_a@example.com"]["lots_only_site_a"],
+            evidence["list_checks"]["qa_manager_a@example.com"]["bins_only_site_a"],
+            evidence["list_checks"]["qa_manager_b@example.com"]["lots_only_site_b"],
+            evidence["list_checks"]["qa_manager_b@example.com"]["bins_only_site_b"],
+            not evidence["direct_read_checks"]["qa_manager_a@example.com"]["lot_b_read_allowed"],
+            not evidence["direct_read_checks"]["qa_manager_a@example.com"]["bin_b_read_allowed"],
+            not evidence["direct_read_checks"]["qa_manager_b@example.com"]["lot_a_read_allowed"],
+            not evidence["direct_read_checks"]["qa_manager_b@example.com"]["bin_a_read_allowed"],
+        ]
+    )
 
     return {
         "status": "pass" if pass_checks else "fail",

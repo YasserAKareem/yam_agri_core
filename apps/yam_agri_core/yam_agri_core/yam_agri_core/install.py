@@ -9,13 +9,12 @@ def after_install() -> None:
     ensure_location_site_field()
     ensure_minimum_doc_permissions()
 
-    from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
-
     # Dev convenience: workspace navigation + sample org chart (guarded)
     from yam_agri_core.yam_agri_core.dev_seed import (
         seed_dev_baseline_demo_data_if_enabled,
         seed_dev_org_chart_if_enabled,
     )
+    from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
     from yam_agri_core.yam_agri_core.workspace_setup import (
         ensure_agriculture_workspace_modernized,
         ensure_yam_agri_workspaces,
@@ -35,12 +34,11 @@ def after_migrate() -> None:
     ensure_minimum_doc_permissions()
     normalize_lot_crop_links()
 
-    from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
-
     from yam_agri_core.yam_agri_core.dev_seed import (
         seed_dev_baseline_demo_data_if_enabled,
         seed_dev_org_chart_if_enabled,
     )
+    from yam_agri_core.yam_agri_core.workflow_setup import ensure_workflow_states_from_active_workflows
     from yam_agri_core.yam_agri_core.workspace_setup import (
         ensure_agriculture_workspace_modernized,
         ensure_yam_agri_workspaces,

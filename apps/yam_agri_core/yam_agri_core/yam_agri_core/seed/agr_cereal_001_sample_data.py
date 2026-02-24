@@ -44,8 +44,12 @@ def create_sample_data(
     soil_test = _get_or_create_soil_test(site=site, plot=plot, overwrite=overwrite_b)
 
     yields = [
-        _get_or_create_plot_yield(site=site, plot=plot, season="2024", crop=crop, yield_kg_per_ha=2600, overwrite=overwrite_b),
-        _get_or_create_plot_yield(site=site, plot=plot, season="2025", crop=crop, yield_kg_per_ha=2400, overwrite=overwrite_b),
+        _get_or_create_plot_yield(
+            site=site, plot=plot, season="2024", crop=crop, yield_kg_per_ha=2600, overwrite=overwrite_b
+        ),
+        _get_or_create_plot_yield(
+            site=site, plot=plot, season="2025", crop=crop, yield_kg_per_ha=2400, overwrite=overwrite_b
+        ),
     ]
 
     varieties = [

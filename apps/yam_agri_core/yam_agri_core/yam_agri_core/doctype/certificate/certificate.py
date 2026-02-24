@@ -1,7 +1,6 @@
 import frappe
-from frappe import _
+from frappe import _, utils
 from frappe.model.document import Document
-from frappe import utils
 
 from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
 
