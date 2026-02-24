@@ -16,3 +16,9 @@ class Nonconformance(Document):
 			frappe.throw(_("Every record must belong to a Site"), frappe.ValidationError)
 
 		assert_site_access(self.get("site"))
+
+		lot = self.get("lot")
+		if lot:
+			lot_site = frappe.db.get_value("Lot", lot, "site")
+			if lot_site and lot_site != self.get("site"):
+				frappe.throw(_("Lot site must match Nonconformance site"), frappe.ValidationError)

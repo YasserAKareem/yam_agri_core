@@ -4,6 +4,7 @@ import json
 from datetime import date
 
 import frappe
+from frappe import _
 
 
 def create_sample_data(
@@ -26,7 +27,7 @@ def create_sample_data(
 
 	if int(confirm) != 1:
 		frappe.throw(
-			"Refusing to write sample data. Re-run with confirm=1.",
+			_("Refusing to write sample data. Re-run with confirm=1."),
 			exc=frappe.ValidationError,
 		)
 
@@ -104,7 +105,9 @@ def _ensure_required_doctypes() -> None:
 	missing = [dt for dt in required if not frappe.db.exists("DocType", dt)]
 	if missing:
 		frappe.throw(
-			f"Missing required DocTypes: {', '.join(missing)}. Run migrate and install required apps.",
+			_("Missing required DocTypes: {0}. Run migrate and install required apps.").format(
+				", ".join(missing)
+			),
 			exc=frappe.ValidationError,
 		)
 
@@ -156,7 +159,7 @@ def _demo_polygon_geojson() -> str:
 def _ensure_crop(crop_name: str) -> str:
 	crop_name = (crop_name or "").strip()
 	if not crop_name:
-		frappe.throw("crop_name is required", exc=frappe.ValidationError)
+		frappe.throw(_("crop_name is required"), exc=frappe.ValidationError)
 
 	if frappe.db.exists("Crop", crop_name):
 		return crop_name

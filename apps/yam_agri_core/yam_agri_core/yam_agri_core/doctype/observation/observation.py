@@ -6,6 +6,11 @@ from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
 
 
 class Observation(Document):
+	def before_insert(self):
+		# Default quality flag to OK; invalid data is quarantined explicitly
+		if not self.get("quality_flag"):
+			self.quality_flag = "OK"
+
 	def validate(self):
 		# Non-negotiable: every record must belong to a Site
 		if not self.get("site"):
@@ -13,7 +18,7 @@ class Observation(Document):
 
 		assert_site_access(self.get("site"))
 
-		# Default quality flag to OK; invalid data is quarantined explicitly
+		# Ensure quality_flag always has a value (covers updates as well as inserts)
 		if not self.get("quality_flag"):
 			self.quality_flag = "OK"
 
