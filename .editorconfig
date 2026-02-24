@@ -1,0 +1,29 @@
+# Root editor config file
+root = true
+
+# Common settings for all files
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+# Python — tabs (Frappe convention)
+[*.py]
+indent_style = tab
+indent_size = 4
+
+# JS / TS / Vue / CSS / SCSS / HTML — tabs
+[{*.js,*.ts,*.vue,*.css,*.scss,*.html}]
+indent_style = tab
+indent_size = 4
+max_line_length = 110
+
+# YAML / JSON — 2-space (ecosystem convention)
+[{*.yml,*.yaml,*.json}]
+indent_style = space
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false

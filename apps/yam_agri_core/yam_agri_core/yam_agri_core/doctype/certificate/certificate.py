@@ -6,14 +6,14 @@ from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
 
 
 class Certificate(Document):
-    def validate(self):
-        if not self.get("site"):
-            frappe.throw(_("Every record must belong to a Site"), frappe.ValidationError)
+	def validate(self):
+		if not self.get("site"):
+			frappe.throw(_("Every record must belong to a Site"), frappe.ValidationError)
 
-        assert_site_access(self.get("site"))
+		assert_site_access(self.get("site"))
 
-    def is_expired(self):
-        expiry = self.get("expiry_date")
-        if not expiry:
-            return False
-        return utils.getdate(expiry) < utils.nowdate()
+	def is_expired(self):
+		expiry = self.get("expiry_date")
+		if not expiry:
+			return False
+		return utils.getdate(expiry) < utils.nowdate()

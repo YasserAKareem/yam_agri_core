@@ -6,22 +6,22 @@ from yam_agri_core.yam_agri_core.site_permissions import assert_site_access
 
 
 class StorageBin(Document):
-    def validate(self):
-        if not self.get("site"):
-            frappe.throw(_("Every record must belong to a Site"), frappe.ValidationError)
+	def validate(self):
+		if not self.get("site"):
+			frappe.throw(_("Every record must belong to a Site"), frappe.ValidationError)
 
-        assert_site_access(self.get("site"))
+		assert_site_access(self.get("site"))
 
-        capacity = float(self.get("capacity_kg") or 0)
-        if capacity < 0:
-            frappe.throw(_("Capacity cannot be negative"), frappe.ValidationError)
+		capacity = float(self.get("capacity_kg") or 0)
+		if capacity < 0:
+			frappe.throw(_("Capacity cannot be negative"), frappe.ValidationError)
 
-        current_qty = float(self.get("current_qty_kg") or 0)
-        if current_qty < 0:
-            frappe.throw(_("Current quantity cannot be negative"), frappe.ValidationError)
+		current_qty = float(self.get("current_qty_kg") or 0)
+		if current_qty < 0:
+			frappe.throw(_("Current quantity cannot be negative"), frappe.ValidationError)
 
-        if capacity > 0 and current_qty > capacity:
-            frappe.throw(
-                _("Current quantity cannot exceed capacity"),
-                frappe.ValidationError,
-            )
+		if capacity > 0 and current_qty > capacity:
+			frappe.throw(
+				_("Current quantity cannot exceed capacity"),
+				frappe.ValidationError,
+			)
