@@ -371,6 +371,15 @@ def run_at01_automated_check() -> dict:
 		frappe.set_user("Administrator")
 		from yam_agri_core.yam_agri_core.doctype.lot.lot import _validate_season_policy_for_dispatch
 
+		for other_policy in frappe.get_all(
+			"Season Policy",
+			filters={"site": site_a, "policy_name": ["like", "AT06-POLICY-%"], "active": 1},
+			fields=["name"],
+		):
+			other_doc = frappe.get_doc("Season Policy", other_policy.name)
+			other_doc.active = 0
+			other_doc.save(ignore_permissions=True)
+
 		device_a = frappe.db.exists("Device", {"device_name": "AT01-DEV-A", "site": site_a})
 		if not device_a:
 			device_a = (
@@ -586,6 +595,15 @@ def run_at02_automated_check() -> dict:
 		frappe.set_user("Administrator")
 		from yam_agri_core.yam_agri_core.doctype.lot.lot import _validate_season_policy_for_dispatch
 
+		for other_policy in frappe.get_all(
+			"Season Policy",
+			filters={"site": site_a, "policy_name": ["like", "AT06-POLICY-%"], "active": 1},
+			fields=["name"],
+		):
+			other_doc = frappe.get_doc("Season Policy", other_policy.name)
+			other_doc.active = 0
+			other_doc.save(ignore_permissions=True)
+
 		policy_name = f"AT02-POLICY-{site_a[-4:]}"
 		policy = frappe.db.exists("Season Policy", {"policy_name": policy_name, "site": site_a})
 		if policy:
@@ -704,6 +722,262 @@ def run_at02_automated_check() -> dict:
 	}
 
 
+def run_m4_gate_automated_check() -> dict:
+	"""Run the M4 dispatch-gate acceptance bundle in one command."""
+
+	at02 = run_at02_automated_check()
+	at06 = run_at06_automated_check()
+	all_pass = at02.get("status") == "pass" and at06.get("status") == "pass"
+
+	return {
+		"status": "pass" if all_pass else "fail",
+		"checks": {
+			"at02": at02.get("status"),
+			"at06": at06.get("status"),
+		},
+		"evidence": {
+			"at02": at02.get("evidence"),
+			"at06": at06.get("evidence"),
+		},
+	}
+
+
+def run_at03_automated_check() -> dict:
+	"""Execute automated AT-03 checks for split transfer scenario."""
+
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == _AT10_USER_A:
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"source_lot": None,
+		"shipment_lot": None,
+		"transfer": None,
+		"transfer_qty": None,
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		tag = frappe.utils.now_datetime().strftime("%H%M%S")
+
+		source_lot = frappe.get_doc(
+			{
+				"doctype": "Lot",
+				"lot_number": f"AT03-SRC-{tag}-{site_a[-4:]}",
+				"site": site_a,
+				"qty_kg": 300,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+
+		shipment_lot = frappe.get_doc(
+			{
+				"doctype": "Lot",
+				"lot_number": f"AT03-SHP-{tag}-{site_a[-4:]}",
+				"site": site_a,
+				"qty_kg": 120,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+
+		transfer = frappe.get_doc(
+			{
+				"doctype": "Transfer",
+				"site": site_a,
+				"transfer_type": "Split",
+				"from_lot": source_lot.name,
+				"to_lot": shipment_lot.name,
+				"qty_kg": 120,
+				"transfer_datetime": frappe.utils.now_datetime(),
+				"status": "Draft",
+				"notes": f"AT03-AUTO-SPLIT-{tag}",
+			}
+		).insert(ignore_permissions=True)
+
+		evidence["source_lot"] = source_lot.name
+		evidence["shipment_lot"] = shipment_lot.name
+		evidence["transfer"] = transfer.name
+		evidence["transfer_qty"] = float(transfer.qty_kg or 0)
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	pass_checks = all(
+		[
+			bool(evidence["source_lot"]),
+			bool(evidence["shipment_lot"]),
+			bool(evidence["transfer"]),
+			evidence["transfer_qty"] == 120.0,
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_at04_automated_check() -> dict:
+	"""Execute automated AT-04 checks for backward traceability."""
+
+	original_user = frappe.session.user
+	evidence = {
+		"shipment_lot": None,
+		"source_lot": None,
+		"transfer": None,
+		"backward_chain_count": 0,
+		"trace_found": False,
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		latest = frappe.get_all(
+			"Transfer",
+			filters={"transfer_type": "Split", "notes": ["like", "AT03-AUTO-SPLIT-%"]},
+			fields=["name", "from_lot", "to_lot", "site"],
+			order_by="modified desc",
+			limit_page_length=1,
+		)
+
+		if not latest:
+			at03 = run_at03_automated_check()
+			if at03.get("status") != "pass":
+				return {
+					"status": "blocked",
+					"reason": "AT-03 prerequisite failed",
+					"at03": at03,
+				}
+			latest = frappe.get_all(
+				"Transfer",
+				filters={"transfer_type": "Split", "notes": ["like", "AT03-AUTO-SPLIT-%"]},
+				fields=["name", "from_lot", "to_lot", "site"],
+				order_by="modified desc",
+				limit_page_length=1,
+			)
+
+		if not latest:
+			return {"status": "fail", "evidence": {"error": "No AT03 split transfer found"}}
+
+		transfer = latest[0]
+		evidence["transfer"] = transfer.get("name")
+		evidence["shipment_lot"] = transfer.get("to_lot")
+		evidence["source_lot"] = transfer.get("from_lot")
+
+		backward_chain = frappe.get_all(
+			"Transfer",
+			filters={"to_lot": transfer.get("to_lot"), "site": transfer.get("site")},
+			fields=["name", "from_lot", "to_lot"],
+			order_by="modified desc",
+			limit_page_length=20,
+		)
+		evidence["backward_chain_count"] = len(backward_chain)
+		evidence["trace_found"] = any(r.get("from_lot") == transfer.get("from_lot") for r in backward_chain)
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	return {
+		"status": "pass" if evidence["trace_found"] else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_at05_automated_check() -> dict:
+	"""Execute automated AT-05 checks for forward traceability."""
+
+	original_user = frappe.session.user
+	evidence = {
+		"source_lot": None,
+		"shipment_lot": None,
+		"transfer": None,
+		"forward_chain_count": 0,
+		"trace_found": False,
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		latest = frappe.get_all(
+			"Transfer",
+			filters={"transfer_type": "Split", "notes": ["like", "AT03-AUTO-SPLIT-%"]},
+			fields=["name", "from_lot", "to_lot", "site"],
+			order_by="modified desc",
+			limit_page_length=1,
+		)
+
+		if not latest:
+			at03 = run_at03_automated_check()
+			if at03.get("status") != "pass":
+				return {
+					"status": "blocked",
+					"reason": "AT-03 prerequisite failed",
+					"at03": at03,
+				}
+			latest = frappe.get_all(
+				"Transfer",
+				filters={"transfer_type": "Split", "notes": ["like", "AT03-AUTO-SPLIT-%"]},
+				fields=["name", "from_lot", "to_lot", "site"],
+				order_by="modified desc",
+				limit_page_length=1,
+			)
+
+		if not latest:
+			return {"status": "fail", "evidence": {"error": "No AT03 split transfer found"}}
+
+		transfer = latest[0]
+		evidence["transfer"] = transfer.get("name")
+		evidence["source_lot"] = transfer.get("from_lot")
+		evidence["shipment_lot"] = transfer.get("to_lot")
+
+		forward_chain = frappe.get_all(
+			"Transfer",
+			filters={"from_lot": transfer.get("from_lot"), "site": transfer.get("site")},
+			fields=["name", "from_lot", "to_lot"],
+			order_by="modified desc",
+			limit_page_length=20,
+		)
+		evidence["forward_chain_count"] = len(forward_chain)
+		evidence["trace_found"] = any(r.get("to_lot") == transfer.get("to_lot") for r in forward_chain)
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	return {
+		"status": "pass" if evidence["trace_found"] else "fail",
+		"evidence": evidence,
+	}
+
+
 def run_at06_automated_check() -> dict:
 	"""Execute automated AT-06 checks for stale QC + expired certificate dispatch blocking.
 
@@ -756,6 +1030,15 @@ def run_at06_automated_check() -> dict:
 	try:
 		frappe.set_user("Administrator")
 		from yam_agri_core.yam_agri_core.doctype.lot.lot import _validate_season_policy_for_dispatch
+
+		for other_policy in frappe.get_all(
+			"Season Policy",
+			filters={"site": site_a, "policy_name": ["like", "AT02-POLICY-%"], "active": 1},
+			fields=["name"],
+		):
+			other_doc = frappe.get_doc("Season Policy", other_policy.name)
+			other_doc.active = 0
+			other_doc.save(ignore_permissions=True)
 
 		policy_name = f"AT06-POLICY-{site_a[-4:]}"
 		policy = frappe.db.exists("Season Policy", {"policy_name": policy_name, "site": site_a})

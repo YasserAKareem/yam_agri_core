@@ -60,3 +60,35 @@ def test_only_qa_manager_can_accept_lot(monkeypatch):
 
 	with pytest.raises(frappe.PermissionError):
 		lot.validate()
+
+
+def test_enforce_qc_site_consistency_blocks_cross_site(monkeypatch):
+	from yam_agri_core.yam_agri_core.site_permissions import enforce_qc_test_site_consistency
+
+	class DB:
+		@staticmethod
+		def get_value(doctype, name, field):
+			return "SITE-A"
+
+	monkeypatch.setattr("frappe.db", DB)
+	monkeypatch.setattr(
+		frappe,
+		"throw",
+		lambda msg, exc=None: (_ for _ in ()).throw(exc(msg) if exc else Exception(msg)),
+	)
+
+	with pytest.raises(frappe.ValidationError):
+		enforce_qc_test_site_consistency({"lot": "LOT-1", "site": "SITE-B"})
+
+
+def test_enforce_qc_site_consistency_allows_same_site(monkeypatch):
+	from yam_agri_core.yam_agri_core.site_permissions import enforce_qc_test_site_consistency
+
+	class DB:
+		@staticmethod
+		def get_value(doctype, name, field):
+			return "SITE-A"
+
+	monkeypatch.setattr("frappe.db", DB)
+
+	assert enforce_qc_test_site_consistency({"lot": "LOT-1", "site": "SITE-A"}) is None
