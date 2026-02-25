@@ -1,17 +1,17 @@
 # YAM Agri Platform V1.1 — Work Breakdown Structure (WBS) & Gantt Chart
 
-> **Document type:** Project Planning  
-> **Version:** 1.0  
-> **Date:** 2026-02-23  
-> **Owner:** YasserAKareem  
-> **Status:** ✅ Approved — baseline plan  
+> **Document type:** Project Planning
+> **Version:** 1.0
+> **Date:** 2026-02-23
+> **Owner:** YasserAKareem
+> **Status:** ✅ Approved — baseline plan
 > **Related:** [Project Charter](../Docs%20v1.1/01_PROJECT_CHARTER.md) | [Backlog & Features Inventory](BACKLOG_AND_FEATURES_INVENTORY.md)
 
 ---
 
 ## 1. WBS Overview
 
-The WBS is decomposed into **10 delivery phases** (Phase 0–9) plus a cross-cutting **Documentation stream** and a **Post-V1.1 Backlog** for future releases.  
+The WBS is decomposed into **10 delivery phases** (Phase 0–9) plus a cross-cutting **Documentation stream** and a **Post-V1.1 Backlog** for future releases.
 Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 
 ---
@@ -351,7 +351,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 
 ## 4. Gantt Chart
 
-> Timeline: 20 calendar weeks starting Week 1 (2026-02-23).  
+> Timeline: 20 calendar weeks starting Week 1 (2026-02-23).
 > Legend: `█` = active  |  `▒` = buffer / review  |  `░` = parallel doc stream
 
 ```
@@ -493,3 +493,155 @@ Any change to scope, timeline, or budget must be:
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-02-23 | YasserAKareem | Initial WBS + Gantt for V1.1 |
+
+---
+
+## 11. Execution Status Snapshot (2026-02-25)
+
+This snapshot reflects the current workbook-tracked execution status after WBS refresh automation (`refresh_wbs_milestones.py`, `prefill_wbs_categories.py`, `refresh_wbs_rows.py`).
+
+### 11.1 Milestone Status
+
+| Milestone | Status |
+|-----------|--------|
+| M0 | ✅ Done |
+| M1 | ✅ Done |
+| M2 | ✅ Done |
+| M3 | ✅ Done |
+| M4 | ✅ Done |
+| M5 | ⬜ Pending |
+| M6 | ⬜ Pending |
+| M7 | ⬜ Pending |
+| M8 | ⬜ Pending |
+| M9 | ⬜ Pending |
+
+### 11.2 Phase Status (Row-level WBS)
+
+| Phase | Done | Partial | Not Started | Total | Status |
+|------|-----:|--------:|------------:|------:|--------|
+| Phase 0 | 14 | 0 | 0 | 14 | ✅ Done |
+| Phase 1 | 11 | 0 | 0 | 11 | ✅ Done |
+| Phase 2 | 23 | 0 | 0 | 23 | ✅ Done |
+| Phase 3 | 13 | 0 | 0 | 13 | ✅ Done |
+| **Phase 4** | **17** | **0** | **0** | **17** | **✅ Done** |
+| Phase 5 | 0 | 0 | 17 | 17 | ⬜ Pending |
+| Phase 6 | 0 | 0 | 13 | 13 | ⬜ Pending |
+| Phase 7 | 0 | 0 | 9 | 9 | ⬜ Pending |
+| Phase 8 | 0 | 0 | 10 | 10 | ⬜ Pending |
+| Phase 9 | 0 | 0 | 8 | 8 | ⬜ Pending |
+
+### 11.3 Phase 4 Closure Evidence (WBS + Sample Data + Low-code Work)
+
+| Stream | Status | Evidence |
+|--------|--------|----------|
+| WBS execution status | ✅ Done | M4 marked done and all Phase 4 rows are done after category prefill + row refresh |
+| Acceptance gates | ✅ Done | AT-02 and AT-06 pass in repeatable run window (`run_at02_automated_check`, `run_at06_automated_check`) |
+| Cross-site regression guard | ✅ Done | AT-10 remains pass in same cycle (`run_at10_automated_check`) |
+| Sample data baseline | ✅ Done | Static Yemen dataset generated with 250 scenarios and bench-imported successfully |
+| Bench import + strict gate | ✅ Done | `seed_phase4_yemen_dataset` + `verify_phase4_yemen_dataset` + strict gate returned `pass` with `mismatch_count=0` |
+| Low-code execution path | ✅ Done | Bench wrapper commands validated end-to-end with real outputs on `localhost` |
+
+### 11.4 Phase 4 Sample-data Coverage (Yemen Context)
+
+Phase 4 evidence must include two-site data and disruption-aware records aligned to Yemen constraints:
+
+- Sites: minimum 2 (`Site A`, `Site B`) for isolation + dispatch gate checks.
+- Lots: at least one dispatch-candidate lot per site with policy-bound crop/season.
+- QC scenarios: missing test, stale test, fresh valid test.
+- Certificate scenarios: missing cert, expired cert, valid cert.
+- Dispatch outcomes:
+    - blocked when mandatory QC/cert missing,
+    - blocked when QC stale or cert expired,
+    - allowed after evidence refresh.
+- Reliability context records:
+    - intermittent/outage windows represented in timestamps,
+    - offline-safe rerun capability (same commands, deterministic output).
+
+Recommended replay size for Yemen-context full-scenario validation (now validated):
+
+- **250 records** total across **5 governorates** and **5 sites**.
+- Expected generated operational counts after import:
+    - Lots: `250`
+    - QCTest: `184` (records with `qc_state != Missing`)
+    - Certificates: `165` (records with `certificate_state != Missing`)
+    - Transfers: `208` (records with `transfer_type != None`)
+    - Scale Tickets: `250`
+    - Observations: `250`
+- Yemen-specific scenario axes included:
+    - connectivity: `2G`, `3G`, `Intermittent`, `Offline Queue`
+    - power: `Stable`, `Outage-2h`, `Outage-6h`
+    - dispatch outcomes: `Allowed` + `Blocked`
+
+### 11.5 Low-code Steps (Operator Runbook)
+
+Run from the repository root via docker wrapper:
+
+1. `bash infra/docker/run.sh preflight`
+2. `Copy-Item artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json -Force`
+3. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
+4. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset --kwargs '{"limit":250,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
+5. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
+6. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
+7. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
+8. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+9. `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.phase4_at02_at06.json`
+10. `python tools/refresh_wbs_milestones.py`
+11. `python tools/prefill_wbs_categories.py`
+12. `python tools/refresh_wbs_rows.py`
+
+### 11.6 Detailed Next WBS Steps (Phase 5 kickoff)
+
+#### 5.1 ScaleTicket CSV Import (WBS 5.1.1–5.1.4)
+
+- 5.1.1 Build parser with hard column validation and row-level error log export.
+- 5.1.2 Enforce site-safe lot resolution (`lot.site == ticket.site`).
+- 5.1.3 Post net-weight updates with non-negative guards and traceable mutation log.
+- 5.1.4 Produce import evidence artifact (`import_log.json/csv`) for AT-07.
+
+#### 5.2 Auto-Nonconformance from mismatch (WBS 5.2.1–5.2.2)
+
+- 5.2.1 Add configurable tolerance per site (initial default: `2.5%`).
+- 5.2.2 Auto-create `Nonconformance` when absolute delta exceeds tolerance.
+- QA flow: `Open -> Under Review -> Closed` with `QA Manager` gate on close.
+
+#### 5.3 IoT/MQTT ingest (WBS 5.3.1–5.3.3)
+
+- 5.3.1 Stand up lightweight gateway (FastAPI + MQTT subscriber) in compose.
+- 5.3.2 Transform MQTT payloads to `Observation` API schema and preserve raw payload.
+- 5.3.3 Add restart-safe container config and health check for outage recovery.
+
+#### 5.4 Observation quarantine controls (WBS 5.4.1–5.4.3)
+
+- 5.4.1 Define per-site thresholds for temperature/humidity and sensor quality flags.
+- 5.4.2 Auto-set `quality_flag=Quarantine` for out-of-range observations.
+- 5.4.3 Default AI/executive views to exclude quarantined observations.
+
+#### 5.5 Alerts + AT-07/AT-08 closure (WBS 5.5.1–5.6)
+
+- 5.5.1 Configure desk alerts for `temp > 35C` or `humidity > 80%`.
+- 5.5.2 Validate alert channels in low-bandwidth mode (Desk first, optional email).
+- 5.6 Run AT-07 and AT-08 in one evidence window, then refresh WBS status scripts.
+
+#### Phase 5 sample-data size (Yemen full-scenario recommendation)
+
+- Sites: `5` (same governorate spread used in Phase 4 dataset).
+- ScaleTicket rows: `300` minimum (60/site) with at least:
+    - `70` clean rows,
+    - `70` row-level CSV errors,
+    - `80` tolerance-pass mismatches,
+    - `80` tolerance-fail mismatches (must auto-create NC).
+- Observation rows: `480` minimum (96/site) covering:
+    - connectivity states (`2G`, `3G`, `Intermittent`, `Offline Queue`),
+    - power states (`Stable`, `Outage-2h`, `Outage-6h`),
+    - threshold bands (`normal`, `warning`, `quarantine`).
+
+#### Phase 5 low-code execution steps (operator)
+
+1. Confirm stack health: `bash infra/docker/run.sh preflight`.
+2. Import Phase 4 baseline 250 dataset and run strict gate (commands in 11.5).
+3. Prepare AT-07 CSV batch files: `clean.csv`, `errors.csv`, `mismatch_pass.csv`, `mismatch_fail.csv`.
+4. Run AT-07 import command(s) and save import logs as evidence artifacts.
+5. Start MQTT test publisher with outage/intermittent replay set.
+6. Run AT-08 observation checks; confirm quarantine flags and alerts.
+7. Execute smoke bundle and evidence collector.
+8. Refresh WBS milestone/row status scripts and attach outputs to run log.

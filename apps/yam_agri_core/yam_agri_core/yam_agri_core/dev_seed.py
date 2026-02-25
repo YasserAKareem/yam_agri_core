@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
 import frappe
@@ -748,3 +750,695 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 		"core_total": _core_total(),
 		"created_records": created,
 	}
+
+
+def seed_phase4_yemen_dataset(
+	confirm: int = 0,
+	dataset_file: str = "artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json",
+	limit: int = 250,
+) -> dict[str, Any]:
+	"""Import static Phase 4 Yemeni sample dataset into bench site DocTypes.
+
+	Use via:
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1, "limit":250, "dataset_file":"artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json"}'
+	"""
+
+	if int(confirm) != 1:
+		frappe.throw(_("Set confirm=1 to import Phase 4 dataset"))
+
+	if int(limit) < 1:
+		frappe.throw(_("limit must be at least 1"))
+
+	for dt in (
+		"Site",
+		"Lot",
+		"QCTest",
+		"Certificate",
+		"Transfer",
+		"ScaleTicket",
+		"Device",
+		"Observation",
+	):
+		if not frappe.db.exists("DocType", dt):
+			frappe.throw(_("Missing DocType: {0}").format(dt))
+
+	dataset_path = _resolve_phase4_dataset_path(dataset_file)
+	if not dataset_path:
+		frappe.throw(_("Dataset file not found: {0}").format(dataset_file))
+
+	try:
+		payload = json.loads(dataset_path.read_text(encoding="utf-8"))
+	except Exception as exc:
+		frappe.throw(_("Failed to parse dataset JSON: {0}").format(str(exc)))
+
+	records = payload.get("records") if isinstance(payload, dict) else None
+	if not isinstance(records, list):
+		frappe.throw(_("Dataset JSON must contain a 'records' array"))
+
+	selected_records = records[: int(limit)]
+	created = {
+		"Site": 0,
+		"Device": 0,
+		"Lot": 0,
+		"QCTest": 0,
+		"Certificate": 0,
+		"Transfer": 0,
+		"ScaleTicket": 0,
+		"Observation": 0,
+	}
+	skipped = 0
+
+	for rec in selected_records:
+		record_id = str(rec.get("record_id") or "").strip()
+		if not record_id:
+			skipped += 1
+			continue
+
+		site = _ensure_phase4_site(rec)
+		if site.get("created"):
+			created["Site"] += 1
+
+		device = _ensure_phase4_device(site=site["name"], rec=rec)
+		if device.get("created"):
+			created["Device"] += 1
+
+		lot = _ensure_phase4_lot(site=site["name"], rec=rec)
+		if lot.get("created"):
+			created["Lot"] += 1
+
+		qct = _ensure_phase4_qctest(site=site["name"], lot=lot["name"], rec=rec)
+		if qct.get("created"):
+			created["QCTest"] += 1
+
+		cert = _ensure_phase4_certificate(site=site["name"], lot=lot["name"], rec=rec)
+		if cert.get("created"):
+			created["Certificate"] += 1
+
+		transfer = _ensure_phase4_transfer(site=site["name"], lot=lot["name"], rec=rec)
+		if transfer.get("created"):
+			created["Transfer"] += 1
+
+		ticket = _ensure_phase4_scale_ticket(
+			site=site["name"], device=device["name"], lot=lot["name"], rec=rec
+		)
+		if ticket.get("created"):
+			created["ScaleTicket"] += 1
+
+		observation = _ensure_phase4_observation(site=site["name"], device=device["name"], rec=rec)
+		if observation.get("created"):
+			created["Observation"] += 1
+
+	frappe.db.commit()
+
+	return {
+		"status": "ok",
+		"dataset_file": str(dataset_path),
+		"requested_limit": int(limit),
+		"records_in_file": len(records),
+		"records_processed": len(selected_records),
+		"records_skipped": skipped,
+		"created": created,
+	}
+
+
+def verify_phase4_yemen_dataset(
+	dataset_file: str = "artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json",
+	limit: int = 250,
+) -> dict[str, Any]:
+	"""Verify expected vs observed records for imported Phase 4 Yemen dataset.
+
+	Use via:
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset --kwargs '{"limit":250}'
+	"""
+
+	if int(limit) < 1:
+		frappe.throw(_("limit must be at least 1"))
+
+	dataset_path = _resolve_phase4_dataset_path(dataset_file)
+	if not dataset_path:
+		frappe.throw(_("Dataset file not found: {0}").format(dataset_file))
+
+	try:
+		payload = json.loads(dataset_path.read_text(encoding="utf-8"))
+	except Exception as exc:
+		frappe.throw(_("Failed to parse dataset JSON: {0}").format(str(exc)))
+
+	all_records = payload.get("records") if isinstance(payload, dict) else None
+	if not isinstance(all_records, list):
+		frappe.throw(_("Dataset JSON must contain a 'records' array"))
+
+	records = all_records[: int(limit)]
+	record_ids = [str(r.get("record_id") or "").strip() for r in records if r.get("record_id")]
+	record_ids_set = set(record_ids)
+	lot_numbers = [str(r.get("lot") or "").strip() for r in records if r.get("lot")]
+
+	expected_by_site: dict[str, int] = {}
+	expected_by_governorate: dict[str, int] = {}
+	expected_doc_counts = {
+		"QCTest": 0,
+		"Certificate": 0,
+		"Transfer": 0,
+		"ScaleTicket": 0,
+		"Observation": 0,
+	}
+	for rec in records:
+		site = str(rec.get("site") or "").strip()
+		gov = str(rec.get("governorate") or "").strip()
+		if site:
+			expected_by_site[site] = expected_by_site.get(site, 0) + 1
+		if gov:
+			expected_by_governorate[gov] = expected_by_governorate.get(gov, 0) + 1
+
+		# Import behavior expectations from seed_phase4_yemen_dataset
+		expected_doc_counts["ScaleTicket"] += 1
+		expected_doc_counts["Observation"] += 1
+		if str(rec.get("qc_state") or "Missing").strip() != "Missing":
+			expected_doc_counts["QCTest"] += 1
+		if str(rec.get("certificate_state") or "Missing").strip() != "Missing":
+			expected_doc_counts["Certificate"] += 1
+		if str(rec.get("transfer_type") or "None").strip() != "None":
+			expected_doc_counts["Transfer"] += 1
+
+	qct_meta = frappe.get_meta("QCTest")
+	qct_fields = ["name", "site", "lot", "test_type"]
+	if qct_meta.has_field("notes"):
+		qct_fields.append("notes")
+
+	if qct_meta.has_field("notes"):
+		qct_rows = frappe.get_all(
+			"QCTest",
+			filters={"notes": ["like", "P4-YEMEN-%"]},
+			fields=qct_fields,
+			limit_page_length=4000,
+		)
+	else:
+		qct_rows = frappe.get_all(
+			"QCTest", filters={"test_type": "Moisture"}, fields=qct_fields, limit_page_length=4000
+		)
+
+	def _transfer_record_id(note: str) -> str:
+		prefix = "P4-YEMEN-"
+		if not note.startswith(prefix):
+			return ""
+		remainder = note[len(prefix) :]
+		parts = remainder.split("-")
+		if len(parts) < 3:
+			return ""
+		return "-".join(parts[:3])
+
+	qct_filtered = []
+	if qct_meta.has_field("notes"):
+		for row in qct_rows:
+			notes = str(row.get("notes") or "")
+			rec_id = notes.replace("P4-YEMEN-", "", 1)
+			if rec_id in record_ids_set:
+				qct_filtered.append(row)
+	else:
+		lot_numbers_set = set(lot_numbers)
+		for row in qct_rows:
+			if str(row.get("lot") or "") in lot_numbers_set and str(row.get("test_type") or "") == "Moisture":
+				qct_filtered.append(row)
+
+	lot_rows = frappe.get_all(
+		"Lot",
+		filters={"lot_number": ["in", lot_numbers or ["__none__"]]},
+		fields=["name", "site", "lot_number"],
+		limit_page_length=2000,
+	)
+	lot_names = {str(row.get("name") or "") for row in lot_rows if row.get("name")}
+
+	observed_by_site: dict[str, int] = {}
+	site_ids = {str(row.get("site") or "") for row in lot_rows if row.get("site")}
+	site_name_rows = frappe.get_all(
+		"Site",
+		filters={"name": ["in", list(site_ids) or ["__none__"]]},
+		fields=["name", "site_name"],
+		limit_page_length=500,
+	)
+	site_id_to_code = {
+		str(row.get("name") or ""): str(row.get("site_name") or row.get("name") or "")
+		for row in site_name_rows
+	}
+	for row in lot_rows:
+		site_id = str(row.get("site") or "").strip()
+		site_code = site_id_to_code.get(site_id, site_id)
+		if site_code:
+			observed_by_site[site_code] = observed_by_site.get(site_code, 0) + 1
+
+	if not qct_meta.has_field("notes"):
+		qct_filtered = []
+		for row in qct_rows:
+			if str(row.get("lot") or "") in lot_names and str(row.get("test_type") or "") == "Moisture":
+				qct_filtered.append(row)
+
+	# Map site -> governorate using dataset content
+	site_to_gov = {
+		str(rec.get("site") or "").strip(): str(rec.get("governorate") or "").strip() for rec in records
+	}
+	observed_by_governorate: dict[str, int] = {}
+	for site, count in observed_by_site.items():
+		gov = site_to_gov.get(site, "")
+		if gov:
+			observed_by_governorate[gov] = observed_by_governorate.get(gov, 0) + count
+
+	cert_rows = frappe.get_all(
+		"Certificate",
+		filters={"cert_type": ["like", "P4-COA-%"]},
+		fields=["name", "cert_type"],
+		limit_page_length=2000,
+	)
+	cert_filtered = [
+		row
+		for row in cert_rows
+		if str(row.get("cert_type") or "").replace("P4-COA-", "", 1) in record_ids_set
+	]
+
+	transfer_rows = frappe.get_all(
+		"Transfer",
+		filters={"notes": ["like", "P4-YEMEN-%"]},
+		fields=["name", "notes"],
+		limit_page_length=4000,
+	)
+	transfer_filtered = [
+		row for row in transfer_rows if _transfer_record_id(str(row.get("notes") or "")) in record_ids_set
+	]
+
+	ticket_rows = frappe.get_all(
+		"ScaleTicket",
+		filters={"ticket_number": ["like", "P4-ST-%"]},
+		fields=["name", "ticket_number"],
+		limit_page_length=2000,
+	)
+	ticket_filtered = [
+		row
+		for row in ticket_rows
+		if str(row.get("ticket_number") or "").replace("P4-ST-", "", 1) in record_ids_set
+	]
+
+	observation_rows = frappe.get_all(
+		"Observation",
+		filters={"observation_type": ["like", "p4.seed.%"]},
+		fields=["name", "observation_type"],
+		limit_page_length=2000,
+	)
+	observation_filtered = [
+		row
+		for row in observation_rows
+		if str(row.get("observation_type") or "").replace("p4.seed.", "", 1) in record_ids_set
+	]
+
+	observed_doc_counts = {
+		"QCTest": len(qct_filtered),
+		"Certificate": len(cert_filtered),
+		"Transfer": len(transfer_filtered),
+		"ScaleTicket": len(ticket_filtered),
+		"Observation": len(observation_filtered),
+	}
+
+	missing_sites = sorted(set(expected_by_site.keys()) - set(observed_by_site.keys()))
+
+	return {
+		"status": "ok",
+		"dataset_file": str(dataset_path),
+		"limit": int(limit),
+		"expected_records": len(records),
+		"observed_qct_records": len(qct_filtered),
+		"expected_by_site": dict(sorted(expected_by_site.items())),
+		"observed_by_site": dict(sorted(observed_by_site.items())),
+		"expected_by_governorate": dict(sorted(expected_by_governorate.items())),
+		"observed_by_governorate": dict(sorted(observed_by_governorate.items())),
+		"expected_doc_counts": expected_doc_counts,
+		"observed_doc_counts": observed_doc_counts,
+		"missing_sites": missing_sites,
+	}
+
+
+def verify_phase4_yemen_dataset_gate(
+	dataset_file: str = "artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json",
+	limit: int = 250,
+	strict: int = 1,
+) -> dict[str, Any]:
+	"""Return PASS/FAIL gate result for Phase 4 Yemen dataset import.
+
+	Use via:
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250}'
+	"""
+
+	result = verify_phase4_yemen_dataset(dataset_file=dataset_file, limit=limit)
+
+	expected_records = int(result.get("expected_records") or 0)
+	observed_qct_records = int(result.get("observed_qct_records") or 0)
+	expected_by_site = result.get("expected_by_site") or {}
+	observed_by_site = result.get("observed_by_site") or {}
+	expected_by_governorate = result.get("expected_by_governorate") or {}
+	observed_by_governorate = result.get("observed_by_governorate") or {}
+	expected_doc_counts = result.get("expected_doc_counts") or {}
+	observed_doc_counts = result.get("observed_doc_counts") or {}
+
+	mismatches: list[dict[str, Any]] = []
+
+	if observed_qct_records != int(expected_doc_counts.get("QCTest") or 0):
+		mismatches.append(
+			{
+				"scope": "QCTest total",
+				"expected": int(expected_doc_counts.get("QCTest") or 0),
+				"observed": observed_qct_records,
+			}
+		)
+
+	for site, expected in sorted(expected_by_site.items()):
+		observed = int(observed_by_site.get(site) or 0)
+		if observed != int(expected):
+			mismatches.append(
+				{
+					"scope": "Site",
+					"key": site,
+					"expected": int(expected),
+					"observed": observed,
+				}
+			)
+
+	for gov, expected in sorted(expected_by_governorate.items()):
+		observed = int(observed_by_governorate.get(gov) or 0)
+		if observed != int(expected):
+			mismatches.append(
+				{
+					"scope": "Governorate",
+					"key": gov,
+					"expected": int(expected),
+					"observed": observed,
+				}
+			)
+
+	for dt in ("Certificate", "Transfer", "ScaleTicket", "Observation"):
+		observed = int(observed_doc_counts.get(dt) or 0)
+		expected = int(expected_doc_counts.get(dt) or 0)
+		if observed != expected:
+			mismatches.append(
+				{
+					"scope": "DocType total",
+					"key": dt,
+					"expected": expected,
+					"observed": observed,
+				}
+			)
+
+	status = "pass" if not mismatches else "fail"
+
+	if status == "fail" and int(strict) == 1:
+		frappe.throw(
+			_("Phase 4 Yemen dataset gate failed with {0} mismatch(es)").format(len(mismatches)),
+			frappe.ValidationError,
+		)
+
+	return {
+		"status": status,
+		"strict": int(strict),
+		"dataset_file": result.get("dataset_file"),
+		"limit": int(limit),
+		"expected_records": expected_records,
+		"observed_qct_records": observed_qct_records,
+		"expected_doc_counts": expected_doc_counts,
+		"mismatch_count": len(mismatches),
+		"mismatches": mismatches,
+		"observed_doc_counts": observed_doc_counts,
+	}
+
+
+def _resolve_phase4_dataset_path(dataset_file: str) -> Path | None:
+	if not dataset_file:
+		return None
+
+	p = Path(dataset_file)
+	if p.is_file():
+		return p
+
+	cwd_candidate = Path.cwd() / dataset_file
+	if cwd_candidate.is_file():
+		return cwd_candidate
+
+	if "yam_agri_core" in set(frappe.get_installed_apps() or []):
+		app_path = Path(frappe.get_app_path("yam_agri_core")).resolve()
+		for parent in app_path.parents:
+			candidate = parent / dataset_file
+			if candidate.is_file():
+				return candidate
+
+	return None
+
+
+def _ensure_phase4_site(rec: dict[str, Any]) -> dict[str, Any]:
+	site_code = str(rec.get("site") or "").strip() or "YEM-UNKNOWN-SITE"
+	governorate = str(rec.get("governorate") or "").strip()
+	site_type = _normalize_site_type(str(rec.get("site_type") or "").strip())
+
+	site_name = frappe.db.get_value("Site", {"site_name": site_code}, "name")
+	if site_name:
+		return {"name": str(site_name), "created": False}
+
+	if frappe.db.exists("Site", site_code):
+		return {"name": site_code, "created": False}
+
+	description = _("Phase 4 Yemen dataset site")
+	if governorate:
+		description = _("Phase 4 Yemen dataset site - {0}").format(governorate)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Site",
+			"site_name": site_code,
+			"site_type": site_type,
+			"description": description,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _normalize_site_type(site_type: str) -> str:
+	allowed = {"Farm", "Silo", "Warehouse", "Store", "Market", "Office"}
+	if site_type in allowed:
+		return site_type
+
+	low = (site_type or "").strip().lower()
+	if "farm" in low:
+		return "Farm"
+	if "silo" in low:
+		return "Silo"
+	if "ware" in low:
+		return "Warehouse"
+	if "store" in low:
+		return "Store"
+	if "market" in low:
+		return "Market"
+	if "office" in low:
+		return "Office"
+
+	return "Warehouse"
+
+
+def _ensure_phase4_device(*, site: str, rec: dict[str, Any]) -> dict[str, Any]:
+	device_name = "P4-DEV-" + str(rec.get("site") or site)[-8:]
+	device_doc = frappe.db.get_value("Device", {"site": site, "device_name": device_name}, "name")
+	if device_doc:
+		return {"name": str(device_doc), "created": False}
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Device",
+			"device_name": device_name,
+			"site": site,
+			"device_type": "Scale",
+			"status": "Active",
+			"serial_number": "P4-" + device_name,
+			"notes": _("Phase 4 Yemen dataset"),
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase4_lot(*, site: str, rec: dict[str, Any]) -> dict[str, Any]:
+	lot_number = str(rec.get("lot") or rec.get("record_id") or "").strip()
+	if not lot_number:
+		lot_number = "P4-LOT-UNKNOWN"
+
+	lot_doc = frappe.db.get_value("Lot", {"site": site, "lot_number": lot_number}, "name")
+	if lot_doc:
+		return {"name": str(lot_doc), "created": False}
+
+	payload: dict[str, Any] = {
+		"doctype": "Lot",
+		"lot_number": lot_number,
+		"site": site,
+		"qty_kg": float(rec.get("qty_kg") or 1000),
+		"status": "Draft",
+	}
+
+	crop_name = str(rec.get("crop") or "").strip()
+	if crop_name and frappe.db.exists("Crop", crop_name):
+		payload["crop"] = crop_name
+
+	doc = frappe.get_doc(payload)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase4_qctest(*, site: str, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	qc_state = str(rec.get("qc_state") or "Missing").strip()
+	if qc_state == "Missing":
+		return {"name": "", "created": False}
+
+	record_id = str(rec.get("record_id") or "").strip()
+	notes = "P4-YEMEN-" + record_id
+	qct_meta = frappe.get_meta("QCTest")
+	qct_filters: dict[str, Any] = {"site": site, "lot": lot, "test_type": "Moisture"}
+	if qct_meta.has_field("notes"):
+		qct_filters["notes"] = notes
+
+	qct_name = frappe.db.get_value("QCTest", qct_filters, "name")
+	if qct_name:
+		return {"name": str(qct_name), "created": False}
+
+	test_date = utils.nowdate() if qc_state == "Fresh" else utils.add_days(utils.nowdate(), -10)
+	payload: dict[str, Any] = {
+		"doctype": "QCTest",
+		"lot": lot,
+		"site": site,
+		"test_type": "Moisture",
+		"test_date": test_date,
+		"result_value": 12.0,
+		"pass_fail": "Pass",
+	}
+	if qct_meta.has_field("notes"):
+		payload["notes"] = notes
+
+	doc = frappe.get_doc(payload)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase4_certificate(*, site: str, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	cert_state = str(rec.get("certificate_state") or "Missing").strip()
+	if cert_state == "Missing":
+		return {"name": "", "created": False}
+
+	record_id = str(rec.get("record_id") or "").strip()
+	cert_type = "P4-COA-" + record_id
+	cert_name = frappe.db.get_value("Certificate", {"site": site, "lot": lot, "cert_type": cert_type}, "name")
+	if cert_name:
+		return {"name": str(cert_name), "created": False}
+
+	expiry_date = utils.add_days(utils.nowdate(), 30)
+	if cert_state == "Expired":
+		expiry_date = utils.add_days(utils.nowdate(), -1)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Certificate",
+			"cert_type": cert_type,
+			"lot": lot,
+			"site": site,
+			"expiry_date": expiry_date,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase4_transfer(*, site: str, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	transfer_type = str(rec.get("transfer_type") or "None").strip()
+	if transfer_type == "None":
+		return {"name": "", "created": False}
+
+	record_id = str(rec.get("record_id") or "").strip()
+	notes = "P4-YEMEN-" + record_id + "-" + transfer_type
+	transfer_name = frappe.db.get_value("Transfer", {"site": site, "notes": notes}, "name")
+	if transfer_name:
+		return {"name": str(transfer_name), "created": False}
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Transfer",
+			"site": site,
+			"transfer_type": transfer_type,
+			"from_lot": lot,
+			"to_lot": lot,
+			"qty_kg": 1,
+			"transfer_datetime": utils.now_datetime(),
+			"status": "Draft",
+			"notes": notes,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase4_scale_ticket(*, site: str, device: str, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	record_id = str(rec.get("record_id") or "").strip()
+	ticket_number = "P4-ST-" + record_id
+	ticket_name = frappe.db.get_value("ScaleTicket", {"site": site, "ticket_number": ticket_number}, "name")
+	if ticket_name:
+		return {"name": str(ticket_name), "created": False}
+
+	net_kg = float(rec.get("qty_kg") or 1000)
+	tare_kg = round(max(20.0, net_kg * 0.08), 2)
+	gross_kg = round(net_kg + tare_kg, 2)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "ScaleTicket",
+			"ticket_number": ticket_number,
+			"site": site,
+			"device": device,
+			"lot": lot,
+			"ticket_datetime": utils.now_datetime(),
+			"gross_kg": gross_kg,
+			"tare_kg": tare_kg,
+			"net_kg": net_kg,
+			"vehicle": str(rec.get("transport_mode") or "Truck"),
+			"driver": _("Phase 4 Driver"),
+			"notes": _("Phase 4 Yemen dataset"),
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase4_observation(*, site: str, device: str, rec: dict[str, Any]) -> dict[str, Any]:
+	record_id = str(rec.get("record_id") or "").strip()
+	observation_type = "p4.seed." + record_id
+	obs_name = frappe.db.get_value(
+		"Observation", {"site": site, "device": device, "observation_type": observation_type}, "name"
+	)
+	if obs_name:
+		return {"name": str(obs_name), "created": False}
+
+	power_profile = str(rec.get("power_profile") or "Stable").strip()
+	temp = 28.0 if power_profile == "Stable" else (30.0 if power_profile == "Outage-2h" else 32.5)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Observation",
+			"site": site,
+			"device": device,
+			"observed_at": utils.now_datetime(),
+			"observation_type": observation_type,
+			"value": temp,
+			"unit": "C",
+			"quality_flag": str(rec.get("quality_flag") or "OK"),
+			"raw_payload": json.dumps(
+				{
+					"phase": "Phase 4",
+					"record_id": record_id,
+					"connectivity": rec.get("connectivity"),
+					"power_profile": power_profile,
+				},
+				ensure_ascii=False,
+			),
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}

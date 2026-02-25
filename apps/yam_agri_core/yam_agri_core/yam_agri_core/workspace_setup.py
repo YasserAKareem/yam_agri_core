@@ -571,12 +571,9 @@ def _get_yam_agri_core_doctypes() -> list[str]:
 	This keeps the workspace aligned with the live inventory without relying on
 	exported CSVs being present in the runtime environment.
 	"""
-	try:
-		dts = frappe.get_all("DocType", filters={"module": "YAM Agri Core"}, pluck="name")
-		# Keep it deterministic.
-		return sorted(set(dts))
-	except Exception:
-		return []
+	dts = frappe.get_all("DocType", filters={"module": "YAM Agri Core"}, pluck="name")
+	# Keep it deterministic.
+	return sorted(set(dts))
 
 
 def _get_agriculture_doctypes() -> list[str]:
@@ -590,11 +587,8 @@ def _get_yam_agri_qms_trace_doctypes() -> list[str]:
 
 
 def _get_module_doctypes(module_name: str) -> list[str]:
-	try:
-		dts = frappe.get_all("DocType", filters={"module": module_name}, pluck="name")
-		return sorted(set(dts))
-	except Exception:
-		return []
+	dts = frappe.get_all("DocType", filters={"module": module_name}, pluck="name")
+	return sorted(set(dts))
 
 
 def _ensure_shortcuts(*, workspace: str, shortcuts: list[tuple[str, str, str, str]]) -> None:
@@ -614,11 +608,8 @@ def _ensure_shortcuts(*, workspace: str, shortcuts: list[tuple[str, str, str, st
 			continue
 		link_to = (row.link_to or "").strip()
 		if link_to and not frappe.db.exists("DocType", link_to):
-			try:
-				doc.shortcuts.remove(row)
-				removed_invalid = True
-			except Exception:
-				pass
+			doc.shortcuts.remove(row)
+			removed_invalid = True
 
 	if removed_invalid:
 		doc.save(ignore_permissions=True)
@@ -645,18 +636,12 @@ def _ensure_shortcuts(*, workspace: str, shortcuts: list[tuple[str, str, str, st
 		keep_score = 1 if keep_label and keep_label != link_to else 0
 		row_score = 1 if row_label and row_label != link_to else 0
 		if row_score > keep_score:
-			try:
-				doc.shortcuts.remove(keep)
-				removed_any = True
-			except Exception:
-				pass
+			doc.shortcuts.remove(keep)
+			removed_any = True
 			seen[key] = row
 		else:
-			try:
-				doc.shortcuts.remove(row)
-				removed_any = True
-			except Exception:
-				pass
+			doc.shortcuts.remove(row)
+			removed_any = True
 
 	if removed_any:
 		doc.save(ignore_permissions=True)
@@ -770,10 +755,8 @@ def _unset_workspace_app(workspace: str) -> None:
 	exist as exported JSON files in an installed app. Since we generate these
 	programmatically, we keep `app` empty.
 	"""
-	try:
+	if frappe.db.exists("Workspace", workspace):
 		frappe.db.set_value("Workspace", workspace, "app", None, update_modified=False)
-	except Exception:
-		pass
 
 
 def _ensure_workspace_sidebar() -> None:

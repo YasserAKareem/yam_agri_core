@@ -72,11 +72,11 @@ def run_demo(*, site: str = "") -> dict:
 def _default_site() -> str:
 	# Frappe core normally uses `Site` DocType.
 	# For demo, pick first site the user can access.
-	try:
-		site = frappe.get_all("Site", pluck="name", limit=1)
-		if site:
-			return site[0]
-	except Exception:
-		pass
+	if not frappe.db.exists("DocType", "Site"):
+		return ""
+
+	site = frappe.get_all("Site", pluck="name", limit=1)
+	if site:
+		return site[0]
 
 	return ""  # caller must provide

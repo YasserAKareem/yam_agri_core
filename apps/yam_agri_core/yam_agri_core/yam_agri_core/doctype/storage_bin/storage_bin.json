@@ -5,6 +5,7 @@
   "custom": 1,
   "autoname": "naming_series:",
   "title_field": "storage_bin_name",
+  "track_changes": 1,
   "fields": [
     {
       "fieldname": "naming_series",

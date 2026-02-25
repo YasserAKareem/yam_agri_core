@@ -5,6 +5,7 @@
   "custom": 1,
   "autoname": "naming_series:",
   "title_field": "capa_description",
+  "track_changes": 1,
   "fields": [
     {
       "fieldname": "naming_series",
@@ -14,7 +15,7 @@
       "default": "YAM-NC-.YYYY.-"
     },
     {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "capa_description", "fieldtype": "Small Text", "label": "CAPA Description"},
     {"fieldname": "status", "fieldtype": "Select", "options": "Open\nUnder Review\nClosed", "label": "Status"}
   ],

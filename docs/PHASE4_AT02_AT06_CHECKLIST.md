@@ -27,6 +27,8 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 - Evidence collector output dir: `artifacts/evidence/phase4_at02_at06/`
 - Report JSON: `artifacts/evidence/phase4_at02_at06/evidence_report.json`
 - Screenshots dir: `artifacts/evidence/phase4_at02_at06/screenshots/`
+- Static Yemeni dataset (250 records): `artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json`
+- Dataset coverage summary: `artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250_summary.md`
 
 ## AT-02 (Season Policy required evidence)
 
@@ -68,12 +70,17 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 
 1. Seed balanced dataset:
    - `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
-2. Run acceptance checks:
+2. (Optional) Import static Yemen dataset (250 records):
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250}'`
+  - Custom file path: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250,"dataset_file":"artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json"}'`
+  - Verify inserted coverage: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset --kwargs '{"limit":250}'`
+  - Gate PASS/FAIL check (throws on mismatch): `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1}'`
+3. Run acceptance checks:
    - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
    - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
    - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
    - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
-3. Capture visual/report artifacts:
+4. Capture visual/report artifacts:
    - `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.phase4_at02_at06.json`
 
 ### Exit criteria
@@ -227,3 +234,43 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 - Follow-up actions:
   - Refresh WBS and promote Phase 4 rows to `Partial/Done`.
   - Append CI metadata for this run window SHA after push.
+
+### 2026-02-25 (Static Yemeni sample data pack for Phase 4)
+
+- Date: 2026-02-25
+- Environment: static artifact generation (repo-local)
+- Tester: Copilot (automated)
+- Artifact set:
+  - `artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json`
+  - `artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250_summary.md`
+- Record target: `250`
+- Coverage goals:
+  - Multi-governorate Yemen context (`Sana'a`, `Taiz`, `Aden`, `Al Hudaydah`, `Ibb`)
+  - Multi-site operations (`Farm`, `Silo`, `Warehouse`)
+  - Power disruption profiles (`Stable`, `Outage-2h`, `Outage-6h`)
+  - Connectivity profiles (`2G`, `3G`, `Intermittent`, `Offline Queue`)
+  - Dispatch-gate outcomes (`Allowed` and `Blocked`) for AT-02 / AT-06 style validation
+
+### 2026-02-25 (Bench import + strict gate for 250 Yemeni records)
+
+- Date: 2026-02-25
+- Environment: dev (`localhost`, docker bench wrapper)
+- Tester: Copilot (automated)
+- Commit SHA: `fc67cbf`
+- Dataset source used by bench:
+  - `apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json`
+- Import command result:
+  - `seed_phase4_yemen_dataset`: `status=ok`, `records_processed=250`, `records_skipped=0`
+  - Created counts: `Site=5`, `Device=5`, `Lot=250`, `QCTest=184`, `Certificate=165`, `Transfer=208`, `ScaleTicket=250`, `Observation=250`
+- Verify command result:
+  - `verify_phase4_yemen_dataset`: `status=ok`
+  - Site distribution matched expected exactly (5/5)
+  - Governorate distribution matched expected exactly (5/5)
+  - Expected/observed DocType counts matched exactly (`QCTest=184`, `Certificate=165`, `Transfer=208`, `ScaleTicket=250`, `Observation=250`)
+- Gate command result:
+  - `verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1,...}'`: `status=pass`, `mismatch_count=0`
+- Blockers resolved during run:
+  - Dataset path visibility in bench runtime (fixed by app-path copy)
+  - Site type normalization for valid `Site.site_type` options
+  - QCTest schema compatibility when `notes` field is absent
+  - Verifier site/gov mapping and QCTest fallback matching

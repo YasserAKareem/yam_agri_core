@@ -5,6 +5,7 @@
   "custom": 1,
   "autoname": "naming_series:",
   "title_field": "observation_type",
+  "track_changes": 1,
   "fields": [
     {
       "fieldname": "naming_series",
@@ -13,7 +14,7 @@
       "options": "YAM-OBS-.YYYY.-",
       "default": "YAM-OBS-.YYYY.-"
     },
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "device", "fieldtype": "Link", "options": "Device", "label": "Device"},
     {"fieldname": "observed_at", "fieldtype": "Datetime", "label": "Observed At"},
     {"fieldname": "observation_type", "fieldtype": "Data", "label": "Observation Type"},
