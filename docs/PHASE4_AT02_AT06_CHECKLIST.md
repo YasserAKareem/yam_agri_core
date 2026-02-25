@@ -165,3 +165,31 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
   - `CI` run: `22343974792` -> `success`
     - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22343974792`
   - `Packaging Metadata` run: `22343974787` -> `failure` (non-gating for this acceptance flow)
+
+### 2026-02-25 (M4 + AT03/AT04/AT05 bench run request on localsite)
+
+- Date: 2026-02-25
+- Environment: dev (docker bench wrapper via `infra/docker/run.sh`)
+- Tester: Copilot (automated)
+- Commit SHA: `16537b118c4edbea8bf2fb1d6532fd1643e429e4`
+- Bench commands requested:
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_m4_gate_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_at03_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_at04_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_at05_automated_check`
+- Result:
+  - `run_m4_gate_automated_check`: BLOCKED (`404 Not Found: localsite does not exist`)
+  - `run_at03_automated_check`: BLOCKED (`404 Not Found: localsite does not exist`)
+  - `run_at04_automated_check`: BLOCKED (`404 Not Found: localsite does not exist`)
+  - `run_at05_automated_check`: BLOCKED (`404 Not Found: localsite does not exist`)
+- Site inventory check:
+  - `bench list-sites` output: `dev.local`, `localhost`
+- CI run URL / Run ID / Conclusion:
+  - `CI` run: `22372521701` -> `success`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22372521701`
+  - `Packaging Metadata` run: `22372521714` -> `success`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22372521714`
+- Blockers:
+  - Requested site `localsite` is not present in this bench environment.
+- Follow-up actions:
+  - Re-run the same commands on the actual `localsite` bench once that site exists, or confirm switching to `localhost`/`dev.local` for local validation.
