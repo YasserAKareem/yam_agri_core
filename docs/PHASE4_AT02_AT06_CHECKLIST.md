@@ -218,7 +218,10 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
   - Backward chain: `count=1`, `trace_found=true`
   - Forward chain: `count=1`, `trace_found=true`
 - CI run URL / Run ID / Conclusion:
-  - Pending (append after pushing this evidence commit SHA).
+  - `CI` run: `22375346071` -> `success`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22375346071`
+  - `Packaging Metadata` run: `22375346083` -> `success`
+    - URL: `https://github.com/YasserAKareem/yam_agri_core/actions/runs/22375346083`
 - Blockers:
   - None for localhost execution window.
 - Follow-up actions:

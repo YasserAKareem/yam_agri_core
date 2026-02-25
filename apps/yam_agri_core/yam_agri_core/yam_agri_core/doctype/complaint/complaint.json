@@ -3,6 +3,7 @@
   "name": "Complaint",
   "module": "YAM Agri Core",
   "custom": 1,
+  "track_changes": 1,
   "autoname": "naming_series:",
   "title_field": "customer_name",
   "fields": [
@@ -13,7 +14,7 @@
       "options": "YAM-COMP-.YYYY.-",
       "default": "YAM-COMP-.YYYY.-"
     },
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "complaint_date", "fieldtype": "Date", "label": "Complaint Date"},
     {"fieldname": "customer_name", "fieldtype": "Data", "label": "Customer Name"},
     {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot"},
