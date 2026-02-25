@@ -190,6 +190,10 @@ def observation_query_conditions(user: str) -> str | None:
 	return build_site_query_condition("Observation", user=user)
 
 
+def observation_threshold_policy_query_conditions(user: str) -> str | None:
+	return build_site_query_condition("Observation Threshold Policy", user=user)
+
+
 def scale_ticket_query_conditions(user: str) -> str | None:
 	return build_site_query_condition("ScaleTicket", user=user)
 
@@ -212,6 +216,10 @@ def complaint_query_conditions(user: str) -> str | None:
 
 def season_policy_query_conditions(user: str) -> str | None:
 	return build_site_query_condition("Season Policy", user=user)
+
+
+def site_tolerance_policy_query_conditions(user: str) -> str | None:
+	return build_site_query_condition("Site Tolerance Policy", user=user)
 
 
 def location_query_conditions(user: str) -> str | None:
@@ -364,6 +372,12 @@ def observation_has_permission(doc, user: str | None = None, permission_type: st
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
 
+def observation_threshold_policy_has_permission(
+	doc, user: str | None = None, permission_type: str | None = None
+) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
 def scale_ticket_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
@@ -385,6 +399,10 @@ def complaint_has_permission(doc, user: str | None = None, permission_type: str 
 
 
 def season_policy_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
+def site_tolerance_policy_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
 

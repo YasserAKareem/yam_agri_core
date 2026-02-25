@@ -645,3 +645,22 @@ Run from the repository root via docker wrapper:
 6. Run AT-08 observation checks; confirm quarantine flags and alerts.
 7. Execute smoke bundle and evidence collector.
 8. Refresh WBS milestone/row status scripts and attach outputs to run log.
+
+### 11.7 Phase 5 Implementation Update (2026-02-25)
+
+- Scope delivered in this cycle: WBS 5.1 to 5.5 runtime foundations and automated acceptance checks.
+- Data and import runtime:
+    - Added Phase 5 Yemen contract seed, verify, and strict gate in dev seed utilities.
+    - Added AT-07 CSV importer API with schema validation, site-safe lot resolution, mismatch tolerance, lot mutation log, and evidence artifact output.
+    - Added Site Tolerance Policy DocType and server-side policy validation.
+- Compliance runtime:
+    - Added auto-Nonconformance creation path for mismatch-fail rows.
+    - Enforced server-side QA Manager gate for Nonconformance status transition to Closed.
+- IoT and monitoring runtime:
+    - Added Dockerized MQTT broker and FastAPI IoT gateway service with health checks and restart-safe compose wiring.
+    - Added Observation Threshold Policy DocType and runtime quarantine/alert tagging flow in Observation validation.
+    - Added executive observation API behavior that excludes Quarantine rows by default.
+- Acceptance status:
+    - AT-07 automated check: pass.
+    - AT-08 automated check: pass.
+    - Frappe Skill Agent quality scan: pass (0 findings).

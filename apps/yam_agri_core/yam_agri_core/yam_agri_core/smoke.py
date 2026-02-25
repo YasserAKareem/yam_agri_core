@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import frappe
 from frappe.exceptions import PermissionError
 
@@ -1198,6 +1200,333 @@ def run_at06_automated_check() -> dict:
 			bool(evidence["expired_certificate"]),
 			bool(evidence["fresh_qc_test"]),
 			bool(evidence["valid_certificate"]),
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_at07_automated_check() -> dict:
+	"""Execute automated AT-07 checks for CSV import + mismatch NC flow."""
+
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == _AT10_USER_A:
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	from yam_agri_core.yam_agri_core.api.scale_ticket_import import import_scale_tickets_csv
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"policy": None,
+		"lot": None,
+		"device": None,
+		"summary": {},
+		"artifact_file": "",
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+
+		if frappe.db.exists("DocType", "Site Tolerance Policy"):
+			policy_name = f"AT07-TOL-{site_a[-4:]}"
+			policy = frappe.db.exists("Site Tolerance Policy", {"policy_name": policy_name, "site": site_a})
+			if policy:
+				policy_doc = frappe.get_doc("Site Tolerance Policy", policy)
+				policy_doc.tolerance_pct = 2.5
+				policy_doc.active = 1
+				policy_doc.save(ignore_permissions=True)
+			else:
+				policy_doc = frappe.get_doc(
+					{
+						"doctype": "Site Tolerance Policy",
+						"policy_name": policy_name,
+						"site": site_a,
+						"tolerance_pct": 2.5,
+						"active": 1,
+					}
+				).insert(ignore_permissions=True)
+			evidence["policy"] = policy_doc.name
+
+		device = frappe.db.get_value("Device", {"site": site_a, "status": "Active"}, "name")
+		if not device:
+			device = (
+				frappe.get_doc(
+					{
+						"doctype": "Device",
+						"device_name": f"AT07-DEV-{site_a[-4:]}",
+						"site": site_a,
+						"device_type": "Scale",
+						"status": "Active",
+					}
+				)
+				.insert(ignore_permissions=True)
+				.name
+			)
+		evidence["device"] = device
+
+		lot_number = f"AT07-LOT-{frappe.utils.now_datetime().strftime('%H%M%S')}-{site_a[-4:]}"
+		lot = (
+			frappe.get_doc(
+				{
+					"doctype": "Lot",
+					"lot_number": lot_number,
+					"site": site_a,
+					"qty_kg": 200,
+					"status": "Draft",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+		evidence["lot"] = lot
+
+		csv_content = (
+			"ticket_number,lot,device,gross_kg,tare_kg,declared_net_kg,vehicle,driver\n"
+			f"AT07-CLEAN-01,{lot},AT07-DEV-{site_a[-4:]},1100,100,1000,Truck,Driver A\n"
+			f"AT07-ERR-01,{lot},AT07-DEV-{site_a[-4:]},,100,1000,Truck,Driver B\n"
+			f"AT07-PASS-01,{lot},AT07-DEV-{site_a[-4:]},1120,100,1000,Truck,Driver C\n"
+			f"AT07-FAIL-01,{lot},AT07-DEV-{site_a[-4:]},1165,100,1000,Truck,Driver D"
+		)
+
+		result = import_scale_tickets_csv(
+			site=site_a,
+			csv_content=csv_content,
+			dry_run=0,
+			write_artifact=1,
+			artifact_file="artifacts/evidence/phase5_at07_at08/at07_import_log.json",
+		)
+
+		evidence["summary"] = result.get("summary") or {}
+		evidence["artifact_file"] = result.get("artifact_file") or ""
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	summary = evidence.get("summary") or {}
+	pass_checks = all(
+		[
+			int(summary.get("rows_total") or 0) == 4,
+			int(summary.get("rows_clean") or 0) == 1,
+			int(summary.get("rows_schema_error") or 0) == 1,
+			int(summary.get("rows_mismatch_pass") or 0) == 1,
+			int(summary.get("rows_mismatch_fail") or 0) == 1,
+			int(summary.get("nonconformance_created") or 0) == 1,
+			bool(evidence.get("artifact_file")),
+			not evidence.get("error"),
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_at08_automated_check() -> dict:
+	"""Execute automated AT-08 checks for threshold quarantine + alert tagging."""
+
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == _AT10_USER_A:
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	from yam_agri_core.yam_agri_core.api.observation_monitoring import get_observation_executive_summary
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"policy": None,
+		"device": None,
+		"normal_observation": None,
+		"warning_observation": None,
+		"quarantine_observation": None,
+		"default_exclusion_ok": False,
+		"include_quarantine_ok": False,
+		"warning_alert_tagged": False,
+		"quarantine_alert_tagged": False,
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+
+		if frappe.db.exists("DocType", "Observation Threshold Policy"):
+			policy_name = f"AT08-THR-{site_a[-4:]}"
+			policy = frappe.db.exists("Observation Threshold Policy", {"policy_name": policy_name, "site": site_a})
+			if policy:
+				policy_doc = frappe.get_doc("Observation Threshold Policy", policy)
+				policy_doc.observation_type = "temperature"
+				policy_doc.warning_min = 15
+				policy_doc.warning_max = 35
+				policy_doc.critical_min = 5
+				policy_doc.critical_max = 36
+				policy_doc.active = 1
+				policy_doc.save(ignore_permissions=True)
+			else:
+				policy_doc = frappe.get_doc(
+					{
+						"doctype": "Observation Threshold Policy",
+						"policy_name": policy_name,
+						"site": site_a,
+						"observation_type": "temperature",
+						"warning_min": 15,
+						"warning_max": 35,
+						"critical_min": 5,
+						"critical_max": 36,
+						"active": 1,
+					}
+				).insert(ignore_permissions=True)
+			evidence["policy"] = policy_doc.name
+
+		device = frappe.db.get_value("Device", {"site": site_a, "status": "Active"}, "name")
+		if not device:
+			device = (
+				frappe.get_doc(
+					{
+						"doctype": "Device",
+						"device_name": f"AT08-DEV-{site_a[-4:]}",
+						"site": site_a,
+						"device_type": "Temperature Sensor",
+						"status": "Active",
+					}
+				)
+				.insert(ignore_permissions=True)
+				.name
+			)
+		evidence["device"] = device
+
+		tag = frappe.utils.now_datetime().strftime("%H%M%S")
+		normal = frappe.get_doc(
+			{
+				"doctype": "Observation",
+				"site": site_a,
+				"device": device,
+				"observed_at": frappe.utils.now_datetime(),
+				"observation_type": "temperature",
+				"value": 28,
+				"unit": "C",
+				"quality_flag": "OK",
+				"raw_payload": json.dumps({"at": "AT08", "tag": tag, "kind": "normal"}),
+			}
+		).insert(ignore_permissions=True)
+		warning = frappe.get_doc(
+			{
+				"doctype": "Observation",
+				"site": site_a,
+				"device": device,
+				"observed_at": frappe.utils.now_datetime(),
+				"observation_type": "temperature",
+				"value": 35.5,
+				"unit": "C",
+				"quality_flag": "OK",
+				"raw_payload": json.dumps({"at": "AT08", "tag": tag, "kind": "warning"}),
+			}
+		).insert(ignore_permissions=True)
+		quarantine = frappe.get_doc(
+			{
+				"doctype": "Observation",
+				"site": site_a,
+				"device": device,
+				"observed_at": frappe.utils.now_datetime(),
+				"observation_type": "temperature",
+				"value": 37.2,
+				"unit": "C",
+				"quality_flag": "OK",
+				"raw_payload": json.dumps({"at": "AT08", "tag": tag, "kind": "quarantine"}),
+			}
+		).insert(ignore_permissions=True)
+
+		evidence["normal_observation"] = normal.name
+		evidence["warning_observation"] = warning.name
+		evidence["quarantine_observation"] = quarantine.name
+
+		warning_doc = frappe.get_doc("Observation", warning.name)
+		quarantine_doc = frappe.get_doc("Observation", quarantine.name)
+
+		try:
+			warning_payload = json.loads(str(warning_doc.raw_payload or "{}"))
+		except ValueError:
+			warning_payload = {}
+		try:
+			quarantine_payload = json.loads(str(quarantine_doc.raw_payload or "{}"))
+		except ValueError:
+			quarantine_payload = {}
+
+		evidence["warning_alert_tagged"] = bool((warning_payload.get("threshold_policy") or {}).get("should_alert"))
+		evidence["quarantine_alert_tagged"] = bool(
+			(quarantine_payload.get("threshold_policy") or {}).get("should_alert")
+		)
+
+		default_view = get_observation_executive_summary(site=site_a, include_quarantine=0, limit=200)
+		all_view = get_observation_executive_summary(site=site_a, include_quarantine=1, limit=200)
+
+		default_rows = default_view.get("rows") or []
+		all_rows = all_view.get("rows") or []
+		evidence["default_exclusion_ok"] = all(
+			str(row.get("quality_flag") or "") != "Quarantine" for row in default_rows
+		)
+		evidence["include_quarantine_ok"] = any(
+			str(row.get("quality_flag") or "") == "Quarantine" for row in all_rows
+		)
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+
+	finally:
+		frappe.set_user(original_user)
+
+	pass_checks = all(
+		[
+			bool(evidence.get("policy")),
+			bool(evidence.get("normal_observation")),
+			bool(evidence.get("warning_observation")),
+			bool(evidence.get("quarantine_observation")),
+			evidence.get("warning_alert_tagged"),
+			evidence.get("quarantine_alert_tagged"),
+			evidence.get("default_exclusion_ok"),
+			evidence.get("include_quarantine_ok"),
+			not evidence.get("error"),
 		]
 	)
 

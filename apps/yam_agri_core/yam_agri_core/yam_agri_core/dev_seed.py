@@ -1442,3 +1442,894 @@ def _ensure_phase4_observation(*, site: str, device: str, rec: dict[str, Any]) -
 	)
 	doc.insert(ignore_permissions=True)
 	return {"name": str(doc.name), "created": True}
+
+
+def generate_phase5_yemen_dataset_contract(
+	confirm: int = 0,
+	dataset_file: str = "artifacts/evidence/phase5_at07_at08/phase5_yemen_sample_data_780.json",
+	scale_ticket_total: int = 300,
+	observation_total: int = 480,
+) -> dict[str, Any]:
+	"""Generate and write Phase 5 Yemen-context dataset contract JSON.
+
+	Use via:
+	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.generate_phase5_yemen_dataset_contract --kwargs '{"confirm":1}'
+	"""
+
+	if int(confirm) != 1:
+		frappe.throw(_("Set confirm=1 to generate Phase 5 dataset contract"))
+
+	payload = _build_phase5_dataset_payload(
+		scale_ticket_total=int(scale_ticket_total),
+		observation_total=int(observation_total),
+	)
+	path = _resolve_output_path(dataset_file)
+	path.parent.mkdir(parents=True, exist_ok=True)
+	path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+	return {
+		"status": "ok",
+		"dataset_file": str(path),
+		"scale_ticket_records": len(payload.get("scale_tickets") or []),
+		"observation_records": len(payload.get("observations") or []),
+	}
+
+
+def seed_phase5_yemen_dataset(
+	confirm: int = 0,
+	dataset_file: str = "artifacts/evidence/phase5_at07_at08/phase5_yemen_sample_data_780.json",
+	scale_ticket_limit: int = 300,
+	observation_limit: int = 480,
+	generate_if_missing: int = 1,
+	write_artifact: int = 1,
+	artifact_file: str = "artifacts/evidence/phase5_at07_at08/phase5_import_log.json",
+) -> dict[str, Any]:
+	"""Import Phase 5 Yemen sample data with AT-07/AT-08 coverage semantics.
+
+	This simulates AT-07 importer behavior by processing ScaleTicket input rows into:
+	- clean
+	- csv_error (schema-fail rows; no ticket insert)
+	- mismatch_pass
+	- mismatch_fail (auto Nonconformance)
+
+	And imports AT-08 Observation rows with threshold-band aware quality flags.
+	"""
+
+	if int(confirm) != 1:
+		frappe.throw(_("Set confirm=1 to import Phase 5 dataset"))
+
+	for dt in ("Site", "Lot", "Device", "ScaleTicket", "Observation", "Nonconformance"):
+		if not frappe.db.exists("DocType", dt):
+			frappe.throw(_("Missing DocType: {0}").format(dt))
+
+	payload, dataset_path = _load_or_build_phase5_dataset(
+		dataset_file=dataset_file,
+		generate_if_missing=generate_if_missing,
+		scale_ticket_total=int(scale_ticket_limit),
+		observation_total=int(observation_limit),
+	)
+
+	scale_rows = (payload.get("scale_tickets") or [])[: int(scale_ticket_limit)]
+	obs_rows = (payload.get("observations") or [])[: int(observation_limit)]
+
+	created = {
+		"Site": 0,
+		"Device": 0,
+		"Lot": 0,
+		"ScaleTicket": 0,
+		"Observation": 0,
+		"Nonconformance": 0,
+	}
+	processed = {
+		"scale_rows_total": len(scale_rows),
+		"scale_clean": 0,
+		"scale_csv_error": 0,
+		"scale_mismatch_pass": 0,
+		"scale_mismatch_fail": 0,
+		"observation_rows_total": len(obs_rows),
+	}
+	evidence_rows: list[dict[str, Any]] = []
+	mutation_log: list[dict[str, Any]] = []
+
+	for rec in scale_rows:
+		site = _ensure_phase5_site(rec)
+		if site.get("created"):
+			created["Site"] += 1
+
+		device = _ensure_phase5_device(site=site["name"], rec=rec)
+		if device.get("created"):
+			created["Device"] += 1
+
+		lot = _ensure_phase5_lot(site=site["name"], rec=rec)
+		if lot.get("created"):
+			created["Lot"] += 1
+
+		category = str(rec.get("category") or "clean").strip()
+		record_id = str(rec.get("record_id") or "").strip()
+
+		if category == "csv_error":
+			processed["scale_csv_error"] += 1
+			evidence_rows.append(
+				{
+					"record_id": record_id,
+					"category": category,
+					"result": "rejected",
+					"reason": str(rec.get("expected_error") or "schema_validation_failed"),
+				}
+			)
+			continue
+
+		ticket = _ensure_phase5_scale_ticket(
+			site=site["name"], device=device["name"], lot=lot["name"], rec=rec
+		)
+		if ticket.get("created"):
+			created["ScaleTicket"] += 1
+
+		if category == "clean":
+			processed["scale_clean"] += 1
+		elif category == "mismatch_pass":
+			processed["scale_mismatch_pass"] += 1
+		elif category == "mismatch_fail":
+			processed["scale_mismatch_fail"] += 1
+
+		mutation = _apply_phase5_lot_mutation(lot=lot["name"], rec=rec)
+		mutation_log.append(mutation)
+
+		nc_name = ""
+		if category == "mismatch_fail":
+			nc = _ensure_phase5_nonconformance(site=site["name"], lot=lot["name"], rec=rec)
+			if nc.get("created"):
+				created["Nonconformance"] += 1
+			nc_name = str(nc.get("name") or "")
+
+		evidence_rows.append(
+			{
+				"record_id": record_id,
+				"category": category,
+				"result": "imported",
+				"ticket": ticket.get("name"),
+				"nonconformance": nc_name,
+				"lot_qty_before": mutation.get("before_qty_kg"),
+				"lot_qty_after": mutation.get("after_qty_kg"),
+			}
+		)
+
+	for rec in obs_rows:
+		site = _ensure_phase5_site(rec)
+		if site.get("created"):
+			created["Site"] += 1
+
+		device = _ensure_phase5_device(site=site["name"], rec=rec)
+		if device.get("created"):
+			created["Device"] += 1
+
+		obs = _ensure_phase5_observation(site=site["name"], device=device["name"], rec=rec)
+		if obs.get("created"):
+			created["Observation"] += 1
+
+	frappe.db.commit()
+
+	artifact_path = None
+	if int(write_artifact) == 1:
+		artifact_path = _write_phase5_import_artifact(
+			artifact_file=artifact_file,
+			dataset_file=str(dataset_path) if dataset_path else dataset_file,
+			processed=processed,
+			created=created,
+			evidence_rows=evidence_rows,
+			mutation_log=mutation_log,
+		)
+
+	return {
+		"status": "ok",
+		"dataset_file": str(dataset_path) if dataset_path else dataset_file,
+		"scale_ticket_limit": int(scale_ticket_limit),
+		"observation_limit": int(observation_limit),
+		"processed": processed,
+		"created": created,
+		"artifact_file": str(artifact_path) if artifact_path else "",
+	}
+
+
+def verify_phase5_yemen_dataset(
+	dataset_file: str = "artifacts/evidence/phase5_at07_at08/phase5_yemen_sample_data_780.json",
+	scale_ticket_limit: int = 300,
+	observation_limit: int = 480,
+	generate_if_missing: int = 1,
+) -> dict[str, Any]:
+	"""Verify expected vs observed Phase 5 Yemen coverage and outcome counts."""
+
+	payload, dataset_path = _load_or_build_phase5_dataset(
+		dataset_file=dataset_file,
+		generate_if_missing=generate_if_missing,
+		scale_ticket_total=int(scale_ticket_limit),
+		observation_total=int(observation_limit),
+	)
+
+	scale_rows = (payload.get("scale_tickets") or [])[: int(scale_ticket_limit)]
+	obs_rows = (payload.get("observations") or [])[: int(observation_limit)]
+
+	expected_scale_by_category = {
+		"clean": 0,
+		"csv_error": 0,
+		"mismatch_pass": 0,
+		"mismatch_fail": 0,
+	}
+	expected_scale_rows_by_site: dict[str, int] = {}
+	expected_scale_by_site: dict[str, int] = {}
+	expected_ticket_count = 0
+	expected_nc_count = 0
+
+	for rec in scale_rows:
+		category = str(rec.get("category") or "clean").strip()
+		site_code = str(rec.get("site") or "").strip()
+		if category in expected_scale_by_category:
+			expected_scale_by_category[category] += 1
+		if site_code:
+			expected_scale_rows_by_site[site_code] = expected_scale_rows_by_site.get(site_code, 0) + 1
+		if site_code and category != "csv_error":
+			expected_scale_by_site[site_code] = expected_scale_by_site.get(site_code, 0) + 1
+		if category != "csv_error":
+			expected_ticket_count += 1
+		if category == "mismatch_fail":
+			expected_nc_count += 1
+
+	expected_obs_by_site: dict[str, int] = {}
+	expected_quarantine = 0
+	expected_alerts = 0
+	for rec in obs_rows:
+		site_code = str(rec.get("site") or "").strip()
+		if site_code:
+			expected_obs_by_site[site_code] = expected_obs_by_site.get(site_code, 0) + 1
+		if str(rec.get("expected_quality_flag") or "").strip() == "Quarantine":
+			expected_quarantine += 1
+		if int(rec.get("alert_expected") or 0) == 1:
+			expected_alerts += 1
+
+	ticket_record_ids = [
+		str(rec.get("record_id") or "").strip()
+		for rec in scale_rows
+		if str(rec.get("category") or "clean").strip() != "csv_error"
+	]
+	ticket_rows = frappe.get_all(
+		"ScaleTicket",
+		filters={
+			"ticket_number": ["in", ["P5-ST-" + rec_id for rec_id in ticket_record_ids] or ["__none__"]]
+		},
+		fields=["name", "site", "ticket_number"],
+		limit_page_length=5000,
+	)
+
+	observed_ticket_count = len(ticket_rows)
+	observed_scale_by_site: dict[str, int] = {}
+	for row in ticket_rows:
+		site_id = str(row.get("site") or "")
+		site_code = _site_code_from_site_id(site_id)
+		if site_code:
+			observed_scale_by_site[site_code] = observed_scale_by_site.get(site_code, 0) + 1
+
+	nc_rows = frappe.get_all(
+		"Nonconformance",
+		filters={"capa_description": ["like", "P5-MISMATCH-%"]},
+		fields=["name", "capa_description", "status"],
+		limit_page_length=5000,
+	)
+	observed_nc_count = len(nc_rows)
+
+	obs_record_ids = [str(rec.get("record_id") or "").strip() for rec in obs_rows]
+	obs_rows_db = frappe.get_all(
+		"Observation",
+		filters={
+			"observation_type": ["in", ["p5.seed." + rec_id for rec_id in obs_record_ids] or ["__none__"]]
+		},
+		fields=["name", "site", "observation_type", "quality_flag", "raw_payload"],
+		limit_page_length=8000,
+	)
+
+	observed_obs_count = len(obs_rows_db)
+	observed_obs_by_site: dict[str, int] = {}
+	observed_quarantine = 0
+	observed_alerts = 0
+	observed_connectivity: set[str] = set()
+	observed_power: set[str] = set()
+
+	for row in obs_rows_db:
+		site_id = str(row.get("site") or "")
+		site_code = _site_code_from_site_id(site_id)
+		if site_code:
+			observed_obs_by_site[site_code] = observed_obs_by_site.get(site_code, 0) + 1
+
+		if str(row.get("quality_flag") or "") == "Quarantine":
+			observed_quarantine += 1
+
+		payload_raw = str(row.get("raw_payload") or "")
+		try:
+			parsed = json.loads(payload_raw) if payload_raw else {}
+		except ValueError:
+			parsed = {}
+
+		conn = str(parsed.get("connectivity") or "").strip()
+		power = str(parsed.get("power_profile") or "").strip()
+		alert = int(parsed.get("alert_expected") or 0)
+		if conn:
+			observed_connectivity.add(conn)
+		if power:
+			observed_power.add(power)
+		if alert == 1:
+			observed_alerts += 1
+
+	return {
+		"status": "ok",
+		"dataset_file": str(dataset_path) if dataset_path else dataset_file,
+		"scale_ticket_limit": int(scale_ticket_limit),
+		"observation_limit": int(observation_limit),
+		"expected": {
+			"scale_by_category": expected_scale_by_category,
+			"scale_rows_by_site": dict(sorted(expected_scale_rows_by_site.items())),
+			"scale_total_rows": len(scale_rows),
+			"scale_ticket_inserted": expected_ticket_count,
+			"nonconformance_created": expected_nc_count,
+			"scale_by_site": dict(sorted(expected_scale_by_site.items())),
+			"observation_total_rows": len(obs_rows),
+			"observation_by_site": dict(sorted(expected_obs_by_site.items())),
+			"observation_quarantine": expected_quarantine,
+			"observation_alerts": expected_alerts,
+		},
+		"observed": {
+			"scale_ticket_inserted": observed_ticket_count,
+			"nonconformance_created": observed_nc_count,
+			"scale_by_site": dict(sorted(observed_scale_by_site.items())),
+			"observation_total_rows": observed_obs_count,
+			"observation_by_site": dict(sorted(observed_obs_by_site.items())),
+			"observation_quarantine": observed_quarantine,
+			"observation_alerts": observed_alerts,
+			"connectivity_values": sorted(observed_connectivity),
+			"power_values": sorted(observed_power),
+		},
+	}
+
+
+def verify_phase5_yemen_dataset_gate(
+	dataset_file: str = "artifacts/evidence/phase5_at07_at08/phase5_yemen_sample_data_780.json",
+	scale_ticket_limit: int = 300,
+	observation_limit: int = 480,
+	generate_if_missing: int = 1,
+	strict: int = 1,
+) -> dict[str, Any]:
+	"""Strict gate for Phase 5 Yemen sample-data coverage and outcomes."""
+
+	result = verify_phase5_yemen_dataset(
+		dataset_file=dataset_file,
+		scale_ticket_limit=scale_ticket_limit,
+		observation_limit=observation_limit,
+		generate_if_missing=generate_if_missing,
+	)
+
+	expected = result.get("expected") or {}
+	observed = result.get("observed") or {}
+	mismatches: list[dict[str, Any]] = []
+
+	for key in ("scale_ticket_inserted", "nonconformance_created", "observation_total_rows"):
+		exp = int(expected.get(key) or 0)
+		obs = int(observed.get(key) or 0)
+		if exp != obs:
+			mismatches.append({"scope": key, "expected": exp, "observed": obs})
+
+	if int(expected.get("observation_quarantine") or 0) != int(observed.get("observation_quarantine") or 0):
+		mismatches.append(
+			{
+				"scope": "observation_quarantine",
+				"expected": int(expected.get("observation_quarantine") or 0),
+				"observed": int(observed.get("observation_quarantine") or 0),
+			}
+		)
+
+	if int(expected.get("observation_alerts") or 0) != int(observed.get("observation_alerts") or 0):
+		mismatches.append(
+			{
+				"scope": "observation_alerts",
+				"expected": int(expected.get("observation_alerts") or 0),
+				"observed": int(observed.get("observation_alerts") or 0),
+			}
+		)
+
+	expected_scale_by_site = expected.get("scale_by_site") or {}
+	observed_scale_by_site = observed.get("scale_by_site") or {}
+	for site, exp in sorted(expected_scale_by_site.items()):
+		obs = int(observed_scale_by_site.get(site) or 0)
+		if obs != int(exp):
+			mismatches.append(
+				{
+					"scope": "scale_by_site",
+					"key": site,
+					"expected": int(exp),
+					"observed": obs,
+				}
+			)
+
+	expected_obs_by_site = expected.get("observation_by_site") or {}
+	observed_obs_by_site = observed.get("observation_by_site") or {}
+	for site, exp in sorted(expected_obs_by_site.items()):
+		obs = int(observed_obs_by_site.get(site) or 0)
+		if obs != int(exp):
+			mismatches.append(
+				{
+					"scope": "observation_by_site",
+					"key": site,
+					"expected": int(exp),
+					"observed": obs,
+				}
+			)
+
+	for site, expected_count in (expected.get("scale_rows_by_site") or {}).items():
+		if int(expected_count) < 60:
+			mismatches.append(
+				{
+					"scope": "scale_site_minimum",
+					"key": site,
+					"expected_min": 60,
+					"observed": int(expected_count),
+				}
+			)
+
+	for site, expected_count in expected_obs_by_site.items():
+		if int(expected_count) < 96:
+			mismatches.append(
+				{
+					"scope": "observation_site_minimum",
+					"key": site,
+					"expected_min": 96,
+					"observed": int(expected_count),
+				}
+			)
+
+	connectivity_values = set(observed.get("connectivity_values") or [])
+	power_values = set(observed.get("power_values") or [])
+	for required in ("2G", "3G", "Intermittent", "Offline Queue"):
+		if required not in connectivity_values:
+			mismatches.append(
+				{
+					"scope": "connectivity_coverage",
+					"required": required,
+				}
+			)
+
+	for required in ("Stable", "Outage-2h", "Outage-6h"):
+		if required not in power_values:
+			mismatches.append(
+				{
+					"scope": "power_coverage",
+					"required": required,
+				}
+			)
+
+	status = "pass" if not mismatches else "fail"
+	if status == "fail" and int(strict) == 1:
+		frappe.throw(
+			_("Phase 5 Yemen dataset gate failed with {0} mismatch(es)").format(len(mismatches)),
+			frappe.ValidationError,
+		)
+
+	return {
+		"status": status,
+		"strict": int(strict),
+		"dataset_file": result.get("dataset_file"),
+		"scale_ticket_limit": int(scale_ticket_limit),
+		"observation_limit": int(observation_limit),
+		"mismatch_count": len(mismatches),
+		"mismatches": mismatches,
+		"expected": expected,
+		"observed": observed,
+	}
+
+
+def _load_or_build_phase5_dataset(
+	*,
+	dataset_file: str,
+	generate_if_missing: int,
+	scale_ticket_total: int,
+	observation_total: int,
+) -> tuple[dict[str, Any], Path | None]:
+	dataset_path = _resolve_phase5_dataset_path(dataset_file)
+	if dataset_path:
+		try:
+			payload = json.loads(dataset_path.read_text(encoding="utf-8"))
+		except ValueError as exc:
+			frappe.throw(_("Failed to parse Phase 5 dataset JSON: {0}").format(str(exc)))
+		return payload, dataset_path
+
+	if int(generate_if_missing) != 1:
+		frappe.throw(_("Dataset file not found: {0}").format(dataset_file))
+
+	payload = _build_phase5_dataset_payload(
+		scale_ticket_total=scale_ticket_total,
+		observation_total=observation_total,
+	)
+
+	out_path = _resolve_output_path(dataset_file)
+	out_path.parent.mkdir(parents=True, exist_ok=True)
+	out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+	return payload, out_path
+
+
+def _build_phase5_dataset_payload(*, scale_ticket_total: int, observation_total: int) -> dict[str, Any]:
+	if int(scale_ticket_total) < 300:
+		frappe.throw(_("scale_ticket_total must be at least 300 for Phase 5 coverage"))
+	if int(observation_total) < 480:
+		frappe.throw(_("observation_total must be at least 480 for Phase 5 coverage"))
+
+	sites = _phase5_site_catalog()
+	connectivity_values = ["2G", "3G", "Intermittent", "Offline Queue"]
+	power_values = ["Stable", "Outage-2h", "Outage-6h"]
+	transport_values = ["Truck", "Pickup", "Co-op Transit"]
+
+	scale_categories = ["clean"] * 70 + ["csv_error"] * 70 + ["mismatch_pass"] * 80 + ["mismatch_fail"] * 80
+	if len(scale_categories) != 300:
+		frappe.throw(_("Phase 5 scale category allocation must equal 300"))
+
+	scale_rows: list[dict[str, Any]] = []
+	for idx, category in enumerate(scale_categories, start=1):
+		site = sites[(idx - 1) % len(sites)]
+		conn = connectivity_values[(idx - 1) % len(connectivity_values)]
+		power = power_values[(idx - 1) % len(power_values)]
+		lot_seq = ((idx - 1) // len(sites)) + 1
+		lot_number = f"P5-LOT-{site['site'][-4:]}-{lot_seq:03d}"
+		record_id = f"ST-{idx:04d}"
+
+		declared = 950.0 + float((idx % 35) * 7)
+		if category == "clean":
+			measured = declared
+			tolerance_pct = 2.5
+			expected_outcome = "imported"
+			expected_error = ""
+		elif category == "csv_error":
+			measured = 0.0
+			tolerance_pct = 2.5
+			expected_outcome = "rejected"
+			expected_error = "missing_required_column"
+		elif category == "mismatch_pass":
+			measured = round(declared * 1.018, 2)
+			tolerance_pct = 2.5
+			expected_outcome = "imported"
+			expected_error = ""
+		else:
+			measured = round(declared * 1.062, 2)
+			tolerance_pct = 2.5
+			expected_outcome = "imported_with_nc"
+			expected_error = ""
+
+		scale_rows.append(
+			{
+				"record_id": record_id,
+				"site": site["site"],
+				"governorate": site["governorate"],
+				"site_type": site["site_type"],
+				"lot": lot_number,
+				"category": category,
+				"declared_net_kg": declared,
+				"measured_net_kg": measured,
+				"tolerance_pct": tolerance_pct,
+				"expected_outcome": expected_outcome,
+				"expected_error": expected_error,
+				"connectivity": conn,
+				"power_profile": power,
+				"transport_mode": transport_values[(idx - 1) % len(transport_values)],
+			}
+		)
+
+	obs_rows: list[dict[str, Any]] = []
+	for idx in range(1, int(observation_total) + 1):
+		site = sites[(idx - 1) % len(sites)]
+		conn = connectivity_values[(idx - 1) % len(connectivity_values)]
+		power = power_values[(idx - 1) % len(power_values)]
+		metric = "temperature" if idx % 2 == 1 else "humidity"
+		band_index = (idx - 1) % 3
+		if band_index == 0:
+			band = "normal"
+			expected_quality = "OK"
+			alert_expected = 0
+			value = 28.0 if metric == "temperature" else 55.0
+		elif band_index == 1:
+			band = "warning"
+			expected_quality = "OK"
+			alert_expected = 1
+			value = 34.5 if metric == "temperature" else 78.0
+		else:
+			band = "quarantine"
+			expected_quality = "Quarantine"
+			alert_expected = 1
+			value = 37.8 if metric == "temperature" else 85.0
+
+		obs_rows.append(
+			{
+				"record_id": f"OBS-{idx:04d}",
+				"site": site["site"],
+				"governorate": site["governorate"],
+				"site_type": site["site_type"],
+				"metric": metric,
+				"threshold_band": band,
+				"value": value,
+				"unit": "C" if metric == "temperature" else "%",
+				"expected_quality_flag": expected_quality,
+				"alert_expected": alert_expected,
+				"connectivity": conn,
+				"power_profile": power,
+			}
+		)
+
+	return {
+		"meta": {
+			"phase": "Phase 5",
+			"context": "Yemen",
+			"generated_at": utils.now_datetime().isoformat(),
+			"scale_ticket_total": len(scale_rows),
+			"observation_total": len(obs_rows),
+			"scale_category_target": {
+				"clean": 70,
+				"csv_error": 70,
+				"mismatch_pass": 80,
+				"mismatch_fail": 80,
+			},
+		},
+		"scale_tickets": scale_rows,
+		"observations": obs_rows,
+	}
+
+
+def _phase5_site_catalog() -> list[dict[str, str]]:
+	return [
+		{"site": "YEM-SAN-SILO-01", "governorate": "Sana'a", "site_type": "Silo"},
+		{"site": "YEM-ADN-WHS-01", "governorate": "Aden", "site_type": "Warehouse"},
+		{"site": "YEM-HUD-STORE-01", "governorate": "Al Hudaydah", "site_type": "Store"},
+		{"site": "YEM-TAI-MARKET-01", "governorate": "Taiz", "site_type": "Market"},
+		{"site": "YEM-IBB-FARM-01", "governorate": "Ibb", "site_type": "Farm"},
+	]
+
+
+def _resolve_phase5_dataset_path(dataset_file: str) -> Path | None:
+	if not dataset_file:
+		return None
+
+	p = Path(dataset_file)
+	if p.is_file():
+		return p
+
+	cwd_candidate = Path.cwd() / dataset_file
+	if cwd_candidate.is_file():
+		return cwd_candidate
+
+	if "yam_agri_core" in set(frappe.get_installed_apps() or []):
+		app_path = Path(frappe.get_app_path("yam_agri_core")).resolve()
+		for parent in app_path.parents:
+			candidate = parent / dataset_file
+			if candidate.is_file():
+				return candidate
+
+	return None
+
+
+def _resolve_output_path(relative_or_absolute_path: str) -> Path:
+	out = Path(relative_or_absolute_path)
+	if out.is_absolute():
+		return out
+
+	repo_root = _resolve_repo_root()
+	return repo_root / relative_or_absolute_path
+
+
+def _resolve_repo_root() -> Path:
+	if "yam_agri_core" in set(frappe.get_installed_apps() or []):
+		app_path = Path(frappe.get_app_path("yam_agri_core")).resolve()
+		for parent in app_path.parents:
+			if (parent / "tools").exists() and (parent / "docs").exists():
+				return parent
+	return Path.cwd()
+
+
+def _site_code_from_site_id(site_id: str) -> str:
+	if not site_id:
+		return ""
+
+	site_name = frappe.db.get_value("Site", site_id, "site_name")
+	if site_name:
+		return str(site_name)
+	return str(site_id)
+
+
+def _ensure_phase5_site(rec: dict[str, Any]) -> dict[str, Any]:
+	return _ensure_phase4_site(rec)
+
+
+def _ensure_phase5_device(*, site: str, rec: dict[str, Any]) -> dict[str, Any]:
+	site_code = str(rec.get("site") or site)
+	device_name = "P5-DEV-" + site_code[-8:]
+	device_doc = frappe.db.get_value("Device", {"site": site, "device_name": device_name}, "name")
+	if device_doc:
+		return {"name": str(device_doc), "created": False}
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Device",
+			"device_name": device_name,
+			"site": site,
+			"device_type": "Scale",
+			"status": "Active",
+			"serial_number": "P5-" + device_name,
+			"notes": _("Phase 5 Yemen dataset"),
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase5_lot(*, site: str, rec: dict[str, Any]) -> dict[str, Any]:
+	lot_number = str(rec.get("lot") or "").strip() or "P5-LOT-UNKNOWN"
+	lot_doc = frappe.db.get_value("Lot", {"site": site, "lot_number": lot_number}, "name")
+	if lot_doc:
+		return {"name": str(lot_doc), "created": False}
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Lot",
+			"lot_number": lot_number,
+			"site": site,
+			"qty_kg": float(rec.get("declared_net_kg") or 1000),
+			"status": "Draft",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase5_scale_ticket(*, site: str, device: str, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	record_id = str(rec.get("record_id") or "").strip()
+	ticket_number = "P5-ST-" + record_id
+	ticket_name = frappe.db.get_value("ScaleTicket", {"site": site, "ticket_number": ticket_number}, "name")
+	if ticket_name:
+		return {"name": str(ticket_name), "created": False}
+
+	declared = float(rec.get("declared_net_kg") or 1000)
+	measured = float(rec.get("measured_net_kg") or declared)
+	tare_kg = round(max(30.0, measured * 0.09), 2)
+	gross_kg = round(measured + tare_kg, 2)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "ScaleTicket",
+			"ticket_number": ticket_number,
+			"site": site,
+			"device": device,
+			"lot": lot,
+			"ticket_datetime": utils.now_datetime(),
+			"gross_kg": gross_kg,
+			"tare_kg": tare_kg,
+			"net_kg": measured,
+			"vehicle": str(rec.get("transport_mode") or "Truck"),
+			"driver": _("Phase 5 Driver"),
+			"notes": _("Phase 5 Yemen dataset declared={0} measured={1}").format(declared, measured),
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _apply_phase5_lot_mutation(*, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	before_qty = float(frappe.db.get_value("Lot", lot, "qty_kg") or 0)
+	measured = float(rec.get("measured_net_kg") or rec.get("declared_net_kg") or 0)
+	after_qty = round(max(0.0, before_qty + measured), 3)
+	frappe.db.set_value("Lot", lot, "qty_kg", after_qty, update_modified=False)
+	return {
+		"lot": lot,
+		"record_id": str(rec.get("record_id") or ""),
+		"before_qty_kg": before_qty,
+		"delta_kg": measured,
+		"after_qty_kg": after_qty,
+	}
+
+
+def _ensure_phase5_nonconformance(*, site: str, lot: str, rec: dict[str, Any]) -> dict[str, Any]:
+	record_id = str(rec.get("record_id") or "").strip()
+	marker = "P5-MISMATCH-" + record_id
+	existing = frappe.db.get_value(
+		"Nonconformance", {"site": site, "lot": lot, "capa_description": ["like", marker + "%"]}, "name"
+	)
+	if existing:
+		return {"name": str(existing), "created": False}
+
+	tolerance = float(rec.get("tolerance_pct") or 2.5)
+	declared = float(rec.get("declared_net_kg") or 0)
+	measured = float(rec.get("measured_net_kg") or 0)
+	delta = round(abs(measured - declared), 3)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Nonconformance",
+			"site": site,
+			"lot": lot,
+			"capa_description": _("{0}; declared={1}; measured={2}; delta={3}; tolerance_pct={4}").format(
+				marker, declared, measured, delta, tolerance
+			),
+			"status": "Open",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _ensure_phase5_observation(*, site: str, device: str, rec: dict[str, Any]) -> dict[str, Any]:
+	record_id = str(rec.get("record_id") or "").strip()
+	obs_type = "p5.seed." + record_id
+	existing = frappe.db.get_value(
+		"Observation", {"site": site, "device": device, "observation_type": obs_type}, "name"
+	)
+	if existing:
+		return {"name": str(existing), "created": False}
+
+	raw = {
+		"phase": "Phase 5",
+		"record_id": record_id,
+		"connectivity": rec.get("connectivity"),
+		"power_profile": rec.get("power_profile"),
+		"threshold_band": rec.get("threshold_band"),
+		"alert_expected": int(rec.get("alert_expected") or 0),
+	}
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Observation",
+			"site": site,
+			"device": device,
+			"observed_at": utils.now_datetime(),
+			"observation_type": obs_type,
+			"value": float(rec.get("value") or 0),
+			"unit": str(rec.get("unit") or ""),
+			"quality_flag": str(rec.get("expected_quality_flag") or "OK"),
+			"raw_payload": json.dumps(raw, ensure_ascii=False),
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"name": str(doc.name), "created": True}
+
+
+def _write_phase5_import_artifact(
+	*,
+	artifact_file: str,
+	dataset_file: str,
+	processed: dict[str, Any],
+	created: dict[str, Any],
+	evidence_rows: list[dict[str, Any]],
+	mutation_log: list[dict[str, Any]],
+) -> Path:
+	artifact_path = _resolve_output_path(artifact_file)
+	artifact_path.parent.mkdir(parents=True, exist_ok=True)
+
+	payload = {
+		"phase": "Phase 5",
+		"generated_at": utils.now_datetime().isoformat(),
+		"dataset_file": dataset_file,
+		"processed": processed,
+		"created": created,
+		"evidence_rows": evidence_rows,
+		"mutation_log": mutation_log,
+	}
+	artifact_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+	csv_path = artifact_path.with_suffix(".csv")
+	headers = ["record_id", "category", "result", "reason", "ticket", "nonconformance"]
+	lines = [",".join(headers)]
+	for row in evidence_rows:
+		lines.append(
+			",".join(
+				[
+					str(row.get("record_id") or ""),
+					str(row.get("category") or ""),
+					str(row.get("result") or ""),
+					str(row.get("reason") or ""),
+					str(row.get("ticket") or ""),
+					str(row.get("nonconformance") or ""),
+				]
+			)
+		)
+	csv_path.write_text("\n".join(lines), encoding="utf-8")
+
+	return artifact_path
