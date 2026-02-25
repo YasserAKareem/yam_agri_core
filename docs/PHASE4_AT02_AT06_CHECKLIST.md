@@ -193,3 +193,34 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
   - Requested site `localsite` is not present in this bench environment.
 - Follow-up actions:
   - Re-run the same commands on the actual `localsite` bench once that site exists, or confirm switching to `localhost`/`dev.local` for local validation.
+
+### 2026-02-25 (Phase 4 acceptance run window on localhost)
+
+- Date: 2026-02-25
+- Environment: dev (`localhost`, docker bench wrapper)
+- Tester: Copilot (automated)
+- Site decision: current `<site>` is authoritative for this run window (`localhost`).
+- Commit SHA: `5852c7b` (pre-evidence-doc update)
+- Command results:
+  - `run_m4_gate_automated_check`: `status=pass`
+  - `run_at03_automated_check`: `status=pass`
+  - `run_at04_automated_check`: `status=pass`
+  - `run_at05_automated_check`: `status=pass`
+- AT-02/AT-06 gate proof:
+  - AT-02 evidence: `policy=YAM-SP-2026-00001`, `lot=YAM-LOT-2026-00049`, `qc_test=YAM-QCT-2026-00066`, `certificate=YAM-CERT-2026-00043`
+  - AT-02 blocked reason: `Cannot dispatch: missing or stale required QC tests: AT02-MOISTURE`
+  - AT-06 evidence: `policy=YAM-SP-2026-00004`, `lot=YAM-LOT-2026-00050`, `cross_site=v3qdo4nkun`
+  - AT-06 blocked reasons:
+    - cross-site invalid blocked: `Lot site must match QCTest site`
+    - stale/expired blocked: `Cannot dispatch: missing or stale required QC tests: AT06-MOISTURE`
+- Trace proof (AT-03/04/05):
+  - Split transfer: `YAM-TRF-2026-00020`, qty `120.0`
+  - Backward chain: `count=1`, `trace_found=true`
+  - Forward chain: `count=1`, `trace_found=true`
+- CI run URL / Run ID / Conclusion:
+  - Pending (append after pushing this evidence commit SHA).
+- Blockers:
+  - None for localhost execution window.
+- Follow-up actions:
+  - Refresh WBS and promote Phase 4 rows to `Partial/Done`.
+  - Append CI metadata for this run window SHA after push.
