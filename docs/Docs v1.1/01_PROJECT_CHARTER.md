@@ -1,11 +1,11 @@
 # Project Charter — YAM Agri Platform V1.1
 
-> **SDLC Phase:** Initiation  
-> **Version:** 1.2  
-> **Status:** ✅ Approved — owner sign-off pending on v1.2  
-> **Date:** 2026-02-23  
-> **Owner:** YasserAKareem  
-> **Related:** [WBS & Gantt](../planning/WBS_AND_GANTT.md) | [Backlog & Features Inventory](../planning/BACKLOG_AND_FEATURES_INVENTORY.md) | [Excel WBS+Gantt](../planning/YAM_AGRI_WBS_GANTT.xlsx)  
+> **SDLC Phase:** Initiation
+> **Version:** 1.2
+> **Status:** ✅ Approved — owner sign-off pending on v1.2
+> **Date:** 2026-02-23
+> **Owner:** YasserAKareem
+> **Related:** [WBS & Gantt](../WBS_AND_GANTT.md) | [Backlog & Features Inventory](../planning/BACKLOG_AND_FEATURES_INVENTORY.md) | [Excel WBS+Gantt](../planning/YAM_AGRI_WBS_GANTT.xlsx)
 
 ---
 
@@ -146,7 +146,7 @@ YAM Agri aims to build a smart, valuable enterprise by using technology to:
 
 ## 5. Project Timeline (V1.1)
 
-> Full WBS decomposition and Gantt chart: [docs/planning/WBS_AND_GANTT.md](../planning/WBS_AND_GANTT.md) | [docs/planning/YAM_AGRI_WBS_GANTT.xlsx](../planning/YAM_AGRI_WBS_GANTT.xlsx)
+> Full WBS decomposition and Gantt chart: [docs/WBS_AND_GANTT.md](../WBS_AND_GANTT.md) | [docs/planning/YAM_AGRI_WBS_GANTT.xlsx](../planning/YAM_AGRI_WBS_GANTT.xlsx)
 
 ### 5.1 Phase Summary
 

@@ -228,6 +228,127 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 | 6.6.2 | Test: PII redaction active for external LLM calls | Dev | 0.5 | 6.6.1 |
 | 6.7 | Ollama local LLM integration (optional, Yemen offline) | Dev | 1 | 6.1 |
 
+### Phase 6 Canonical Integrated Scope (single source of truth)
+
+This section is the canonical scope definition for integrated ERP/MES/WMS/POS/CRM/AI modeling in this WBS.
+All repeated scope text in other sections must reference this section instead of duplicating mappings.
+
+#### Integrated Data Model and Module Mapping
+
+#### 1) Platform scope (100 users, 10M USD, local-first)
+
+- ERP Core: finance, procurement, inventory, sales/orders, CRM baseline, HR/payroll baseline.
+- MES/Manufacturing: work orders, recipes/BOM, production batches, QA gates.
+- WMS: multi-warehouse stock, transfers, picking/putaway, batch-location visibility.
+- POS: 60 outlets, synced sales/returns with inventory, CRM, and finance.
+- CRM: pipeline, campaign, service, contract touchpoints.
+- Analytics + AI: unified reporting, alerts, predictive and advisory suggestions.
+
+#### 2) Canonical module-to-entity mapping (Frappe/ERPNext + YAM custom)
+
+| Module domain | Canonical entities / DocTypes |
+|---------------|-------------------------------|
+| Organization | Company, Cost Center, Branch/Location |
+| Customer/Supplier | Customer, Supplier, Contact, Address |
+| Product taxonomy (FAO 9 groups) | Item Group (Group 1..9), Item (40 SKUs), Item Attribute, Item Variant, custom field `fao_icc_code` |
+| Location model | Site, Warehouse, StorageBin, Plant as Site Type, Retail outlet as Site Type |
+| Contract farming (custom) | Contract Farming Agreement, Contract Plot Allocation, Contract Item Target, Contract Delivery Schedule, Contract Settlement |
+| Batch/Lot traceability | Batch (ERPNext), Lot (YAM), ProductionBatch link, expiry/sell-by fields |
+| Inventory/WMS | Stock Ledger Entry, Bin, Stock Entry, Transfer, Pick List, Delivery Note |
+| Manufacturing/MES | BOM/Recipe, Work Order/Production Order, Job Card (optional), Quality Inspection, Recall (custom) |
+| POS/Retail | POS Profile, POS Invoice, Sales Invoice, Sales Return, Complaint |
+| Finance | Journal Entry, Payment Entry, GL Entry, Cost Center dimensions |
+| Quality/Safety | QCTest, Certificate, Nonconformance, Quality Inspection, EvidencePack |
+| AI/Analytics (custom + reporting) | AI Interaction Log (append-only custom), Model Registry (custom), reporting artifacts |
+
+#### ERP↔MES↔WMS↔POS↔CRM↔AI interface contracts
+
+| Interface | Source | Target | Contract payload (minimum) | Control |
+|-----------|--------|--------|----------------------------|---------|
+| ERP→MES Production release | ERP (Item/BOM/Work Order) | MES runtime | item, bom/recipe, qty, due_date, site | QA gate before release |
+| MES→WMS Batch output | ProductionBatch/Work Order | Stock Entry/Bin/Batch | production_batch, lot/batch, qty, warehouse | lot/batch traceability required |
+| WMS→POS Availability | Bin/Batch ledger | POS Profile/POS Invoice | item, available_qty, lot/batch, outlet_site | prevent oversell at outlet |
+| POS→ERP Settlement | POS Invoice/Sales Return | GL/Payment/Customer ledger | invoice, return, taxes, payments, customer | financial posting validation |
+| CRM↔ERP Service loop | Complaint/Service touchpoint | Sales/Quality records | complaint_ref, customer, lot, resolution_state | CAPA linkage required |
+| AI↔Business records (assistive-only) | Lot/NC/EvidencePack context | AI Interaction Log + suggestion UI | source_record, prompt_hash, response_hash, decision | no autonomous write/transition |
+
+#### Local open AI infrastructure profile (V1.2 enhancement)
+
+- Runtime profile: Linux hosts with local-first services and offline resilience.
+- AI stack: AI Gateway + Ollama (local model routing) + Qdrant (vector store) + MinIO (object evidence store).
+- Infra context: OpenStack/Kubernetes profile is a deployment target after Docker Compose stability gates pass.
+- Governance: assistive-only responses, redaction before external routing, append-only interaction logging.
+
+```mermaid
+flowchart LR
+    U[Desk/PWA Users] --> FG[Frappe ERP Core]
+    FG --> QA[QA/QC + Traceability]
+    FG --> WMS[WMS + POS + CRM]
+    FG --> AIGW[AI Gateway]
+    AIGW --> OLL[Ollama Local LLM]
+    AIGW --> VDB[Qdrant]
+    FG --> OBJ[MinIO Evidence Store]
+    AIGW --> AILOG[AI Interaction Log]
+    FG --> AILOG
+```
+
+Related architecture diagrams:
+- `docs/C4 model Architecture v1.1/04_COMPONENT_AI_LAYER.md`
+- `docs/C4 model Architecture v1.1/07_DYNAMIC_AI_ASSIST.md`
+- `docs/C4 model Architecture v1.1/09_DEPLOYMENT_STAGING.md`
+
+#### 3) ER relationship backbone (implementation target)
+
+- Company `1..n` Site.
+- Site `1..n` Warehouse/StorageBin.
+- Item Group `1..n` Item.
+- Item `1..n` Batch and Item `1..n` Lot.
+- Contract Farming Agreement `1..n` Contract Plot Allocation.
+- Contract Farming Agreement `1..n` Contract Item Target.
+- Contract Harvest Event `n..1` Lot and `n..1` Contract Farming Agreement.
+- Lot `1..n` QCTest, `1..n` Certificate, `1..n` Nonconformance, `1..n` Transfer, `1..n` ScaleTicket.
+- Production Order `1..n` ProductionBatch and ProductionBatch `n..1` Lot/Batch.
+- POS Invoice `n..1` Site and `n..n` Item via POS lines.
+- Stock Movement `n..1` from Site/Warehouse and `n..1` to Site/Warehouse and `n..1` Batch/Lot.
+- AI Interaction Log `n..1` Site and `n..1` source record (Lot/NC/EvidencePack), decision tracked per interaction.
+
+#### 4) FAO 9 groups + 40 SKU governance
+
+- Keep FAO hierarchy in Item Group with 9 top groups.
+- Keep SKU catalog in Item with required attributes:
+    - `sku_code`, `product_group`, `fao_icc_code`, `cpc_code`
+    - `base_uom`, `pack_uom`, `shelf_life_days`
+    - `quality_grade`, `organic_flag`, `gmo_flag`
+    - `procurement_type`, `processing_stage`, `traceability_required`
+- Enforce master-data validation before transactions (sales, procurement, production, POS).
+
+#### FAO-to-SKU Governance and Contract Farming Canonical Model
+
+#### 5) Contract farming canonical data model (practical)
+
+- Agreement header: partner, season, dates, status, terms.
+- Line targets: crop/SKU, area min/max, expected yield, quality grade, pricing basis.
+- Allocation: farm/field/site assignment.
+- Harvest event: actual yield, quality, lot link, date.
+- Delivery event: destination, accepted quantity, rejection reason.
+- Settlement: payment, bonuses/penalties, deductions, references.
+
+#### 6) WBS expansion (de-duplicated)
+
+- Add section: Integrated Data Model and Module Mapping.
+- Add section: FAO-to-SKU Governance and Contract Farming Canonical Model.
+- Add section: ERP↔MES↔WMS↔POS↔CRM↔AI interface contracts.
+- Keep phase sequencing unchanged; this is scope-depth, not phase-order change.
+
+#### 7) Acceptance criteria for this enhancement
+
+- Single canonical mapping table only (no duplicate module/entity lists).
+- Every entity mapped to actual Frappe/ERPNext DocType or explicit new custom DocType.
+- FAO 9 groups and 40 SKUs traceable from master data to transaction flows.
+- Contract farming flow traceable from agreement to settlement.
+- Lot/Batch traceability preserved from farm/plant to POS and complaint/recall.
+- AI logs linked to business records with decision outcomes (assistive-only governance).
+
 ---
 
 ### Phase 7 — EvidencePack Generator
@@ -509,7 +630,7 @@ This snapshot reflects the current workbook-tracked execution status after WBS r
 | M2 | ✅ Done |
 | M3 | ✅ Done |
 | M4 | ✅ Done |
-| M5 | ⬜ Pending |
+| M5 | ✅ Done |
 | M6 | ⬜ Pending |
 | M7 | ⬜ Pending |
 | M8 | ⬜ Pending |
@@ -524,7 +645,7 @@ This snapshot reflects the current workbook-tracked execution status after WBS r
 | Phase 2 | 23 | 0 | 0 | 23 | ✅ Done |
 | Phase 3 | 13 | 0 | 0 | 13 | ✅ Done |
 | **Phase 4** | **17** | **0** | **0** | **17** | **✅ Done** |
-| Phase 5 | 0 | 0 | 17 | 17 | ⬜ Pending |
+| **Phase 5** | **17** | **0** | **0** | **17** | **✅ Done** |
 | Phase 6 | 0 | 0 | 13 | 13 | ⬜ Pending |
 | Phase 7 | 0 | 0 | 9 | 9 | ⬜ Pending |
 | Phase 8 | 0 | 0 | 10 | 10 | ⬜ Pending |
@@ -664,3 +785,28 @@ Run from the repository root via docker wrapper:
     - AT-07 automated check: pass.
     - AT-08 automated check: pass.
     - Frappe Skill Agent quality scan: pass (0 findings).
+
+### 11.8 Phase 5 Closure Status (WBS + Sample Data + Low-code)
+
+| Stream | Status | Evidence |
+|--------|--------|----------|
+| WBS 5.1 (CSV Import) | ✅ Done | Runtime API `import_scale_tickets_csv` with schema validation, site-safe lot resolution, and import artifact output |
+| WBS 5.2 (Tolerance + NC) | ✅ Done | `Site Tolerance Policy` active policy lookup + mismatch-fail auto-NC + QA-only NC close gate |
+| WBS 5.3 (IoT Ingest) | ✅ Done | Dockerized `mqtt` + `iot-gateway` services with restart and health checks in compose |
+| WBS 5.4 (Quarantine) | ✅ Done | `Observation Threshold Policy` with runtime threshold evaluation and automatic `quality_flag=Quarantine` |
+| WBS 5.5/5.6 (Alerts + Acceptance) | ✅ Done | Multi-channel alert metadata tagging + AT-07 and AT-08 smoke checks passing |
+| Sample-data contract | ✅ Done | Phase 5 Yemen dataset: 5 sites, 300 ScaleTicket rows, 480 Observation rows, strict gate pass |
+| Low-code run path | ✅ Done | Gateway up + bench checks + evidence artifacts executed in one cycle |
+
+### 11.9 Detailed Next WBS Steps (Phase 6 kickoff)
+
+This kickoff section is intentionally de-duplicated.
+
+- Canonical functional scope, module/entity mapping, ER backbone, FAO/SKU governance, and contract model:
+    see **Phase 6 Canonical Integrated Scope (single source of truth)** in this document.
+- Execution focus for next cycle:
+        1. Implement AI Gateway (`POST /suggest`) with redaction middleware.
+        2. Deliver Compliance/CAPA/Evidence suggestion UX as assistive-only flows.
+        3. Add append-only AI Interaction Log + decision outcomes.
+        4. Run governance tests: no autonomous writes and redaction enforcement.
+        5. Prepare Phase 6 sample-data and low-code runbook evidence.
