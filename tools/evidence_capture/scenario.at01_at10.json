@@ -9,9 +9,9 @@
   "pages": [
     "/app/agriculture",
     "/app/site",
-    "/app/storage-bin",
+    "/app/storagebin",
     "/app/lot",
-    "/app/qc-test",
+    "/app/qctest",
     "/app/certificate",
     "/app/nonconformance",
     "/app/observation"
