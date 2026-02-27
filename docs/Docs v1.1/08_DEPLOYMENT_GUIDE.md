@@ -203,22 +203,35 @@ cd yam_agri_core/environments/staging
 cp .env.example .env
 # Set all passwords and secrets for staging (different from dev!)
 
+# Validate tooling and required variables
+./scripts/preflight.sh .env
+
+# Generate secrets manifest from .env (do not commit generated file)
+./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml
+
 # Apply k8s manifests
 kubectl apply -f manifests/namespace.yaml
+kubectl apply -f manifests/pvc.yaml
 kubectl apply -f manifests/configmap.yaml
-kubectl apply -f manifests/secrets.yaml    # created from .env — never committed
+kubectl apply -f manifests/secrets.generated.yaml
 kubectl apply -f manifests/mariadb.yaml
 kubectl apply -f manifests/redis.yaml
 kubectl apply -f manifests/frappe.yaml
 kubectl apply -f manifests/nginx.yaml
+kubectl apply -f manifests/gateways.yaml
+kubectl apply -f manifests/ingress.yaml
 
 # Wait for pods to be ready
-kubectl get pods -n yam-staging -w
+kubectl get pods -n yam-agri-staging -w
 ```
 
 ### 5.3 Staging Acceptance
 
 Run all 10 acceptance tests (Section 4 of [07_TEST_PLAN.md](07_TEST_PLAN.md)) on staging before signing off.
+
+```bash
+./scripts/phase8_acceptance.sh localhost
+```
 
 ---
 

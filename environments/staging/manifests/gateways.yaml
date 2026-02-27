@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-gateway
+  namespace: yam-agri-staging
+spec:
+  # Kickoff default: keep disabled until image pinning is finalized.
+  replicas: 0
+  selector:
+    matchLabels:
+      app: ai-gateway
+  template:
+    metadata:
+      labels:
+        app: ai-gateway
+    spec:
+      containers:
+        - name: ai-gateway
+          image: yamagri/ai-gateway:latest
+          ports:
+            - containerPort: 8089
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8089
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8089
+            initialDelaySeconds: 20
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-gateway
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: ai-gateway
+  ports:
+    - name: http
+      port: 8089
+      targetPort: 8089
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-gateway
+  namespace: yam-agri-staging
+spec:
+  # Kickoff default: keep disabled until image pinning is finalized.
+  replicas: 0
+  selector:
+    matchLabels:
+      app: iot-gateway
+  template:
+    metadata:
+      labels:
+        app: iot-gateway
+    spec:
+      containers:
+        - name: iot-gateway
+          image: yamagri/iot-gateway:latest
+          ports:
+            - containerPort: 8088
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8088
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8088
+            initialDelaySeconds: 20
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iot-gateway
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: iot-gateway
+  ports:
+    - name: http
+      port: 8088
+      targetPort: 8088

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: yam-agri-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frappe/erpnext:v16.5.0
+          command:
+            - nginx-entrypoint.sh
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BACKEND
+              value: backend:8000
+            - name: SOCKETIO
+              value: websocket:9000
+            - name: FRAPPE_SITE_NAME_HEADER
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: FRAPPE_SITE_NAME_HEADER
+            - name: UPSTREAM_REAL_IP_ADDRESS
+              value: 127.0.0.1
+            - name: UPSTREAM_REAL_IP_HEADER
+              value: X-Forwarded-For
+            - name: UPSTREAM_REAL_IP_RECURSIVE
+              value: "off"
+            - name: PROXY_READ_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: PROXY_READ_TIMEOUT
+            - name: CLIENT_MAX_BODY_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: CLIENT_MAX_BODY_SIZE
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          volumeMounts:
+            - name: frappe-sites
+              mountPath: /home/frappe/frappe-bench/sites
+      volumes:
+        - name: frappe-sites
+          persistentVolumeClaim:
+            claimName: frappe-sites-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

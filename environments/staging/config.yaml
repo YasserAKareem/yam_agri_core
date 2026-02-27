@@ -1,4 +1,23 @@
-# Staging Environment Configuration
-# Used for UAT and integrations on new machine (K3s), production-like configs
+environment: staging
+namespace: yam-agri-staging
+site_name: yam-staging.vpn.internal
+ingress_host: yam-staging.vpn.internal
 
-# Add your staging-specific configuration here
+images:
+  frappe: frappe/erpnext:v16.5.0
+  mariadb: mariadb:10.6
+  redis: redis:6.2-alpine
+  ai_gateway: yamagri/ai-gateway:latest
+  iot_gateway: yamagri/iot-gateway:latest
+
+apps:
+  install: erpnext,agriculture,yam_agri_core,yam_agri_qms_trace
+
+storage:
+  class_name: local-path
+  sites_pvc_size: 20Gi
+  mariadb_pvc_size: 20Gi
+
+network:
+  api_access: wireguard-only
+  ingress_entrypoints: websecure

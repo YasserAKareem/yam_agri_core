@@ -1,0 +1,327 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: yam-agri-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: frappe/erpnext:v16.5.0
+          command:
+            - bash
+            - -lc
+            - >-
+              cd /home/frappe/frappe-bench &&
+              exec /home/frappe/frappe-bench/env/bin/gunicorn
+              --chdir=/home/frappe/frappe-bench/sites
+              --bind=0.0.0.0:8000
+              --threads=4
+              --workers=2
+              --worker-class=gthread
+              --timeout=120
+              frappe.app:application
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SITE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: SITE_NAME
+            - name: INSTALL_APPS
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: INSTALL_APPS
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: yam-agri-staging-secrets
+                  key: db-password
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: yam-agri-staging-secrets
+                  key: db-root-password
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: yam-agri-staging-secrets
+                  key: admin-password
+            - name: FRAPPE_REDIS_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_CACHE_URL
+            - name: FRAPPE_REDIS_QUEUE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_QUEUE_URL
+            - name: SOCKETIO_REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_SOCKETIO_URL
+            - name: AI_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: AI_GATEWAY_URL
+            - name: AI_GATEWAY_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: AI_GATEWAY_TIMEOUT
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 40
+            periodSeconds: 15
+          volumeMounts:
+            - name: frappe-sites
+              mountPath: /home/frappe/frappe-bench/sites
+      volumes:
+        - name: frappe-sites
+          persistentVolumeClaim:
+            claimName: frappe-sites-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket
+  namespace: yam-agri-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: websocket
+  template:
+    metadata:
+      labels:
+        app: websocket
+    spec:
+      containers:
+        - name: websocket
+          image: frappe/erpnext:v16.5.0
+          command:
+            - node
+            - /home/frappe/frappe-bench/apps/frappe/socketio.js
+          ports:
+            - containerPort: 9000
+          env:
+            - name: FRAPPE_REDIS_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_CACHE_URL
+            - name: FRAPPE_REDIS_QUEUE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_QUEUE_URL
+          volumeMounts:
+            - name: frappe-sites
+              mountPath: /home/frappe/frappe-bench/sites
+      volumes:
+        - name: frappe-sites
+          persistentVolumeClaim:
+            claimName: frappe-sites-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket
+  namespace: yam-agri-staging
+spec:
+  selector:
+    app: websocket
+  ports:
+    - name: websocket
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-short
+  namespace: yam-agri-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue-short
+  template:
+    metadata:
+      labels:
+        app: queue-short
+    spec:
+      containers:
+        - name: queue-short
+          image: frappe/erpnext:v16.5.0
+          command:
+            - bash
+            - -lc
+            - cd /home/frappe/frappe-bench && bench worker --queue short,default
+          env:
+            - name: FRAPPE_REDIS_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_CACHE_URL
+            - name: FRAPPE_REDIS_QUEUE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_QUEUE_URL
+            - name: AI_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: AI_GATEWAY_URL
+          volumeMounts:
+            - name: frappe-sites
+              mountPath: /home/frappe/frappe-bench/sites
+      volumes:
+        - name: frappe-sites
+          persistentVolumeClaim:
+            claimName: frappe-sites-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-long
+  namespace: yam-agri-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue-long
+  template:
+    metadata:
+      labels:
+        app: queue-long
+    spec:
+      containers:
+        - name: queue-long
+          image: frappe/erpnext:v16.5.0
+          command:
+            - bash
+            - -lc
+            - cd /home/frappe/frappe-bench && bench worker --queue long,default,short
+          env:
+            - name: FRAPPE_REDIS_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_CACHE_URL
+            - name: FRAPPE_REDIS_QUEUE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_QUEUE_URL
+            - name: AI_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: AI_GATEWAY_URL
+          volumeMounts:
+            - name: frappe-sites
+              mountPath: /home/frappe/frappe-bench/sites
+      volumes:
+        - name: frappe-sites
+          persistentVolumeClaim:
+            claimName: frappe-sites-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+  namespace: yam-agri-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: frappe/erpnext:v16.5.0
+          command:
+            - bash
+            - -lc
+            - cd /home/frappe/frappe-bench && bench schedule
+          env:
+            - name: FRAPPE_REDIS_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_CACHE_URL
+            - name: FRAPPE_REDIS_QUEUE
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: REDIS_QUEUE_URL
+            - name: AI_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: yam-agri-staging-config
+                  key: AI_GATEWAY_URL
+          volumeMounts:
+            - name: frappe-sites
+              mountPath: /home/frappe/frappe-bench/sites
+      volumes:
+        - name: frappe-sites
+          persistentVolumeClaim:
+            claimName: frappe-sites-pvc

@@ -810,3 +810,25 @@ This kickoff section is intentionally de-duplicated.
         3. Add append-only AI Interaction Log + decision outcomes.
         4. Run governance tests: no autonomous writes and redaction enforcement.
         5. Prepare Phase 6 sample-data and low-code runbook evidence.
+
+### 11.10 Phase 7 Closure Status (2026-02-27)
+
+- Phase 7 implementation is completed and committed.
+- EvidencePack generator scope delivered: linked record builder, PDF export, ZIP export, auditor portal stub, AT-09 automation.
+- Execution evidence document: `docs/PHASE7_EXECUTION_LOG_2026-02-27.md`.
+- Acceptance status:
+    - `run_at09_automated_check`: pass
+    - `run_phase7_smoke`: pass
+    - `bench --site localhost run-tests --app yam_agri_core`: pass
+
+### 11.11 Phase 8 Kickoff Status (2026-02-27)
+
+- Phase 8 planning/execution kickoff started with staging baseline assets:
+    - `environments/staging/config.yaml`
+    - `environments/staging/.env.example`
+    - `environments/staging/manifests/*` (modular k3s manifests)
+    - `environments/staging/scripts/preflight.sh`
+    - `environments/staging/scripts/generate-secrets.sh`
+    - `environments/staging/scripts/phase8_acceptance.sh`
+- Kickoff execution plan document: `docs/PHASE8_KICKOFF_PLAN_2026-02-27.md`.
+- Next closure target remains M8: all AT-01 through AT-10 pass on staging.

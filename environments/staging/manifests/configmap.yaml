@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yam-agri-staging-config
+  namespace: yam-agri-staging
+data:
+  SITE_NAME: yam-staging.vpn.internal
+  INSTALL_APPS: erpnext,agriculture,yam_agri_core,yam_agri_qms_trace
+  DB_HOST: db
+  DB_PORT: "3306"
+  DB_NAME: yam_agri
+  DB_USER: yam
+  REDIS_CACHE_URL: redis://redis-cache:6379
+  REDIS_QUEUE_URL: redis://redis-queue:6379
+  REDIS_SOCKETIO_URL: redis://redis-socketio:6379
+  AI_GATEWAY_URL: http://ai-gateway:8089/suggest
+  AI_GATEWAY_TIMEOUT: "20"
+  FRAPPE_SITE_NAME_HEADER: "$host"
+  PROXY_READ_TIMEOUT: "120"
+  CLIENT_MAX_BODY_SIZE: 50m

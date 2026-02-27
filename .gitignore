@@ -1,8 +1,11 @@
 # Ignore local environment files
 infra/docker/.env
+environments/staging/.env
+environments/staging/manifests/secrets.generated.yaml
 
 # Backup files (created by bash run.sh backup)
 infra/docker/backups/
+environments/staging/artifacts/
 
 # Offline Docker image archives (created by bash run.sh prefetch)
 infra/docker/offline-images.tar
