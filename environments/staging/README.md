@@ -39,16 +39,7 @@ cp .env.example .env
 3. Apply manifests on staging server (via WireGuard VPN):
 
 ```bash
-kubectl apply -f manifests/namespace.yaml
-kubectl apply -f manifests/pvc.yaml
-kubectl apply -f manifests/configmap.yaml
-kubectl apply -f manifests/secrets.generated.yaml
-kubectl apply -f manifests/mariadb.yaml
-kubectl apply -f manifests/redis.yaml
-kubectl apply -f manifests/frappe.yaml
-kubectl apply -f manifests/nginx.yaml
-kubectl apply -f manifests/gateways.yaml
-kubectl apply -f manifests/ingress.yaml
+./scripts/apply_manifests.sh
 ```
 
 4. Execute acceptance bundle on staging bench node:

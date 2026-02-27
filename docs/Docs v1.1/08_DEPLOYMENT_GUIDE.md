@@ -210,16 +210,7 @@ cp .env.example .env
 ./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml
 
 # Apply k8s manifests
-kubectl apply -f manifests/namespace.yaml
-kubectl apply -f manifests/pvc.yaml
-kubectl apply -f manifests/configmap.yaml
-kubectl apply -f manifests/secrets.generated.yaml
-kubectl apply -f manifests/mariadb.yaml
-kubectl apply -f manifests/redis.yaml
-kubectl apply -f manifests/frappe.yaml
-kubectl apply -f manifests/nginx.yaml
-kubectl apply -f manifests/gateways.yaml
-kubectl apply -f manifests/ingress.yaml
+./scripts/apply_manifests.sh
 
 # Wait for pods to be ready
 kubectl get pods -n yam-agri-staging -w

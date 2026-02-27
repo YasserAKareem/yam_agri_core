@@ -832,3 +832,10 @@ This kickoff section is intentionally de-duplicated.
     - `environments/staging/scripts/phase8_acceptance.sh`
 - Kickoff execution plan document: `docs/PHASE8_KICKOFF_PLAN_2026-02-27.md`.
 - Next closure target remains M8: all AT-01 through AT-10 pass on staging.
+
+### 11.12 Phase 8 Execution Progress (2026-02-27)
+
+- `preflight.sh` and `generate-secrets.sh` execution path validated.
+- Added `apply_manifests.sh` to enforce documented manifest order.
+- Added `phase8_acceptance.sh` rehearsal evidence: all AT-01..AT-10 pass in bench test context.
+- Pending for WBS closure: execute manifest apply and acceptance on actual staging k3s node via WireGuard.

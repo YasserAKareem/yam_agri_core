@@ -1286,7 +1286,8 @@ def run_at07_automated_check() -> dict:
 			)
 		evidence["device"] = device
 
-		lot_number = f"AT07-LOT-{frappe.utils.now_datetime().strftime('%H%M%S')}-{site_a[-4:]}"
+		run_tag = frappe.utils.now_datetime().strftime("%H%M%S%f")
+		lot_number = f"AT07-LOT-{run_tag}-{site_a[-4:]}"
 		lot = (
 			frappe.get_doc(
 				{
@@ -1302,12 +1303,13 @@ def run_at07_automated_check() -> dict:
 		)
 		evidence["lot"] = lot
 
+		device_ref = str(device)
 		csv_content = (
 			"ticket_number,lot,device,gross_kg,tare_kg,declared_net_kg,vehicle,driver\n"
-			f"AT07-CLEAN-01,{lot},AT07-DEV-{site_a[-4:]},1100,100,1000,Truck,Driver A\n"
-			f"AT07-ERR-01,{lot},AT07-DEV-{site_a[-4:]},,100,1000,Truck,Driver B\n"
-			f"AT07-PASS-01,{lot},AT07-DEV-{site_a[-4:]},1120,100,1000,Truck,Driver C\n"
-			f"AT07-FAIL-01,{lot},AT07-DEV-{site_a[-4:]},1165,100,1000,Truck,Driver D"
+			f"AT07-CLEAN-{run_tag},{lot},{device_ref},1100,100,1000,Truck,Driver A\n"
+			f"AT07-ERR-{run_tag},{lot},{device_ref},,100,1000,Truck,Driver B\n"
+			f"AT07-PASS-{run_tag},{lot},{device_ref},1120,100,1000,Truck,Driver C\n"
+			f"AT07-FAIL-{run_tag},{lot},{device_ref},1165,100,1000,Truck,Driver D"
 		)
 
 		result = import_scale_tickets_csv(
