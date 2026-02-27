@@ -60,3 +60,11 @@ Start Phase 8 (Staging on k3s) execution against WBS 8.1-8.5 and prepare a repea
 - All WBS 8.1-8.5 tasks marked complete with run evidence.
 - `run_at01` through `run_at10` pass on staging site.
 - M8 exit criterion satisfied: all 10 acceptance tests pass on k3s staging.
+
+## 7) Current blocker state
+
+- Remote execution from this workstation is currently blocked by access prerequisites:
+  - `yam-staging.vpn.internal` does not resolve.
+  - WireGuard tooling/session is not active on this workstation.
+- Blocker evidence: `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`.
+- Next unlock action: establish WireGuard access and confirm DNS resolution, then rerun `scripts/check_staging_access.sh` and continue with real `DRY_RUN=0` operations.

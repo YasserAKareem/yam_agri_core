@@ -149,3 +149,35 @@ Rehearsal command:
 Result:
 
 - `pass` with all expected backup artifacts produced (database + public tar + private tar + config json).
+
+## 8) Real remote execution attempt and blocker evidence
+
+### 8.1 Real execution attempt
+
+Command attempted:
+
+- `DRY_RUN=0 ./scripts/provision_k3s.sh yam-staging.vpn.internal ubuntu`
+
+Result:
+
+- failed immediately: `ssh: Could not resolve hostname yam-staging.vpn.internal: Name or service not known`
+
+### 8.2 Connectivity evidence capture
+
+Added and executed:
+
+- `environments/staging/scripts/check_staging_access.sh yam-staging.vpn.internal ubuntu`
+
+Evidence file:
+
+- `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`
+
+Evidence summary:
+
+- WireGuard tools: missing on this workstation (`wg` not found).
+- DNS: staging host unresolved.
+- Therefore remote staging-host execution cannot proceed from this host until VPN + DNS path is established.
+
+### 8.3 Updated operator gating
+
+Runbook now requires `check_staging_access.sh` before any remote mutation steps.

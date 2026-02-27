@@ -852,3 +852,12 @@ This kickoff section is intentionally de-duplicated.
 - Executed migration backup-only evidence run on dev bench context and captured artifacts under `artifacts/evidence/phase8/migration/`.
 - Executed offline manifest order validation via `DRY_RUN_MODE=render ./scripts/apply_manifests.sh` (pass).
 - Remaining blocker for full WBS 8 closure: execute remote apply + full restore on staging host over WireGuard and rerun AT-01..AT-10 on staging site.
+
+### 11.14 Phase 8 Access Blocker Evidence (2026-02-27)
+
+- Real remote execution attempt (`DRY_RUN=0`) was performed and failed due unresolved staging DNS from current workstation.
+- Added access precheck script:
+    - `environments/staging/scripts/check_staging_access.sh`
+- Captured blocker evidence:
+    - `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`
+- Gate for continuing WBS 8.1.1/8.2.x real execution: WireGuard session + DNS resolution to staging host must be active.

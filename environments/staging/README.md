@@ -16,6 +16,7 @@ This directory is the execution baseline for WBS Phase 8 (k3s staging).
 - `.env.example`: operator-provided secrets/overrides template.
 - `manifests/`: modular k3s manifests.
 - `scripts/provision_k3s.sh`: remote k3s installation/provisioning helper (8.1.1).
+- `scripts/check_staging_access.sh`: validates VPN/DNS/SSH access to staging host.
 - `scripts/setup_wireguard.sh`: WireGuard config generation/apply helper (8.2.1).
 - `scripts/restrict_k3s_api.sh`: firewall rule helper to limit k3s API to VPN subnet (8.2.2).
 - `scripts/preflight.sh`: validates local tooling and `.env` readiness.
@@ -34,7 +35,13 @@ cp .env.example .env
 # edit .env with strong passwords and staging host values
 ```
 
-2. Provision staging server and secure VPN/API path:
+2. Validate staging host reachability:
+
+```bash
+./scripts/check_staging_access.sh <staging_host> <ssh_user>
+```
+
+3. Provision staging server and secure VPN/API path:
 
 ```bash
 # 8.1.1: k3s install (dry-run first)
@@ -47,14 +54,14 @@ DRY_RUN=1 WG_ENDPOINT=<public_host_or_ip> ./scripts/setup_wireguard.sh <staging_
 DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./scripts/restrict_k3s_api.sh <staging_host> <ssh_user>
 ```
 
-3. Run preflight and generate secrets:
+4. Run preflight and generate secrets:
 
 ```bash
 ./scripts/preflight.sh .env
 ./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml
 ```
 
-4. Apply manifests on staging server (via WireGuard VPN):
+5. Apply manifests on staging server (via WireGuard VPN):
 
 ```bash
 # offline render validation
@@ -64,7 +71,7 @@ DRY_RUN_MODE=render ./scripts/apply_manifests.sh
 ./scripts/apply_manifests.sh
 ```
 
-5. Run dev -> staging migration (backup-only rehearsal then full):
+6. Run dev -> staging migration (backup-only rehearsal then full):
 
 ```bash
 # backup-only evidence run
@@ -74,7 +81,7 @@ MODE=backup-only ./scripts/migrate_dev_to_staging.sh
 MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./scripts/migrate_dev_to_staging.sh
 ```
 
-6. Execute acceptance bundle on staging bench node:
+7. Execute acceptance bundle on staging bench node:
 
 ```bash
 ./scripts/phase8_acceptance.sh localhost

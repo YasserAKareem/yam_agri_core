@@ -183,6 +183,9 @@ bench --site ${SITE_NAME} import-fixtures --app yam_agri_core
 ### 5.1 Install k3s on Staging Server
 
 ```bash
+# Pre-check VPN/DNS/SSH reachability
+./scripts/check_staging_access.sh <staging_host> <ssh_user>
+
 # From operator workstation (safe dry-run first)
 DRY_RUN=1 ./scripts/provision_k3s.sh <staging_host> <ssh_user>
 
