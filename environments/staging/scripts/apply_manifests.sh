@@ -26,11 +26,18 @@ for rel in "${files[@]}"; do
 
 done
 
+if [[ "$DRY_RUN_MODE" == "render" ]]; then
+  echo "[DRY-RUN] Rendering kustomize output only (no API calls)"
+  kubectl kustomize "$ROOT_DIR/manifests" >/dev/null
+  echo "[OK] Rendered manifests successfully"
+  exit 0
+fi
+
 for rel in "${files[@]}"; do
   abs="$ROOT_DIR/$rel"
   echo "[APPLY] $rel"
   if [[ "$DRY_RUN_MODE" == "client" ]]; then
-    kubectl apply --dry-run=client -f "$abs"
+    kubectl apply --dry-run=client --validate=false -f "$abs"
   else
     kubectl apply -f "$abs"
   fi

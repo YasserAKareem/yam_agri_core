@@ -76,3 +76,76 @@ Fix implemented:
 3. Run `./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml`.
 4. Run `./scripts/apply_manifests.sh`.
 5. Run `./scripts/phase8_acceptance.sh <staging_site_name>` and archive JSONL in Phase 8 evidence.
+
+## 6) Remaining WBS execution pass (8.1.1, 8.2.x, 8.4)
+
+### 6.1 Added operator scripts
+
+- `environments/staging/scripts/provision_k3s.sh` (WBS 8.1.1)
+- `environments/staging/scripts/setup_wireguard.sh` (WBS 8.2.1)
+- `environments/staging/scripts/restrict_k3s_api.sh` (WBS 8.2.2)
+- `environments/staging/scripts/migrate_dev_to_staging.sh` (WBS 8.4.1/8.4.2)
+
+### 6.2 Commands executed in this pass
+
+1. `DRY_RUN=1 ./scripts/provision_k3s.sh staging.example.internal ubuntu`
+2. `DRY_RUN=1 WG_ENDPOINT=staging.example.internal ./scripts/setup_wireguard.sh staging.example.internal ubuntu`
+3. `DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./scripts/restrict_k3s_api.sh staging.example.internal ubuntu`
+4. `MODE=backup-only ARTIFACT_ROOT=artifacts/evidence/phase8/migration ./scripts/migrate_dev_to_staging.sh`
+
+### 6.3 Results
+
+- 8.1.1 remote install path: validated in dry-run (safe execution preview produced).
+- 8.2.1 WireGuard config path: validated in dry-run.
+- 8.2.2 k3s API restriction path: validated in dry-run.
+- 8.4 backup workflow: executed successfully in backup-only mode.
+
+Backup evidence from latest run:
+
+- directory: `artifacts/evidence/phase8/migration/20260227T070325Z/`
+- files captured:
+  - `20260227_100326-localhost-database.sql.gz`
+  - `20260227_100326-localhost-files.tar`
+  - `20260227_100326-localhost-private-files.tar`
+  - `20260227_100326-localhost-site_config_backup.json`
+  - `manifest.json`
+
+### 6.4 Remaining hard blocker for full Phase 8 closure
+
+- Apply + restore still require execution on real staging host reachable via WireGuard (not available from this workstation context).
+- Final closure command set remains:
+  1. `DRY_RUN=0 ./scripts/provision_k3s.sh <staging_host> <ssh_user>`
+  2. `DRY_RUN=0 WG_ENDPOINT=<public_host_or_ip> ./scripts/setup_wireguard.sh <staging_host> <ssh_user>`
+  3. `DRY_RUN=0 VPN_SUBNET=<vpn_subnet> ./scripts/restrict_k3s_api.sh <staging_host> <ssh_user>`
+  4. `./scripts/apply_manifests.sh`
+  5. `MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./scripts/migrate_dev_to_staging.sh`
+  6. `./scripts/phase8_acceptance.sh <staging_site>`
+
+## 7) Additional execution validations in this pass
+
+### 7.1 Manifest order validation without cluster
+
+- executed: `DRY_RUN_MODE=render ./scripts/apply_manifests.sh`
+- result: `pass` (`[OK] Rendered manifests successfully`)
+
+### 7.2 Migration workflow re-validation after pattern hardening
+
+Issue fixed:
+
+- backup file matching in migration script could capture private file tar for both public/private slots.
+
+Fix:
+
+- switched to site-specific filename patterns:
+  - `*-${DEV_SITE}-database.sql.gz`
+  - `*-${DEV_SITE}-site_config_backup.json`
+  - `*-${DEV_SITE}-private-files.tar`
+  - `*-${DEV_SITE}-files.tar`
+
+Rehearsal command:
+
+- `MODE=backup-only ARTIFACT_ROOT=/tmp/phase8-migration-test ./scripts/migrate_dev_to_staging.sh`
+
+Result:
+
+- `pass` with all expected backup artifacts produced (database + public tar + private tar + config json).

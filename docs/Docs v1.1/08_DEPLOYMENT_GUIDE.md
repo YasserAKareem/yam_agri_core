@@ -183,13 +183,11 @@ bench --site ${SITE_NAME} import-fixtures --app yam_agri_core
 ### 5.1 Install k3s on Staging Server
 
 ```bash
-# On staging server (via SSH + WireGuard VPN)
-curl -sfL https://get.k3s.io | sh -
+# From operator workstation (safe dry-run first)
+DRY_RUN=1 ./scripts/provision_k3s.sh <staging_host> <ssh_user>
 
-# Check status
-kubectl get nodes
-# Expected: NAME    STATUS   ROLES    AGE   VERSION
-#           node1   Ready    master   1m    v1.x.x
+# Execute for real
+DRY_RUN=0 ./scripts/provision_k3s.sh <staging_host> <ssh_user>
 ```
 
 ### 5.2 Deploy Frappe Stack
@@ -203,6 +201,10 @@ cd yam_agri_core/environments/staging
 cp .env.example .env
 # Set all passwords and secrets for staging (different from dev!)
 
+# WireGuard + k3s API restriction (dry-run then apply)
+DRY_RUN=1 WG_ENDPOINT=<public_host_or_ip> ./scripts/setup_wireguard.sh <staging_host> <ssh_user>
+DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./scripts/restrict_k3s_api.sh <staging_host> <ssh_user>
+
 # Validate tooling and required variables
 ./scripts/preflight.sh .env
 
@@ -210,13 +212,24 @@ cp .env.example .env
 ./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml
 
 # Apply k8s manifests
+DRY_RUN_MODE=render ./scripts/apply_manifests.sh
 ./scripts/apply_manifests.sh
 
 # Wait for pods to be ready
 kubectl get pods -n yam-agri-staging -w
 ```
 
-### 5.3 Staging Acceptance
+### 5.3 Data Migration (Dev -> Staging)
+
+```bash
+# Create backup evidence from dev
+MODE=backup-only ./scripts/migrate_dev_to_staging.sh
+
+# Full restore on staging
+MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./scripts/migrate_dev_to_staging.sh
+```
+
+### 5.4 Staging Acceptance
 
 Run all 10 acceptance tests (Section 4 of [07_TEST_PLAN.md](07_TEST_PLAN.md)) on staging before signing off.
 

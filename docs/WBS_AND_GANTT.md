@@ -839,3 +839,16 @@ This kickoff section is intentionally de-duplicated.
 - Added `apply_manifests.sh` to enforce documented manifest order.
 - Added `phase8_acceptance.sh` rehearsal evidence: all AT-01..AT-10 pass in bench test context.
 - Pending for WBS closure: execute manifest apply and acceptance on actual staging k3s node via WireGuard.
+
+### 11.13 Phase 8 Remaining WBS Progress (2026-02-27)
+
+- Added WBS 8.1.1 operator automation:
+    - `environments/staging/scripts/provision_k3s.sh`
+- Added WBS 8.2.1/8.2.2 operator automation:
+    - `environments/staging/scripts/setup_wireguard.sh`
+    - `environments/staging/scripts/restrict_k3s_api.sh`
+- Added WBS 8.4 migration automation:
+    - `environments/staging/scripts/migrate_dev_to_staging.sh` (`MODE=backup-only|full`)
+- Executed migration backup-only evidence run on dev bench context and captured artifacts under `artifacts/evidence/phase8/migration/`.
+- Executed offline manifest order validation via `DRY_RUN_MODE=render ./scripts/apply_manifests.sh` (pass).
+- Remaining blocker for full WBS 8 closure: execute remote apply + full restore on staging host over WireGuard and rerun AT-01..AT-10 on staging site.

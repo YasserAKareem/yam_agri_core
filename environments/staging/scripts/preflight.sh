@@ -2,6 +2,9 @@
 set -euo pipefail
 
 ENV_FILE="${1:-.env}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STAGING_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$STAGING_DIR/../.." && pwd)"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "[ERROR] Missing env file: $ENV_FILE"
@@ -45,7 +48,7 @@ for var_name in "${required_vars[@]}"; do
   fi
 done
 
-if git ls-files --error-unmatch environments/staging/manifests/secrets.generated.yaml >/dev/null 2>&1; then
+if git -C "$REPO_ROOT" ls-files --error-unmatch environments/staging/manifests/secrets.generated.yaml >/dev/null 2>&1; then
   echo "[ERROR] secrets.generated.yaml is tracked by git; this must remain untracked"
   exit 1
 fi

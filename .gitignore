@@ -2,6 +2,7 @@
 infra/docker/.env
 environments/staging/.env
 environments/staging/manifests/secrets.generated.yaml
+environments/staging/wireguard/generated/
 
 # Backup files (created by bash run.sh backup)
 infra/docker/backups/
