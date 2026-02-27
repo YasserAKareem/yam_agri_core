@@ -37,7 +37,7 @@ def choose_javascript(root: Path, ci: bool) -> list[Candidate]:
         cmd = "bun install --frozen-lockfile" if ci else "bun install"
         return [Candidate("javascript", "bun", cmd, "Detected package.json + bun lockfile")]
     if has_npm_lock:
-        cmd = "npm ci" if ci else "npm ci"
+        cmd = "npm ci" if ci else "npm install"
         return [Candidate("javascript", "npm", cmd, "Detected package.json + npm lockfile")]
     return [Candidate("javascript", "npm", "npm install", "Detected package.json without lockfile")]
 

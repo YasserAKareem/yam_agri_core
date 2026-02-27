@@ -877,7 +877,7 @@ def get_yam_agri_workspace_status() -> dict:
 	"""Return a diagnostic snapshot of YAM Agri workspace state.
 
 	Safe to run via:
-	- bench --site <site> execute yam_agri_core.yam_agri_core.workspace_setup.get_yam_agri_workspace_status
+	- bench --site <site> execute yam_agri_core.yam_agri_core.workspace.setup.get_yam_agri_workspace_status
 	"""
 	module_name = "YAM Agri"
 

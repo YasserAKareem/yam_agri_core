@@ -99,7 +99,7 @@ def seed_baseline_demo_data_force() -> None:
 	"""Force-seed baseline demo data (idempotent).
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_baseline_demo_data_force
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_baseline_demo_data_force
 
 	This bypasses developer_mode guards, but still only inserts minimal records
 	and uses ignore_permissions=True.
@@ -414,7 +414,7 @@ def check_site_isolation_coverage() -> dict[str, Any]:
 	"""Return gaps between DocTypes that have a `site` field and hook coverage.
 
 	Use via:
-	- bench execute yam_agri_core.yam_agri_core.dev_seed.check_site_isolation_coverage
+	- bench execute yam_agri_core.yam_agri_core.seed.dev_data.check_site_isolation_coverage
 
 	This is a diagnostic helper; it does not change data.
 	"""
@@ -457,7 +457,7 @@ def get_baseline_record_counts() -> dict[str, int]:
 	"""Return record counts for baseline DocTypes.
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.get_baseline_record_counts
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.get_baseline_record_counts
 	"""
 
 	counts: dict[str, int] = {}
@@ -500,7 +500,7 @@ def seed_m4_balanced_samples(confirm: int = 0, target_records: int = 140) -> dic
 	"""Create balanced M4 sample data for QA/QC and season-policy gate testing.
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1, "target_records":140}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_m4_balanced_samples --kwargs '{"confirm":1, "target_records":140}'
 
 	Behavior:
 	- Requires confirm=1.
@@ -760,8 +760,8 @@ def seed_phase4_yemen_dataset(
 	"""Import static Phase 4 Yemeni sample dataset into bench site DocTypes.
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1}'
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1, "limit":250, "dataset_file":"artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json"}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_phase4_yemen_dataset --kwargs '{"confirm":1}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_phase4_yemen_dataset --kwargs '{"confirm":1, "limit":250, "dataset_file":"artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json"}'
 	"""
 
 	if int(confirm) != 1:
@@ -869,8 +869,8 @@ def verify_phase4_yemen_dataset(
 	"""Verify expected vs observed records for imported Phase 4 Yemen dataset.
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset --kwargs '{"limit":250}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset --kwargs '{"limit":250}'
 	"""
 
 	if int(limit) < 1:
@@ -1083,7 +1083,7 @@ def verify_phase4_yemen_dataset_gate(
 	"""Return PASS/FAIL gate result for Phase 4 Yemen dataset import.
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250}'
 	"""
 
 	result = verify_phase4_yemen_dataset(dataset_file=dataset_file, limit=limit)
@@ -1453,7 +1453,7 @@ def generate_phase5_yemen_dataset_contract(
 	"""Generate and write Phase 5 Yemen-context dataset contract JSON.
 
 	Use via:
-	- bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.generate_phase5_yemen_dataset_contract --kwargs '{"confirm":1}'
+	- bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.generate_phase5_yemen_dataset_contract --kwargs '{"confirm":1}'
 	"""
 
 	if int(confirm) != 1:

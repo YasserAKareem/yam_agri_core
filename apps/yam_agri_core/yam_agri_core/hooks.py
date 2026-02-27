@@ -6,10 +6,10 @@ app_publisher = "YAM Agri Co."
 app_description = "YAM Agri Core — cereal supply chain quality and traceability platform"
 app_email = "dev@yam-agri.com"
 app_license = "MIT"
-app_version = "1.1.0-dev"
+app_version = "1.1.0.dev0"
 source_link = "https://github.com/YasserAKareem/yam_agri_core"
 app_logo_url = "/assets/yam_agri_core/images/yam-agri-logo.svg"
-required_apps = ["frappe/erpnext"]
+required_apps = ["erpnext"]
 
 add_to_apps_screen = [
 	{

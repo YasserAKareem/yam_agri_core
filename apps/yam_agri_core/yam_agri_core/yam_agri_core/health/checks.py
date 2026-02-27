@@ -16,7 +16,7 @@ def run_phase2_smoke() -> dict:
 	"""Minimal post-migrate smoke for Phase 2 integration.
 
 	Safe to run via:
-	- bench --site <site> execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke
+	- bench --site <site> execute yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke
 	"""
 
 	checks: dict[str, object] = {
@@ -77,7 +77,7 @@ def get_at10_readiness() -> dict:
 	"""Readiness report for manual AT-10 execution.
 
 	Safe to run via:
-	- bench --site <site> execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness
+	- bench --site <site> execute yam_agri_core.yam_agri_core.health.checks.get_at10_readiness
 	"""
 
 	sites = frappe.get_all("Site", fields=["name"], limit_page_length=500)
@@ -1393,7 +1393,9 @@ def run_at08_automated_check() -> dict:
 
 		if frappe.db.exists("DocType", "Observation Threshold Policy"):
 			policy_name = f"AT08-THR-{site_a[-4:]}"
-			policy = frappe.db.exists("Observation Threshold Policy", {"policy_name": policy_name, "site": site_a})
+			policy = frappe.db.exists(
+				"Observation Threshold Policy", {"policy_name": policy_name, "site": site_a}
+			)
 			if policy:
 				policy_doc = frappe.get_doc("Observation Threshold Policy", policy)
 				policy_doc.observation_type = "temperature"
@@ -1493,7 +1495,9 @@ def run_at08_automated_check() -> dict:
 		except ValueError:
 			quarantine_payload = {}
 
-		evidence["warning_alert_tagged"] = bool((warning_payload.get("threshold_policy") or {}).get("should_alert"))
+		evidence["warning_alert_tagged"] = bool(
+			(warning_payload.get("threshold_policy") or {}).get("should_alert")
+		)
 		evidence["quarantine_alert_tagged"] = bool(
 			(quarantine_payload.get("threshold_policy") or {}).get("should_alert")
 		)

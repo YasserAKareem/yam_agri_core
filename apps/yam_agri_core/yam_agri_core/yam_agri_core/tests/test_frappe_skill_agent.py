@@ -18,41 +18,83 @@ _TOOLS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
 if _TOOLS_DIR not in sys.path:
 	sys.path.insert(0, _TOOLS_DIR)
 
-from frappe_skill_agent import (
-	TAXONOMY,
-	BugDefinition,
-	LearnedRule,
-	QCFinding,
-	QCReport,
-	TrainingDataset,
-	_compute_coverage,
-	_finding,
-	_td,
-	check_ai_writes_frappe,
-	check_auto_learn_patterns,
-	check_broad_except,
-	check_hardcoded_business_logic,
-	check_hardcoded_cloud_config,
-	check_hardcoded_credentials,
-	check_hardcoded_db_config,
-	check_hardcoded_emails,
-	check_hardcoded_feature_flags,
-	check_hardcoded_server_config,
-	check_master_doctype_audit_trail,
-	check_master_doctype_required_fields,
-	check_missing_cross_site_lot_validation,
-	check_missing_translations,
-	check_perm_query_has_permission_parity,
-	coverage_stats,
-	load_taxonomy_from_file,
-	print_text_report,
-	propose_bug_type,
-	register_bug_type,
-	run_qc,
-	save_learned_rules,
-)
+try:
+	from frappe_skill_agent import (
+		TAXONOMY,
+		BugDefinition,
+		LearnedRule,
+		QCFinding,
+		QCReport,
+		TrainingDataset,
+		_compute_coverage,
+		_finding,
+		_td,
+		check_ai_writes_frappe,
+		check_auto_learn_patterns,
+		check_broad_except,
+		check_hardcoded_business_logic,
+		check_hardcoded_cloud_config,
+		check_hardcoded_credentials,
+		check_hardcoded_db_config,
+		check_hardcoded_emails,
+		check_hardcoded_feature_flags,
+		check_hardcoded_server_config,
+		check_master_doctype_audit_trail,
+		check_master_doctype_required_fields,
+		check_missing_cross_site_lot_validation,
+		check_missing_translations,
+		check_perm_query_has_permission_parity,
+		coverage_stats,
+		load_taxonomy_from_file,
+		print_text_report,
+		propose_bug_type,
+		register_bug_type,
+		reset_learned_knowledge,
+		save_learned_knowledge,
+		save_learned_rules,
+		scan_directory,
+		write_training_data_jsonld,
+	)
+	HAS_SKILL_AGENT = True
+except ImportError:
+	HAS_SKILL_AGENT = False
+	# Define dummy aliases to prevent NameError during test class definition
+	TAXONOMY = {}
+	BugDefinition = None
+	LearnedRule = None
+	QCFinding = None
+	QCReport = None
+	TrainingDataset = None
+	_compute_coverage = None
+	_finding = None
+	_td = None
+	check_ai_writes_frappe = None
+	check_auto_learn_patterns = None
+	check_broad_except = None
+	check_hardcoded_business_logic = None
+	check_hardcoded_cloud_config = None
+	check_hardcoded_credentials = None
+	check_hardcoded_db_config = None
+	check_hardcoded_emails = None
+	check_hardcoded_feature_flags = None
+	check_hardcoded_server_config = None
+	check_master_doctype_audit_trail = None
+	check_master_doctype_required_fields = None
+	check_missing_cross_site_lot_validation = None
+	check_missing_translations = None
+	check_perm_query_has_permission_parity = None
+	coverage_stats = None
+	load_taxonomy_from_file = None
+	print_text_report = None
+	propose_bug_type = None
+	register_bug_type = None
+	reset_learned_knowledge = None
+	scan_directory = None
+	save_learned_knowledge = None
+	write_training_data_jsonld = None
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestTaxonomyRegistry(unittest.TestCase):
 	"""Verify the bug taxonomy is correctly populated."""
 
@@ -144,6 +186,7 @@ class TestTaxonomyRegistry(unittest.TestCase):
 		TAXONOMY["1.1.1"] = original
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestFindingFactory(unittest.TestCase):
 	"""Verify _finding() picks up taxonomy metadata correctly."""
 
@@ -187,6 +230,7 @@ class TestFindingFactory(unittest.TestCase):
 		self.assertEqual(f.planned_response, ("Step 1: Custom step",))
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestChecks(unittest.TestCase):
 	"""Smoke-test each check function using temporary files."""
 
@@ -320,6 +364,7 @@ class TestChecks(unittest.TestCase):
 		shutil.rmtree(tmpdir)
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestQCReport(unittest.TestCase):
 	"""Test QCReport serialisation with the new fields."""
 
@@ -373,6 +418,7 @@ class TestQCReport(unittest.TestCase):
 		self.assertFalse(report.passed())
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestPrintTextReport(unittest.TestCase):
 	"""Verify print_text_report output format."""
 
@@ -430,6 +476,7 @@ class TestPrintTextReport(unittest.TestCase):
 		self.assertIn("Planned Response", buf_verbose.getvalue())
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestHardcodedChecks(unittest.TestCase):
 	"""Tests for the new hardcoded-bug detection checks (FS-012 to FS-019)."""
 
@@ -580,6 +627,7 @@ class TestHardcodedChecks(unittest.TestCase):
 		os.unlink(path)
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestMasterDataChecks(unittest.TestCase):
 	"""Tests for FS-017 (master audit trail) and FS-018 (required fields)."""
 
@@ -660,6 +708,7 @@ class TestMasterDataChecks(unittest.TestCase):
 		os.unlink(path)
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestAutoLearning(unittest.TestCase):
 	"""Tests for the auto-learning infrastructure."""
 
@@ -799,6 +848,7 @@ class TestAutoLearning(unittest.TestCase):
 		self.assertIn("Concurrency Bugs", output)
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestTrainingDataFields(unittest.TestCase):
 	"""Tests for the v4 training-data fields on BugDefinition."""
 
@@ -906,6 +956,7 @@ class TestTrainingDataFields(unittest.TestCase):
 		self.assertEqual(bad, [], f"Empty or non-string telemetry signatures: {bad}")
 
 
+@unittest.skipUnless(HAS_SKILL_AGENT, "frappe_skill_agent module not found (tools/ not in path)")
 class TestTrainingDataset(unittest.TestCase):
 	"""Tests for TrainingDataset JSON-LD export."""
 

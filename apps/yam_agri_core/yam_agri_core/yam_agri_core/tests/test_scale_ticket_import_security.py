@@ -67,7 +67,9 @@ def test_close_nonconformance_enforces_site_access(monkeypatch):
 	site_access_called = {"site": ""}
 
 	monkeypatch.setattr(module, "_assert_role_gate", lambda **_kwargs: None)
-	monkeypatch.setattr(module, "assert_site_access", lambda site: site_access_called.__setitem__("site", site))
+	monkeypatch.setattr(
+		module, "assert_site_access", lambda site: site_access_called.__setitem__("site", site)
+	)
 	monkeypatch.setattr(frappe, "get_doc", lambda _doctype, _name: nc_doc)
 
 	result = module.close_nonconformance_with_qa("NC-1")

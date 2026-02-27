@@ -9,7 +9,9 @@ def test_summary_without_site_returns_empty_when_user_has_no_allowed_sites(monke
 	monkeypatch.setattr(module.frappe, "session", SimpleNamespace(user="qa.user@example.com"))
 	monkeypatch.setattr(module, "_has_global_site_access", lambda _user: False)
 	monkeypatch.setattr(module, "get_allowed_sites", lambda user=None: [])
-	monkeypatch.setattr(module.frappe, "get_all", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError()))
+	monkeypatch.setattr(
+		module.frappe, "get_all", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError())
+	)
 
 	result = module.get_observation_executive_summary(site=None, include_quarantine=0, limit=50)
 

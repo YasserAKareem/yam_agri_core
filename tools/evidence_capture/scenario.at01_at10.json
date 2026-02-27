@@ -32,10 +32,10 @@
     { "doctype": "Weather", "limit": 10 }
   ],
   "bench_execute": [
-    "yam_agri_core.yam_agri_core.smoke.run_phase2_smoke",
-    "yam_agri_core.yam_agri_core.smoke.get_at10_readiness",
-    "yam_agri_core.yam_agri_core.smoke.run_at10_automated_check",
-    "yam_agri_core.yam_agri_core.install.get_lot_crop_link_status",
-    "yam_agri_core.yam_agri_core.install.get_site_location_bridge_status"
+    "yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke",
+    "yam_agri_core.yam_agri_core.health.checks.get_at10_readiness",
+    "yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check",
+    "yam_agri_core.yam_agri_core.patches.v1_2.migrate_lot_crop_links.get_lot_crop_link_status",
+    "yam_agri_core.yam_agri_core.patches.v1_2.ensure_schema_and_roles.get_site_location_bridge_status"
   ]
 }
