@@ -2,8 +2,8 @@
 
 > **SDLC Phase:** Release / Closure  
 > **Version:** 1.1  
-> **Status:** ⚠️ Draft — pending acceptance test sign-off  
-> **Date:** 2026-02-23  
+> **Status:** ⚠️ Draft — staging release gate deferred (Phase 8 access dependency)  
+> **Date:** 2026-02-27  
 > **Related:** [Project Charter](01_PROJECT_CHARTER.md) | [Test Plan](07_TEST_PLAN.md)
 
 ---
@@ -134,20 +134,20 @@ The following items were identified during documentation review as gaps in V1.1.
 
 | Test | Description | Dev | Staging |
 |------|-------------|-----|---------|
-| AT-01 | Create Site + StorageBin + Lot | 🔲 | 🔲 |
-| AT-02 | QCTest + Certificate attach | 🔲 | 🔲 |
-| AT-03 | Transfer: split Lot | 🔲 | 🔲 |
-| AT-04 | Trace backward | 🔲 | 🔲 |
-| AT-05 | Trace forward | 🔲 | 🔲 |
-| AT-06 | Block shipment on missing QC/cert | 🔲 | 🔲 |
-| AT-07 | Scale ticket CSV import + mismatch | 🔲 | 🔲 |
-| AT-08 | Sensor Observation quarantine | 🔲 | 🔲 |
-| AT-09 | EvidencePack generation | 🔲 | 🔲 |
-| AT-10 | Site isolation | 🔲 | 🔲 |
+| AT-01 | Create Site + StorageBin + Lot | ✅ | 🔲 |
+| AT-02 | QCTest + Certificate attach | ✅ | 🔲 |
+| AT-03 | Transfer: split Lot | ✅ | 🔲 |
+| AT-04 | Trace backward | ✅ | 🔲 |
+| AT-05 | Trace forward | ✅ | 🔲 |
+| AT-06 | Block shipment on missing QC/cert | ✅ | 🔲 |
+| AT-07 | Scale ticket CSV import + mismatch | ✅ | 🔲 |
+| AT-08 | Sensor Observation quarantine | ✅ | 🔲 |
+| AT-09 | EvidencePack generation | ✅ | 🔲 |
+| AT-10 | Site isolation | ✅ | 🔲 |
 
 **Status legend:** ✅ Passed · ❌ Failed · 🔲 Not yet run
 
-> Update this table as tests are executed.
+Staging status remains pending due unresolved remote access path (`yam-staging.vpn.internal`) from current operator workstation.
 
 ---
 
@@ -197,7 +197,7 @@ None — this is the initial V1.1 release.
 
 | Release | Focus | Status |
 |---------|-------|--------|
-| **V1.1** | Quality + Traceability Core (this release) | 🔲 In progress |
+| **V1.1** | Quality + Traceability Core (this release) | ⚠️ In progress (staging gate deferred) |
 | V1.2 | Storage & Harvest AI layer (stages D, E, F) | 🔲 Planned |
 | V1.3 | Pre-season Planning & Field Ops AI (stages A, B, C) | 🔲 Planned |
 | V2.0 | Logistics, Trading & Processing AI (stages G, H) | 🔲 Future |
@@ -220,3 +220,4 @@ None — this is the initial V1.1 release.
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-02-23 | YasserAKareem | Initial release notes — V1.1 |
+| 1.1 | 2026-02-27 | Codex | Updated dev acceptance status and recorded Phase 8 staging access defer gate |

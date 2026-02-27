@@ -872,3 +872,14 @@ This kickoff section is intentionally de-duplicated.
     - `STAGING_HOST_IP` + optional WG auto-up in `check_staging_access.sh`
 - Remaining external dependency (still required):
     - valid WireGuard peer config and reachable staging endpoint/IP from operator workstation.
+
+### 11.16 Phase 8 Deferred / Phase 9 Provisional Start (2026-02-27)
+
+- Decision: postpone remaining Phase 8 remote operations and continue to next phase.
+- Phase 8 state:
+    - local automation, scripts, and evidence capture path are ready,
+    - remote closure remains blocked on access dependency (VPN/DNS/SSH path).
+- Phase 9 state:
+    - kickoff started in provisional mode,
+    - WBS 9.1 and 9.2 are executable now (release notes + final doc review),
+    - WBS 9.3–9.5 remain blocked until Phase 8 staging acceptance is complete.

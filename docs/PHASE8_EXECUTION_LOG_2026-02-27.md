@@ -233,3 +233,12 @@ Once valid peer config and reachable staging IP are available:
 7. `./apply_manifests.sh`
 8. `MODE=full STAGING_TARGET=ubuntu@yam-staging.vpn.internal STAGING_SITE=yam-staging.vpn.internal ./migrate_dev_to_staging.sh`
 9. `./phase8_acceptance.sh yam-staging.vpn.internal`
+
+## 10) Defer Decision (2026-02-27)
+
+- Owner direction: postpone Phase 8 remote execution for now and continue to next phase.
+- Resulting status:
+  - Phase 8 remains partially complete with local automation/evidence in place.
+  - Remote staging closure steps are deferred until access path (VPN/DNS/SSH) is available.
+- Handover:
+  - Phase 9 provisional execution started with release-prep documentation updates.
