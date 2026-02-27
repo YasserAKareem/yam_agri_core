@@ -8,6 +8,7 @@ Usage: $0 <staging_host> [ssh_user]
 Environment variables:
   DRY_RUN=1                 Print remote commands only (default: 1)
   SSH_PORT=22               SSH port
+  SSH_HOST_OVERRIDE=1.2.3.4 Optional SSH target host/IP override
   VPN_SUBNET=10.88.0.0/24   Allowed VPN subnet for k3s API (6443/tcp)
   SSH_ALLOW=0.0.0.0/0       Allowed source for SSH (set to VPN subnet if desired)
 USAGE
@@ -26,10 +27,12 @@ fi
 STAGING_HOST="$1"
 SSH_USER="${2:-ubuntu}"
 SSH_PORT="${SSH_PORT:-22}"
+SSH_HOST_OVERRIDE="${SSH_HOST_OVERRIDE:-}"
 DRY_RUN="${DRY_RUN:-1}"
 VPN_SUBNET="${VPN_SUBNET:-10.88.0.0/24}"
 SSH_ALLOW="${SSH_ALLOW:-0.0.0.0/0}"
-SSH_TARGET="${SSH_USER}@${STAGING_HOST}"
+SSH_CONNECT_HOST="${SSH_HOST_OVERRIDE:-$STAGING_HOST}"
+SSH_TARGET="${SSH_USER}@${SSH_CONNECT_HOST}"
 
 REMOTE_SCRIPT="$(cat <<SCRIPT
 set -euo pipefail
@@ -50,6 +53,9 @@ SCRIPT
 
 if [[ "$DRY_RUN" == "1" ]]; then
   echo "[DRY-RUN] Would apply k3s API firewall restriction on $SSH_TARGET"
+  if [[ -n "$SSH_HOST_OVERRIDE" ]]; then
+    echo "[DRY-RUN] SSH_HOST_OVERRIDE in use (staging_host=$STAGING_HOST connect_host=$SSH_CONNECT_HOST)"
+  fi
   echo "$REMOTE_SCRIPT"
   exit 0
 fi

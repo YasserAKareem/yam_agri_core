@@ -181,3 +181,55 @@ Evidence summary:
 ### 8.3 Updated operator gating
 
 Runbook now requires `check_staging_access.sh` before any remote mutation steps.
+
+## 9) Blocker remediation patch (workstation VPN/DNS unblock)
+
+### 9.1 Implemented changes
+
+- Added `environments/staging/scripts/unblock_staging_access.sh`:
+  - optional WireGuard install (`WG_AUTO_INSTALL=1`),
+  - optional tunnel bring-up (`WG_AUTO_UP=1 WG_CONFIG=...`),
+  - optional `/etc/hosts` repair (`STAGING_HOST_IP=... UPDATE_HOSTS=1`),
+  - runs access gate and can execute remote sequence after pass (`RUN_SEQUENCE=1`).
+- Added top-level wrappers in `environments/staging/`:
+  - `check_staging_access.sh`
+  - `provision_k3s.sh`
+  - `setup_wireguard.sh`
+  - `restrict_k3s_api.sh`
+  - `apply_manifests.sh`
+  - `migrate_dev_to_staging.sh`
+  - `phase8_acceptance.sh`
+  - `preflight.sh`
+  - `generate-secrets.sh`
+  - `unblock_staging_access.sh`
+- Enhanced connectivity and remote scripts for DNS-less operation:
+  - `check_staging_access.sh`: supports `WG_AUTO_UP`, `WG_CONFIG`, `STAGING_HOST_IP`, `SSH_HOST_OVERRIDE`.
+  - `provision_k3s.sh`, `setup_wireguard.sh`, `restrict_k3s_api.sh`: support `SSH_HOST_OVERRIDE`.
+
+### 9.2 Validation commands and results
+
+1. `bash -n` validation for updated scripts and wrappers:
+   - result: pass.
+2. `cd environments/staging && ./unblock_staging_access.sh yam-staging.vpn.internal ubuntu`
+   - result: fail (expected) at unresolved DNS without fallback.
+3. `cd environments/staging && STAGING_HOST_IP=10.88.0.1 ./unblock_staging_access.sh yam-staging.vpn.internal ubuntu`
+   - result: DNS blocker bypassed; progressed to SSH stage and failed there (expected while WG tunnel/auth still unavailable).
+
+Evidence logs:
+
+- `artifacts/evidence/phase8/connectivity/unblock_20260227T072842Z.log`
+- `artifacts/evidence/phase8/connectivity/unblock_20260227T072843Z_with_ip.log`
+
+### 9.3 Operational next command set
+
+Once valid peer config and reachable staging IP are available:
+
+1. `cd environments/staging`
+2. `WG_AUTO_UP=1 WG_CONFIG=<peer-config-or-name> STAGING_HOST_IP=<staging_vpn_ip_or_reachable_ip> UPDATE_HOSTS=1 ./unblock_staging_access.sh yam-staging.vpn.internal ubuntu`
+3. `./check_staging_access.sh yam-staging.vpn.internal ubuntu`
+4. `DRY_RUN=0 ./provision_k3s.sh yam-staging.vpn.internal ubuntu`
+5. `DRY_RUN=0 APPLY_REMOTE=1 WG_ENDPOINT=<public_host_or_ip> ./setup_wireguard.sh yam-staging.vpn.internal ubuntu`
+6. `DRY_RUN=0 ./restrict_k3s_api.sh yam-staging.vpn.internal ubuntu`
+7. `./apply_manifests.sh`
+8. `MODE=full STAGING_TARGET=ubuntu@yam-staging.vpn.internal STAGING_SITE=yam-staging.vpn.internal ./migrate_dev_to_staging.sh`
+9. `./phase8_acceptance.sh yam-staging.vpn.internal`

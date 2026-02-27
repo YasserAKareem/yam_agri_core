@@ -861,3 +861,14 @@ This kickoff section is intentionally de-duplicated.
 - Captured blocker evidence:
     - `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`
 - Gate for continuing WBS 8.1.1/8.2.x real execution: WireGuard session + DNS resolution to staging host must be active.
+
+### 11.15 Phase 8 Blocker Remediation (2026-02-27)
+
+- Added workstation unblock automation:
+    - `environments/staging/scripts/unblock_staging_access.sh`
+- Added operator command wrappers in `environments/staging/` to align runbook commands with direct invocation (no `scripts/` prefix required).
+- Hardened remote scripts with DNS-less SSH fallback:
+    - `SSH_HOST_OVERRIDE` support in `provision_k3s.sh`, `setup_wireguard.sh`, `restrict_k3s_api.sh`
+    - `STAGING_HOST_IP` + optional WG auto-up in `check_staging_access.sh`
+- Remaining external dependency (still required):
+    - valid WireGuard peer config and reachable staging endpoint/IP from operator workstation.

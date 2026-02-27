@@ -38,15 +38,17 @@ Start Phase 8 (Staging on k3s) execution against WBS 8.1-8.5 and prepare a repea
 
 1. `cd environments/staging`
 2. `cp .env.example .env` and fill strong credentials.
-3. `./scripts/preflight.sh .env`
-4. `./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml`
-5. `DRY_RUN=1 ./scripts/provision_k3s.sh <staging_host> <ssh_user>`
-6. `DRY_RUN=1 WG_ENDPOINT=<public_host_or_ip> ./scripts/setup_wireguard.sh <staging_host> <ssh_user>`
-7. `DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./scripts/restrict_k3s_api.sh <staging_host> <ssh_user>`
-8. `./scripts/apply_manifests.sh`
-9. `MODE=backup-only ./scripts/migrate_dev_to_staging.sh`
-10. `MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./scripts/migrate_dev_to_staging.sh`
-11. `./scripts/phase8_acceptance.sh <site_name>`
+3. `./preflight.sh .env`
+4. `./generate-secrets.sh .env manifests/secrets.generated.yaml`
+5. `./check_staging_access.sh <staging_host> <ssh_user>`
+6. If blocked on WG/DNS: `WG_AUTO_UP=1 WG_CONFIG=<peer-config-or-name> STAGING_HOST_IP=<staging_vpn_ip_or_reachable_ip> UPDATE_HOSTS=1 ./unblock_staging_access.sh <staging_host> <ssh_user>`
+7. `DRY_RUN=0 ./provision_k3s.sh <staging_host> <ssh_user>`
+8. `DRY_RUN=0 APPLY_REMOTE=1 WG_ENDPOINT=<public_host_or_ip> ./setup_wireguard.sh <staging_host> <ssh_user>`
+9. `DRY_RUN=0 VPN_SUBNET=10.88.0.0/24 ./restrict_k3s_api.sh <staging_host> <ssh_user>`
+10. `./apply_manifests.sh`
+11. `MODE=backup-only ./migrate_dev_to_staging.sh`
+12. `MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./migrate_dev_to_staging.sh`
+13. `./phase8_acceptance.sh <site_name>`
 
 ## 5) Known gaps to close in next execution slice
 
@@ -67,4 +69,11 @@ Start Phase 8 (Staging on k3s) execution against WBS 8.1-8.5 and prepare a repea
   - `yam-staging.vpn.internal` does not resolve.
   - WireGuard tooling/session is not active on this workstation.
 - Blocker evidence: `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`.
-- Next unlock action: establish WireGuard access and confirm DNS resolution, then rerun `scripts/check_staging_access.sh` and continue with real `DRY_RUN=0` operations.
+- Remediation rehearsal evidence:
+  - `artifacts/evidence/phase8/connectivity/unblock_20260227T072842Z.log`
+  - `artifacts/evidence/phase8/connectivity/unblock_20260227T072843Z_with_ip.log`
+- Remediation implemented:
+  - `scripts/unblock_staging_access.sh` (auto install/up WG option + DNS fallback + access gate).
+  - Root-level command wrappers (`environments/staging/*.sh`) for operator command consistency.
+  - `SSH_HOST_OVERRIDE` and `STAGING_HOST_IP` fallback support in remote scripts.
+- Next unlock action: provide valid peer config and reachable staging IP, run `./unblock_staging_access.sh`, then continue real `DRY_RUN=0` operations.

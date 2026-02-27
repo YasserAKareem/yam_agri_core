@@ -7,6 +7,9 @@ Usage: $0 [staging_host] [ssh_user]
 
 Environment variables:
   DRY_RUN=1                        Print actions only (default: 1)
+  SSH_PORT=22                      SSH port for remote apply
+  SSH_HOST_OVERRIDE=1.2.3.4        Optional SSH target host/IP override
+  CONNECT_TIMEOUT=8                SSH connect timeout in seconds
   WG_INTERFACE=wg0                 WireGuard interface name
   WG_SUBNET=10.88.0.0/24           WireGuard subnet
   WG_SERVER_IP=10.88.0.1/24        Server tunnel address
@@ -27,6 +30,9 @@ fi
 STAGING_HOST="${1:-}"
 SSH_USER="${2:-ubuntu}"
 DRY_RUN="${DRY_RUN:-1}"
+SSH_PORT="${SSH_PORT:-22}"
+SSH_HOST_OVERRIDE="${SSH_HOST_OVERRIDE:-}"
+CONNECT_TIMEOUT="${CONNECT_TIMEOUT:-8}"
 WG_INTERFACE="${WG_INTERFACE:-wg0}"
 WG_SUBNET="${WG_SUBNET:-10.88.0.0/24}"
 WG_SERVER_IP="${WG_SERVER_IP:-10.88.0.1/24}"
@@ -43,7 +49,11 @@ if [[ "$DRY_RUN" == "1" ]]; then
   echo "[DRY-RUN] Interface=$WG_INTERFACE Subnet=$WG_SUBNET ServerIP=$WG_SERVER_IP Port=$WG_LISTEN_PORT"
   echo "[DRY-RUN] Peers=$WG_PEERS"
   if [[ "$APPLY_REMOTE" == "1" ]]; then
-    echo "[DRY-RUN] Would install /etc/wireguard/${WG_INTERFACE}.conf on ${SSH_USER}@${STAGING_HOST}"
+    ssh_connect_host="${SSH_HOST_OVERRIDE:-$STAGING_HOST}"
+    echo "[DRY-RUN] Would install /etc/wireguard/${WG_INTERFACE}.conf on ${SSH_USER}@${ssh_connect_host}:${SSH_PORT}"
+    if [[ -n "$SSH_HOST_OVERRIDE" ]]; then
+      echo "[DRY-RUN] SSH_HOST_OVERRIDE in use (staging_host=$STAGING_HOST connect_host=$ssh_connect_host)"
+    fi
   fi
   exit 0
 fi
@@ -115,8 +125,9 @@ if [[ "$APPLY_REMOTE" == "1" ]]; then
     exit 1
   fi
 
-  ssh_target="${SSH_USER}@${STAGING_HOST}"
-  scp "$server_conf" "$ssh_target:/tmp/${WG_INTERFACE}.conf"
-  ssh "$ssh_target" "sudo mkdir -p /etc/wireguard && sudo mv /tmp/${WG_INTERFACE}.conf /etc/wireguard/${WG_INTERFACE}.conf && sudo chmod 600 /etc/wireguard/${WG_INTERFACE}.conf && sudo systemctl enable --now wg-quick@${WG_INTERFACE} && sudo wg show ${WG_INTERFACE}"
+  ssh_connect_host="${SSH_HOST_OVERRIDE:-$STAGING_HOST}"
+  ssh_target="${SSH_USER}@${ssh_connect_host}"
+  scp -P "$SSH_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout="$CONNECT_TIMEOUT" "$server_conf" "$ssh_target:/tmp/${WG_INTERFACE}.conf"
+  ssh -p "$SSH_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout="$CONNECT_TIMEOUT" "$ssh_target" "sudo mkdir -p /etc/wireguard && sudo mv /tmp/${WG_INTERFACE}.conf /etc/wireguard/${WG_INTERFACE}.conf && sudo chmod 600 /etc/wireguard/${WG_INTERFACE}.conf && sudo systemctl enable --now wg-quick@${WG_INTERFACE} && sudo wg show ${WG_INTERFACE}"
   echo "[OK] Applied WireGuard server config on $ssh_target"
 fi

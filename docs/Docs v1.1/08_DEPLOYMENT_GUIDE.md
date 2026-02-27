@@ -184,13 +184,18 @@ bench --site ${SITE_NAME} import-fixtures --app yam_agri_core
 
 ```bash
 # Pre-check VPN/DNS/SSH reachability
-./scripts/check_staging_access.sh <staging_host> <ssh_user>
+./check_staging_access.sh <staging_host> <ssh_user>
+
+# If workstation has no active WG/DNS path, run unblock helper first
+WG_AUTO_UP=1 WG_CONFIG=<peer-config-or-name> \
+STAGING_HOST_IP=<staging_vpn_ip_or_reachable_ip> UPDATE_HOSTS=1 \
+./unblock_staging_access.sh <staging_host> <ssh_user>
 
 # From operator workstation (safe dry-run first)
-DRY_RUN=1 ./scripts/provision_k3s.sh <staging_host> <ssh_user>
+DRY_RUN=1 ./provision_k3s.sh <staging_host> <ssh_user>
 
 # Execute for real
-DRY_RUN=0 ./scripts/provision_k3s.sh <staging_host> <ssh_user>
+DRY_RUN=0 ./provision_k3s.sh <staging_host> <ssh_user>
 ```
 
 ### 5.2 Deploy Frappe Stack
@@ -205,18 +210,23 @@ cp .env.example .env
 # Set all passwords and secrets for staging (different from dev!)
 
 # WireGuard + k3s API restriction (dry-run then apply)
-DRY_RUN=1 WG_ENDPOINT=<public_host_or_ip> ./scripts/setup_wireguard.sh <staging_host> <ssh_user>
-DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./scripts/restrict_k3s_api.sh <staging_host> <ssh_user>
+DRY_RUN=1 WG_ENDPOINT=<public_host_or_ip> ./setup_wireguard.sh <staging_host> <ssh_user>
+DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./restrict_k3s_api.sh <staging_host> <ssh_user>
+
+# Optional fallback when DNS is not yet available on workstation
+SSH_HOST_OVERRIDE=<reachable_ip_or_host> DRY_RUN=0 ./provision_k3s.sh <staging_host> <ssh_user>
+SSH_HOST_OVERRIDE=<reachable_ip_or_host> DRY_RUN=0 APPLY_REMOTE=1 WG_ENDPOINT=<public_host_or_ip> ./setup_wireguard.sh <staging_host> <ssh_user>
+SSH_HOST_OVERRIDE=<reachable_ip_or_host> DRY_RUN=0 VPN_SUBNET=10.88.0.0/24 ./restrict_k3s_api.sh <staging_host> <ssh_user>
 
 # Validate tooling and required variables
-./scripts/preflight.sh .env
+./preflight.sh .env
 
 # Generate secrets manifest from .env (do not commit generated file)
-./scripts/generate-secrets.sh .env manifests/secrets.generated.yaml
+./generate-secrets.sh .env manifests/secrets.generated.yaml
 
 # Apply k8s manifests
-DRY_RUN_MODE=render ./scripts/apply_manifests.sh
-./scripts/apply_manifests.sh
+DRY_RUN_MODE=render ./apply_manifests.sh
+./apply_manifests.sh
 
 # Wait for pods to be ready
 kubectl get pods -n yam-agri-staging -w
@@ -226,10 +236,10 @@ kubectl get pods -n yam-agri-staging -w
 
 ```bash
 # Create backup evidence from dev
-MODE=backup-only ./scripts/migrate_dev_to_staging.sh
+MODE=backup-only ./migrate_dev_to_staging.sh
 
 # Full restore on staging
-MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./scripts/migrate_dev_to_staging.sh
+MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./migrate_dev_to_staging.sh
 ```
 
 ### 5.4 Staging Acceptance
@@ -237,7 +247,7 @@ MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./scripts/migra
 Run all 10 acceptance tests (Section 4 of [07_TEST_PLAN.md](07_TEST_PLAN.md)) on staging before signing off.
 
 ```bash
-./scripts/phase8_acceptance.sh localhost
+./phase8_acceptance.sh localhost
 ```
 
 ---
