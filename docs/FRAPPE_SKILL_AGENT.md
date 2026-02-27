@@ -1,7 +1,7 @@
 # Frappe Skill Agent — Developer Guide
 
-> **Version:** v4 · **File:** `tools/frappe_skill_agent.py`  
-> **Maintained by:** YAM Agri Core team  
+> **Version:** v4 · **File:** `tools/frappe_skill_agent.py`
+> **Maintained by:** YAM Agri Core team
 > **Last updated:** 2026-02-24
 
 ---
@@ -78,6 +78,12 @@ python tools/frappe_skill_agent.py --save-learned proposals.json
 
 # Load previously reviewed rules into the taxonomy
 python tools/frappe_skill_agent.py --load-taxonomy approved.json
+
+# Server-side only scan (Python + hooks)
+python tools/frappe_skill_agent.py --scope server
+
+# Append a dated daily findings list (recommended for daily server review)
+python tools/frappe_skill_agent.py --scope server --daily-list artifacts/evidence/qc_daily/server_qc_daily.md
 ```
 
 **Exit codes:** `0` = passed (no critical/high findings); `1` = failed; `2` = configuration error.
@@ -155,19 +161,23 @@ Each check function receives the file path, the `QCReport` to append to, and
 
 ```
 usage: frappe_skill_agent.py [--app-path PATH] [--format {text,json}]
+                              [--scope {all,server,client}]
                               [--verbose]
                               [--save-learned PATH] [--load-taxonomy PATH]
                               [--export-training-data PATH]
+                              [--daily-list PATH]
 ```
 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--app-path PATH` | auto-detected | Root of the inner Frappe Python package to scan |
 | `--format {text,json}` | `text` | Output format. `json` emits a single JSON document to stdout |
+| `--scope {all,server,client}` | `all` | Scan all checks, server-side checks only (Python/hooks), or client-side checks only (JS/DocType JSON) |
 | `--verbose` | off | Show remediation steps + buggy/fixed code for **every** finding (default: only critical/high) |
 | `--save-learned PATH` | — | Write auto-learned rule proposals to `PATH` as JSON |
 | `--load-taxonomy PATH` | — | Load additional `BugDefinition` entries from `PATH` and add them to the registry before scanning |
 | `--export-training-data PATH` | — | Serialise the full taxonomy as a JSON-LD training dataset to `PATH` |
+| `--daily-list PATH` | — | Append a dated markdown findings list to `PATH` for once-daily tracking |
 
 ### Text report anatomy
 

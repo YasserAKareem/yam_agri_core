@@ -3,6 +3,7 @@
   "name": "QCTest",
   "module": "YAM Agri Core",
   "custom": 1,
+  "track_changes": 1,
   "autoname": "naming_series:",
   "title_field": "test_type",
   "fields": [
@@ -14,7 +15,7 @@
       "default": "YAM-QCT-.YYYY.-"
     },
     {"fieldname": "lot", "fieldtype": "Link", "options": "Lot", "label": "Lot"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "test_type", "fieldtype": "Data", "label": "Test Type"},
     {"fieldname": "test_date", "fieldtype": "Date", "label": "Test Date"},
     {"fieldname": "result_value", "fieldtype": "Float", "label": "Result Value"},

@@ -5,6 +5,7 @@
   "custom": 1,
   "autoname": "naming_series:",
   "title_field": "title",
+  "track_changes": 1,
   "fields": [
     {
       "fieldname": "naming_series",
@@ -14,7 +15,7 @@
       "default": "YAM-EP-.YYYY.-"
     },
     {"fieldname": "title", "fieldtype": "Data", "label": "Title"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "from_date", "fieldtype": "Date", "label": "From Date"},
     {"fieldname": "to_date", "fieldtype": "Date", "label": "To Date"},
     {

@@ -70,8 +70,11 @@ bash infra/docker/run.sh init
 pip install pre-commit
 pre-commit install
 
-# Run tests
-cd apps/yam_agri_core && python -m pytest tests/ -v
+# Run pure-Python tests (fast, no DB)
+cd apps/yam_agri_core && python -m pytest yam_agri_core/yam_agri_core/tests/ -v
+
+# Run Frappe integration tests (requires Docker stack)
+bash infra/docker/run.sh bench --site localhost run-tests --app yam_agri_core
 
 # Lint
 cd apps/yam_agri_core && ruff check .

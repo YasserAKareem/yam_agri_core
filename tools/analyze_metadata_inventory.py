@@ -15,10 +15,9 @@ import argparse
 import csv
 import os
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable
-
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -113,6 +112,7 @@ def _find_latest_snapshot_dir(base_dir: str) -> str:
 
 def _snapshot_paths(export_dir: str) -> SnapshotPaths:
 	export_dir = os.path.abspath(export_dir)
+
 	def p(name: str) -> str:
 		return os.path.join(export_dir, name)
 
@@ -168,6 +168,39 @@ def generate_inventory_summary(export_dir: str) -> str:
 	paths = _snapshot_paths(export_dir)
 	doctypes = _read_csv(paths.doctypes_csv)
 	fields = _read_csv(paths.docfields_csv)
+	# look for classification columns in raw doctypes (they may have been
+	# added by tooling such as generate_master_data_workbook)
+	stage_missing = [d.get("name") for d in doctypes if not d.get("Supply_Chain_Stage")]
+	proc_missing = [d.get("name") for d in doctypes if not d.get("E2E_Process")]
+	if stage_missing or proc_missing:
+		print()
+		print("== Classification completeness check ==")
+		if stage_missing:
+			print(
+				f"DocTypes missing Supply_Chain_Stage ({len(stage_missing)}): {stage_missing[:10]}{'...' if len(stage_missing) > 10 else ''}"
+			)
+		if proc_missing:
+			print(
+				f"DocTypes missing E2E_Process ({len(proc_missing)}): {proc_missing[:10]}{'...' if len(proc_missing) > 10 else ''}"
+			)
+		print()
+	# also inspect generated master workbook if present
+	master_path = os.path.join(REPO_ROOT, "master_data_export", "master.csv")
+	if os.path.exists(master_path):
+		master_rows = _read_csv(master_path)
+		blk_stage = [r for r in master_rows if not r.get("Supply_Chain_Stage")]
+		blk_proc = [r for r in master_rows if not r.get("E2E_Process")]
+		if blk_stage or blk_proc:
+			print("== Generated master.csv classification issues ==")
+			if blk_stage:
+				print(
+					f"{len(blk_stage)} rows in master.csv have empty Supply_Chain_Stage (example: {blk_stage[0].get('DocType')})"
+				)
+			if blk_proc:
+				print(
+					f"{len(blk_proc)} rows in master.csv have empty E2E_Process (example: {blk_proc[0].get('DocType')})"
+				)
+			print()
 
 	doctype_names = {d.get("name", "").strip() for d in doctypes if d.get("name")}
 
@@ -209,6 +242,18 @@ def generate_inventory_summary(export_dir: str) -> str:
 	workflow_transitions_count = 0
 	if paths.workflow_transitions_csv:
 		workflow_transitions_count = sum(1 for _ in _read_csv(paths.workflow_transitions_csv))
+	# if the master export workbook exists, compute stage distribution
+	master_path = os.path.join(REPO_ROOT, "master_data_export", "master.csv")
+	if os.path.exists(master_path):
+		try:
+			with open(master_path, newline="", encoding="utf-8") as f:
+				reader = csv.DictReader(f)
+				stage_counts = Counter(r.get("Supply_Chain_Stage", "") for r in reader)
+			print("\nSupply-chain stage distribution in master.csv:")
+			for stage, cnt in stage_counts.items():
+				print(f"  {stage!r}: {cnt}")
+		except Exception as e:
+			print(f"failed to read master.csv for stage breakdown: {e}")
 
 	present = [d for d in EXPECTED_DOMAIN_DOCTYPES if d in doctype_names]
 	missing = [d for d in EXPECTED_DOMAIN_DOCTYPES if d not in doctype_names]
@@ -236,7 +281,7 @@ def generate_inventory_summary(export_dir: str) -> str:
 		return ", ".join(items) if items else "(none)"
 
 	lines: list[str] = []
-	lines.append(f"# Metadata Inventory Summary")
+	lines.append("# Metadata Inventory Summary")
 	lines.append("")
 	lines.append(f"Snapshot: `{os.path.relpath(paths.export_dir, REPO_ROOT).replace(os.sep, '/')}`")
 	lines.append(f"Generated: `{datetime.now().isoformat(timespec='seconds')}`")
@@ -244,11 +289,17 @@ def generate_inventory_summary(export_dir: str) -> str:
 
 	lines.append("## Counts")
 	lines.append("")
-	lines.append(f"- DocTypes: **{len(doctypes)}** (non-table: {len(non_table_doctypes)}, child tables: {len(child_tables)}, singles: {len(singles)}, submittable: {len(submittables)})")
-	lines.append(f"- DocFields: **{len(fields)}** (value-carrying: {len(value_fields)}, layout/no-value: {len(fields) - len(value_fields)})")
+	lines.append(
+		f"- DocTypes: **{len(doctypes)}** (non-table: {len(non_table_doctypes)}, child tables: {len(child_tables)}, singles: {len(singles)}, submittable: {len(submittables)})"
+	)
+	lines.append(
+		f"- DocFields: **{len(fields)}** (value-carrying: {len(value_fields)}, layout/no-value: {len(fields) - len(value_fields)})"
+	)
 	lines.append(f"- Custom DocTypes: **{len(custom_doctypes)}**")
 	if custom_fields_count or property_setters_count:
-		lines.append(f"- Customizations: Custom Fields **{custom_fields_count}**, Property Setters **{property_setters_count}**")
+		lines.append(
+			f"- Customizations: Custom Fields **{custom_fields_count}**, Property Setters **{property_setters_count}**"
+		)
 	if workspaces_count or workspace_links_count:
 		lines.append(f"- Workspaces: **{workspaces_count}** (workspace links: {workspace_links_count})")
 	if reports_count:

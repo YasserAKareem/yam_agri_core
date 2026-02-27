@@ -6,10 +6,10 @@ app_publisher = "YAM Agri Co."
 app_description = "YAM Agri Core — cereal supply chain quality and traceability platform"
 app_email = "dev@yam-agri.com"
 app_license = "MIT"
-app_version = "1.1.0-dev"
+app_version = "1.1.0.dev0"
 source_link = "https://github.com/YasserAKareem/yam_agri_core"
 app_logo_url = "/assets/yam_agri_core/images/yam-agri-logo.svg"
-required_apps = ["frappe/erpnext"]
+required_apps = ["erpnext"]
 
 add_to_apps_screen = [
 	{
@@ -52,12 +52,14 @@ permission_query_conditions = {
 	"Nonconformance": "yam_agri_core.yam_agri_core.site_permissions.nonconformance_query_conditions",
 	"Device": "yam_agri_core.yam_agri_core.site_permissions.device_query_conditions",
 	"Observation": "yam_agri_core.yam_agri_core.site_permissions.observation_query_conditions",
+	"Observation Threshold Policy": "yam_agri_core.yam_agri_core.site_permissions.observation_threshold_policy_query_conditions",
 	"ScaleTicket": "yam_agri_core.yam_agri_core.site_permissions.scale_ticket_query_conditions",
 	"Transfer": "yam_agri_core.yam_agri_core.site_permissions.transfer_query_conditions",
 	"StorageBin": "yam_agri_core.yam_agri_core.site_permissions.storage_bin_query_conditions",
 	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_query_conditions",
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_query_conditions",
 	"Season Policy": "yam_agri_core.yam_agri_core.site_permissions.season_policy_query_conditions",
+	"Site Tolerance Policy": "yam_agri_core.yam_agri_core.site_permissions.site_tolerance_policy_query_conditions",
 	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_query_conditions",
 	"YAM Soil Test": "yam_agri_core.yam_agri_core.site_permissions.yam_soil_test_query_conditions",
 	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_query_conditions",
@@ -77,12 +79,14 @@ has_permission = {
 	"Nonconformance": "yam_agri_core.yam_agri_core.site_permissions.nonconformance_has_permission",
 	"Device": "yam_agri_core.yam_agri_core.site_permissions.device_has_permission",
 	"Observation": "yam_agri_core.yam_agri_core.site_permissions.observation_has_permission",
+	"Observation Threshold Policy": "yam_agri_core.yam_agri_core.site_permissions.observation_threshold_policy_has_permission",
 	"ScaleTicket": "yam_agri_core.yam_agri_core.site_permissions.scale_ticket_has_permission",
 	"Transfer": "yam_agri_core.yam_agri_core.site_permissions.transfer_has_permission",
 	"StorageBin": "yam_agri_core.yam_agri_core.site_permissions.storage_bin_has_permission",
 	"EvidencePack": "yam_agri_core.yam_agri_core.site_permissions.evidence_pack_has_permission",
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_has_permission",
 	"Season Policy": "yam_agri_core.yam_agri_core.site_permissions.season_policy_has_permission",
+	"Site Tolerance Policy": "yam_agri_core.yam_agri_core.site_permissions.site_tolerance_policy_has_permission",
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
@@ -104,10 +108,12 @@ global_search_doctypes = {
 		{"doctype": "Transfer", "index": 5},
 		{"doctype": "ScaleTicket", "index": 6},
 		{"doctype": "Observation", "index": 7},
+		{"doctype": "Observation Threshold Policy", "index": 8},
 		{"doctype": "Nonconformance", "index": 8},
 		{"doctype": "EvidencePack", "index": 9},
 		{"doctype": "Complaint", "index": 10},
 		{"doctype": "Season Policy", "index": 11},
+		{"doctype": "Site Tolerance Policy", "index": 12},
 	],
 }
 
@@ -118,5 +124,8 @@ doc_events = {
 	},
 	"Certificate": {
 		"validate": "yam_agri_core.yam_agri_core.site_permissions.enforce_certificate_site_consistency",
+	},
+	"Observation": {
+		"validate": "yam_agri_core.yam_agri_core.doctype.observation.observation.enforce_observation_validate",
 	},
 }

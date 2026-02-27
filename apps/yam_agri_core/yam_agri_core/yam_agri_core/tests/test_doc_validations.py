@@ -1,62 +1,110 @@
-import pytest
-
 import frappe
+from frappe.tests.utils import FrappeTestCase
+from frappe.utils import add_days, nowdate
+
+from yam_agri_core.yam_agri_core.doctype.lot.lot import check_certificates_for_dispatch
+from yam_agri_core.yam_agri_core.doctype.qc_test.qc_test import QCTest
+from yam_agri_core.yam_agri_core.site_permissions import enforce_qc_test_site_consistency
 
 
-def test_check_certificates_for_dispatch_raises_on_expired(monkeypatch):
-	# simulate a certificate that's expired
-	monkeypatch.setattr(frappe, "get_all", lambda *a, **k: [{"name": "CERT-1", "expiry_date": "2020-01-01"}])
-	monkeypatch.setattr(
-		frappe, "throw", lambda msg, exc=None: (_ for _ in ()).throw(exc(msg) if exc else Exception(msg))
-	)
+class TestDocValidations(FrappeTestCase):
+	def setUp(self):
+		super().setUp()
+		self.addCleanup(frappe.set_user, "Administrator")
 
-	from yam_agri_core.yam_agri_core.doctype.lot.lot import check_certificates_for_dispatch
+	def test_check_certificates_for_dispatch_raises_on_expired(self):
+		site_doc = frappe.get_doc({"doctype": "Site", "site_name": "Test Site Checks"}).insert(ignore_permissions=True)
+		site = site_doc.name
 
-	with pytest.raises(frappe.ValidationError):
-		check_certificates_for_dispatch("LOT-1", "For Dispatch")
+		lot_doc = frappe.get_doc({
+			"doctype": "Lot",
+			"lot_number": "LOT-EXP-1",
+			"site": site,
+			"qty_kg": 100
+		}).insert(ignore_permissions=True)
+		lot_name = lot_doc.name
 
+		# Create expired certificate
+		frappe.get_doc({
+			"doctype": "Certificate",
+			"cert_type": "Organic",
+			"site": site,
+			"expiry_date": "2020-01-01",
+			"lot": lot_name
+		}).insert(ignore_permissions=True)
 
-def test_qc_test_freshness(monkeypatch):
-	from yam_agri_core.yam_agri_core.doctype.qc_test.qc_test import QCTest
+		with self.assertRaises(frappe.ValidationError):
+			check_certificates_for_dispatch(lot_name, "For Dispatch")
 
-	doc = QCTest()
-	# no date -> not fresh
-	assert doc.days_since_test() is None
+	def test_qc_test_freshness(self):
+		doc = frappe.new_doc("QCTest")
+		if not hasattr(doc, "days_since_test"):
+			doc.days_since_test = QCTest.days_since_test.__get__(doc, type(doc))
+			doc.is_fresh_for_season = QCTest.is_fresh_for_season.__get__(doc, type(doc))
 
-	# monkeypatch utils.getdate/nowdate to simulate dates
-	class utils:
-		@staticmethod
-		def getdate(x):
-			from datetime import date
+		self.assertIsNone(doc.days_since_test())
 
-			if x == "2026-02-15":
-				return date(2026, 2, 15)
-			return date(2026, 2, 22)
+		doc.test_date = add_days(nowdate(), -7)
+		self.assertEqual(doc.days_since_test(), 7)
+		self.assertTrue(doc.is_fresh_for_season(7))
+		self.assertFalse(doc.is_fresh_for_season(6))
 
-	monkeypatch.setattr("yam_agri_core.yam_agri_core.doctype.qc_test.qc_test.utils", utils)
+	def test_only_qa_manager_can_accept_lot(self):
+		site_doc = frappe.get_doc({"doctype": "Site", "site_name": "Test Site Perms"}).insert(ignore_permissions=True)
+		site = site_doc.name
 
-	doc.test_date = "2026-02-15"
-	assert doc.days_since_test() == 7
-	assert doc.is_fresh_for_season(7)
+		lot = frappe.get_doc({
+			"doctype": "Lot",
+			"lot_number": "LOT-PERMS-1",
+			"site": site,
+			"qty_kg": 100,
+			"status": "Draft"
+		}).insert(ignore_permissions=True)
 
+		user = "test_no_qa@example.com"
+		if not frappe.db.exists("User", user):
+			user_doc = frappe.new_doc("User")
+			user_doc.email = user
+			user_doc.first_name = "Test No QA"
+			user_doc.save(ignore_permissions=True)
 
-def test_only_qa_manager_can_accept_lot(monkeypatch):
-	from yam_agri_core.yam_agri_core.doctype.lot.lot import Lot
+		frappe.set_user(user)
 
-	# simulate old status = Draft in DB
-	class DB:
-		@staticmethod
-		def get_value(doctype, name, field):
-			return "Draft"
+		lot.status = "Accepted"
+		with self.assertRaises(frappe.PermissionError):
+			lot.save()
 
-	monkeypatch.setattr("frappe.db", DB)
-	# simulate user does NOT have QA Manager role
-	monkeypatch.setattr("frappe.has_role", lambda role: False)
+	def test_enforce_qc_site_consistency_blocks_cross_site(self):
+		site_a_doc = frappe.get_doc({"doctype": "Site", "site_name": "Site A"}).insert(ignore_permissions=True)
+		site_a = site_a_doc.name
 
-	lot = Lot()
-	lot.name = "LOT-1"
-	lot.site = "Site-1"
-	lot.status = "Accepted"
+		site_b_doc = frappe.get_doc({"doctype": "Site", "site_name": "Site B"}).insert(ignore_permissions=True)
+		site_b = site_b_doc.name
 
-	with pytest.raises(frappe.PermissionError):
-		lot.validate()
+		lot_doc = frappe.get_doc({
+			"doctype": "Lot",
+			"lot_number": "LOT-SITE-A",
+			"site": site_a,
+			"qty_kg": 100
+		}).insert(ignore_permissions=True)
+		lot_name = lot_doc.name
+
+		doc_dict = {"lot": lot_name, "site": site_b}
+
+		with self.assertRaises(frappe.ValidationError):
+			enforce_qc_test_site_consistency(doc_dict)
+
+	def test_enforce_qc_site_consistency_allows_same_site(self):
+		site_a_doc = frappe.get_doc({"doctype": "Site", "site_name": "Site A"}).insert(ignore_permissions=True)
+		site_a = site_a_doc.name
+
+		lot_doc = frappe.get_doc({
+			"doctype": "Lot",
+			"lot_number": "LOT-SITE-A-OK",
+			"site": site_a,
+			"qty_kg": 100
+		}).insert(ignore_permissions=True)
+		lot_name = lot_doc.name
+
+		# Should not raise
+		enforce_qc_test_site_consistency({"lot": lot_name, "site": site_a})

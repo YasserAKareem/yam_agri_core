@@ -3,8 +3,10 @@
   "name": "YAM Crop Variety Recommendation",
   "module": "YAM Agri Core",
   "custom": 1,
+  "title_field": "variety",
+  "track_changes": 1,
   "fields": [
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "season", "fieldtype": "Data", "label": "Season"},
     {"fieldname": "plot", "fieldtype": "Link", "options": "YAM Plot", "label": "Plot"},
     {"fieldname": "crop", "fieldtype": "Link", "options": "Crop", "label": "Crop"},

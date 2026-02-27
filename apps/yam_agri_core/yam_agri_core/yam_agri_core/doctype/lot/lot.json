@@ -3,6 +3,7 @@
   "name": "Lot",
   "module": "YAM Agri Core",
   "custom": 1,
+  "track_changes": 1,
   "autoname": "naming_series:",
   "title_field": "lot_number",
   "fields": [
@@ -14,7 +15,7 @@
       "default": "YAM-LOT-.YYYY.-"
     },
     {"fieldname": "lot_number", "fieldtype": "Data", "label": "Lot Number"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "crop", "fieldtype": "Link", "options": "Crop", "label": "Crop"},
     {"fieldname": "qty_kg", "fieldtype": "Float", "label": "Quantity (kg)", "reqd": 1},
     {"fieldname": "status", "fieldtype": "Select", "options": "Draft\nAccepted\nRejected\nFor Dispatch\nDispatched", "label": "Status", "reqd": 1}

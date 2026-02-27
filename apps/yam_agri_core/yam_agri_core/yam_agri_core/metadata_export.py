@@ -202,7 +202,7 @@ def run(
 	exported["workflows.csv"] = len(workflows)
 
 	# Some tables may not exist in all versions; best-effort export.
-	try:
+	if frappe.db.exists("DocType", "Workflow Document State"):
 		wf_state_fields = [
 			"parent",
 			"state",
@@ -221,10 +221,8 @@ def run(
 		)
 		_write_csv(base / "workflow_states.csv", workflow_states, wf_state_fields)
 		exported["workflow_states.csv"] = len(workflow_states)
-	except Exception:
-		pass
 
-	try:
+	if frappe.db.exists("DocType", "Workflow Transition"):
 		wf_transition_fields = [
 			"parent",
 			"state",
@@ -242,8 +240,6 @@ def run(
 		)
 		_write_csv(base / "workflow_transitions.csv", workflow_transitions, wf_transition_fields)
 		exported["workflow_transitions.csv"] = len(workflow_transitions)
-	except Exception:
-		pass
 
 	if int(include_reports):
 		report_fields = [
@@ -257,12 +253,10 @@ def run(
 			"prepared_report",
 			"modified",
 		]
-		try:
+		if frappe.db.exists("DocType", "Report"):
 			reports = _get_all("Report", fields=report_fields, order_by="report_name asc")
 			_write_csv(base / "reports.csv", reports, report_fields)
 			exported["reports.csv"] = len(reports)
-		except Exception:
-			pass
 
 	if int(include_workspaces):
 		workspace_fields = [
@@ -278,11 +272,11 @@ def run(
 			"icon",
 			"modified",
 		]
-		try:
+		if frappe.db.exists("DocType", "Workspace"):
 			workspaces = _get_all("Workspace", fields=workspace_fields, order_by="sequence_id asc")
 			_write_csv(base / "workspaces.csv", workspaces, workspace_fields)
 			exported["workspaces.csv"] = len(workspaces)
-		except Exception:
+		else:
 			workspaces = []
 
 		link_rows: list[dict[str, Any]] = []

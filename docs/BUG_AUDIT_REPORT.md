@@ -1,8 +1,8 @@
 # YAM Agri Core — Bug Audit Report
 
-**Audit Date:** 2026-02-24  
-**Auditor:** Frappe Skill QC Agent v2 (automated) + manual review  
-**Scope:** Full codebase audit against Frappe best practices and project non-negotiable rules  
+**Audit Date:** 2026-02-24
+**Auditor:** Frappe Skill QC Agent v2 (automated) + manual review
+**Scope:** Full codebase audit against Frappe best practices and project non-negotiable rules
 **Reference:** [Frappe Framework](https://github.com/frappe/frappe), [ERPNext](https://github.com/frappe/erpnext)
 
 > **How to regenerate this report:**
@@ -336,20 +336,51 @@ DB connection failures, permission errors, and logic bugs are hidden and produce
 
 ---
 
+### BUG-009 · `[1.1.1/2.3.3/6.1.4]` DocType JSON compliance gaps (site reqd, track_changes, title_field)
+
+| Attribute | Value |
+|-----------|-------|
+| **Taxonomy** | 1 Functional Bugs · 2 Logical Bugs · 6 UI/UX Bugs |
+| **Rule** | FS-003, FS-005, FS-004, FS-017, FS-018 |
+| **Severity** | Medium / Low |
+| **Status** | ✅ Fixed |
+
+**Files affected:**
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/device/device.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/evidence_pack/evidence_pack.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/nonconformance/nonconformance.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/observation/observation.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/scale_ticket/scale_ticket.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/season_policy/season_policy.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/storage_bin/storage_bin.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/yam_crop_variety/yam_crop_variety.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/yam_crop_variety_recommendation/yam_crop_variety_recommendation.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/yam_plot/yam_plot.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/yam_plot_yield/yam_plot_yield.json`
+- `apps/yam_agri_core/yam_agri_core/yam_agri_core/doctype/yam_soil_test/yam_soil_test.json`
+
+**Fix summary:**
+1. Added `"reqd": 1` on all `site` fields flagged by FS-003
+2. Enabled `"track_changes": 1` on flagged DocTypes (transaction and master)
+3. Added missing `"title_field"` on master DocTypes where required
+4. Added lifecycle `is_active` field for master records flagged by FS-018
+
+---
+
 ## All Bugs by Taxonomy Code (Quick Reference)
 
 | Code | FS Rule | Severity | Description | Status |
 |------|---------|----------|-------------|--------|
-| 1.1.1 | FS-003 | Medium | `site` not `reqd:1` in 14 DocType JSONs | 📋 Planned |
+| 1.1.1 | FS-003 | Medium | `site` not `reqd:1` in DocType JSONs | ✅ Fixed |
 | 1.1.2 | FS-007 | High | `quality_flag` default in `validate()` only | ✅ Fixed |
 | 1.2.5 | FS-006 | Medium | Non-existent app in smoke.py check | 📋 Planned |
-| 2.2.4 | FS-008 | Medium | Broad `except Exception` in `api/agr_cereal_001.py` | 📋 Planned |
-| 2.3.3 | FS-005 | Medium | `track_changes` missing on all transaction DocTypes | 📋 Planned |
+| 2.2.4 | FS-008 | Medium | Broad `except Exception` in utility modules | 📋 Planned |
+| 2.3.3 | FS-005 | Medium | `track_changes` missing on transaction/master DocTypes | ✅ Fixed |
 | 5.2.2 | FS-010 | Critical | AI module calls Frappe write API | ✅ None found |
 | 5.2.3 | FS-011 | Critical | PQC / has_permission out of sync | ✅ None found |
 | 5.2.4 | FS-009 | High | Nonconformance missing lot-site cross-check | ✅ Fixed |
 | 5.3.3 | FS-006 | High | Hardcoded QA user emails in smoke.py | ✅ Fixed |
-| 6.1.4 | FS-004 | Low | Missing `title_field` on 4 DocTypes | 📋 Planned |
+| 6.1.4 | FS-004 | Low | Missing `title_field` on DocTypes | ✅ Fixed |
 | 6.3.1 | FS-001 | Critical | 7 untranslated `frappe.throw()` calls | ✅ Fixed |
 | 8.1.2 | — | Low | `custom: 1` on app-owned `lot.json` | 📋 Planned |
 

@@ -92,7 +92,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Executed Commands:
   - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_lot_crop_link_status`
   - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_site_location_bridge_status`
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke`
 - Key Results:
   - `get_lot_crop_link_status`: `{available: true, total_lots: 22, unresolved_count: 0}`
   - `get_site_location_bridge_status`: `{available: true, total_locations: 0}`
@@ -111,7 +111,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Tester: Copilot (automated readiness audit)
 - Commit SHA: `9288e19`
 - Executed Command:
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.get_at10_readiness`
 - Result: `status=not_ready`
 - Readiness details:
   - `sites.count=1` (need at least 2 sites)
@@ -134,7 +134,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Environment (dev/staging): dev (`localhost` site)
 - Tester: Copilot (automated provisioning + readiness check)
 - Executed Command:
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.get_at10_readiness`
 - Result: `status=ready`
 - Applied setup changes:
   - Created Site B: `v3qdo4nkun` (`site_name=Site B`)
@@ -155,7 +155,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Environment (dev/staging): dev (`localhost` site)
 - Tester: Copilot (automated execution)
 - Executed Command:
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
 - Result: `status=pass`
 - Evidence summary:
   - `qa_manager_a@example.com`
@@ -206,9 +206,9 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Tester: Copilot (automated execution)
 - Commit SHA: `fcdadb6`
 - Executed Commands:
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.get_at10_readiness`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
   - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_lot_crop_link_status`
   - `bench --site localhost execute yam_agri_core.yam_agri_core.install.get_site_location_bridge_status`
 - AT-01: PARTIAL PASS (schema/validation hooks pass; manual transaction evidence still required)
@@ -246,7 +246,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Environment (dev/staging): dev (`localhost` site)
 - Tester: Copilot (automated execution)
 - Executed Command:
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at01_automated_check`
 - Result: `status=pass`
 - Evidence fields captured:
   - `sites.site_a`, `sites.site_b`
@@ -284,7 +284,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - AT-01: PASS
   - Latest validated AT-01 entry in this checklist: **2026-02-24 (AT-01 automated execution)** with `status=pass` and cross-site block evidence.
 - AT-10: PASS (fresh run)
-  - Command: `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+  - Command: `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
   - Result: `{"status":"pass", ...}` with list scoping + direct-read denial checks passing for Site A/Site B users.
 - Smoke / readiness outputs (fresh runs)
   - `run_phase2_smoke`: `status=ok`
@@ -313,10 +313,10 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
     - `enforce_certificate_site_consistency`
   - Updated milestone mapping for closure handoff: `M3=✅ Done`, `M4=⬜ Pending`.
 - Executed commands:
-  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
-  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
-  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
-  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.get_at10_readiness`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
+  - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at01_automated_check`
   - `python tools/refresh_wbs_milestones.py`
   - `python tools/prefill_wbs_categories.py`
   - `python tools/refresh_wbs_rows.py`
@@ -376,7 +376,7 @@ For Phase 4 dispatch-gate acceptance (`AT-02`, `AT-06`), use [docs/PHASE4_AT02_A
 - Tester: Copilot (automated implementation + execution)
 - Seed execution:
   - Command:
-    - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
+    - `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
   - Result:
     - `{"status":"ok","seed_tag":"20260224112009","target_records":140,"core_total":141,"created_records":92}`
 - Acceptance execution:

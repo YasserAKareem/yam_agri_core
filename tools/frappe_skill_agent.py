@@ -51,6 +51,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any
 
 # ---------------------------------------------------------------------------
@@ -205,18 +206,21 @@ def coverage_stats(taxonomy: dict[str, BugDefinition] | None = None) -> dict:
 
 
 # ── 1. Functional Bugs ────────────────────────────────────────────────────
-_td("1.1.1", "Functional Bugs", "Input Handling", "Missing required field validation",
+_td(
+	"1.1.1",
+	"Functional Bugs",
+	"Input Handling",
+	"Missing required field validation",
 	"Required field '{field}' has no server-side or JSON-level validation guard",
-	["Step 1: Add `reqd: 1` to the field definition in the DocType JSON",
-	 "Step 2: Add a Python `validate()` check: if not self.get('{field}'): frappe.throw(_('…'))",
-	 "Step 3: Run `bench migrate` so the DB constraint is updated",
-	 "Step 4: Add a unit test that saves a record without the field and expects ValidationError"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
-	negative_example=(
-		"class Lot(Document):\n"
-		"    def validate(self):\n"
-		"        pass  # no site check"
-	),
+	[
+		"Step 1: Add `reqd: 1` to the field definition in the DocType JSON",
+		"Step 2: Add a Python `validate()` check: if not self.get('{field}'): frappe.throw(_('…'))",
+		"Step 3: Run `bench migrate` so the DB constraint is updated",
+		"Step 4: Add a unit test that saves a record without the field and expects ValidationError",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
+	negative_example=("class Lot(Document):\n    def validate(self):\n        pass  # no site check"),
 	positive_example=(
 		"class Lot(Document):\n"
 		"    def validate(self):\n"
@@ -228,16 +232,23 @@ _td("1.1.1", "Functional Bugs", "Input Handling", "Missing required field valida
 		"IntegrityError: Column 'site' cannot be null",
 	],
 	ast_diff=(
-		"Add Stmt[If(not self.get('site'))] → Stmt[Call[frappe.throw](...)] "
-		"inside FunctionDef[validate]"
-	))
+		"Add Stmt[If(not self.get('site'))] → Stmt[Call[frappe.throw](...)] inside FunctionDef[validate]"
+	),
+)
 
-_td("1.1.2", "Functional Bugs", "Input Handling", "Incorrect default values",
+_td(
+	"1.1.2",
+	"Functional Bugs",
+	"Input Handling",
+	"Incorrect default values",
 	"Field default is set in validate() instead of before_insert(), so it may not persist on programmatic inserts",
-	["Step 1: Move the default assignment from validate() to before_insert()",
-	 "Step 2: Keep a fallback assignment in validate() as defence-in-depth",
-	 "Step 3: Verify with bench run-tests that the field is populated on new records"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
+	[
+		"Step 1: Move the default assignment from validate() to before_insert()",
+		"Step 2: Keep a fallback assignment in validate() as defence-in-depth",
+		"Step 3: Verify with bench run-tests that the field is populated on new records",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
 	negative_example=(
 		"def validate(self):\n"
 		"    if not self.status:\n"
@@ -255,57 +266,68 @@ _td("1.1.2", "Functional Bugs", "Input Handling", "Incorrect default values",
 		"AttributeError: 'NoneType' object has no attribute 'upper' on self.status",
 		"INSERT INTO tabNonconformance ... status=NULL",
 	],
-	ast_diff=(
-		"Move Assign[self.status='Open'] from FunctionDef[validate] "
-		"to new FunctionDef[before_insert]"
-	))
+	ast_diff=("Move Assign[self.status='Open'] from FunctionDef[validate] to new FunctionDef[before_insert]"),
+)
 
-_td("1.1.3", "Functional Bugs", "Input Handling", "Case sensitivity issues",
+_td(
+	"1.1.3",
+	"Functional Bugs",
+	"Input Handling",
+	"Case sensitivity issues",
 	"String comparison uses raw == instead of case-insensitive .lower() / .casefold()",
-	["Step 1: Normalise both sides with .lower() before comparison",
-	 "Step 2: Update any related DB queries to use COLLATE or frappe.db filters",
-	 "Step 3: Add test cases for upper-case and mixed-case inputs"],
-	cwe_id="CWE-178", cwe_name="Improper Handling of Case Sensitivity",
+	[
+		"Step 1: Normalise both sides with .lower() before comparison",
+		"Step 2: Update any related DB queries to use COLLATE or frappe.db filters",
+		"Step 3: Add test cases for upper-case and mixed-case inputs",
+	],
+	cwe_id="CWE-178",
+	cwe_name="Improper Handling of Case Sensitivity",
 	negative_example="if crop_name == 'Wheat':  # fails for 'wheat' or 'WHEAT'",
 	positive_example="if crop_name.lower() == 'wheat':  # case-insensitive",
 	telemetry_signatures=[
 		"Crop 'wheat' not found — check suggests 'Wheat' exists (case mismatch)",
 		"KeyError: 'WHEAT' not in crop registry",
 	],
-	ast_diff=(
-		"Replace Compare[Name == Constant] with "
-		"Compare[Call[.lower](Name) == Constant(.lower())]"
-	))
+	ast_diff=("Replace Compare[Name == Constant] with Compare[Call[.lower](Name) == Constant(.lower())]"),
+)
 
-_td("1.1.4", "Functional Bugs", "Input Handling", "Special character mishandling",
+_td(
+	"1.1.4",
+	"Functional Bugs",
+	"Input Handling",
+	"Special character mishandling",
 	"Field value is used in a context that does not escape special characters",
-	["Step 1: Use frappe.db.escape() for any value inserted into a query string",
-	 "Step 2: Use frappe.utils.sanitize_html() for user-supplied HTML content",
-	 "Step 3: Add test cases with apostrophes, quotes, and angle brackets"],
-	cwe_id="CWE-116", cwe_name="Improper Encoding or Escaping of Output",
-	negative_example=(
-		"# SQL injection risk\n"
-		"frappe.db.sql(f\"SELECT * FROM tabLot WHERE name='{name}'\")"
-	),
-	positive_example=(
-		"# Safe parameterised ORM call\n"
-		"frappe.get_all('Lot', filters={'name': name})"
-	),
+	[
+		"Step 1: Use frappe.db.escape() for any value inserted into a query string",
+		"Step 2: Use frappe.utils.sanitize_html() for user-supplied HTML content",
+		"Step 3: Add test cases with apostrophes, quotes, and angle brackets",
+	],
+	cwe_id="CWE-116",
+	cwe_name="Improper Encoding or Escaping of Output",
+	negative_example=("# SQL injection risk\nfrappe.db.sql(f\"SELECT * FROM tabLot WHERE name='{name}'\")"),
+	positive_example=("# Safe parameterised ORM call\nfrappe.get_all('Lot', filters={'name': name})"),
 	telemetry_signatures=[
 		"ProgrammingError: You have an error in your SQL syntax near '''",
 		"mariadb.OperationalError: Unmatched quotes in query",
 	],
 	ast_diff=(
-		"Replace Call[frappe.db.sql](JoinedStr[f-string]) with "
-		"Call[frappe.get_all](Constant, Dict[filters])"
-	))
+		"Replace Call[frappe.db.sql](JoinedStr[f-string]) with Call[frappe.get_all](Constant, Dict[filters])"
+	),
+)
 
-_td("1.1.5", "Functional Bugs", "Input Handling", "Null/empty input crashes",
+_td(
+	"1.1.5",
+	"Functional Bugs",
+	"Input Handling",
+	"Null/empty input crashes",
 	"Code dereferences a value that may be None/empty without a guard",
-	["Step 1: Add `if not value: return` guard before dereferencing",
-	 "Step 2: Use `(self.get('field') or '').strip()` pattern",
-	 "Step 3: Add a test that saves a record with each nullable field empty"],
-	cwe_id="CWE-476", cwe_name="NULL Pointer Dereference",
+	[
+		"Step 1: Add `if not value: return` guard before dereferencing",
+		"Step 2: Use `(self.get('field') or '').strip()` pattern",
+		"Step 3: Add a test that saves a record with each nullable field empty",
+	],
+	cwe_id="CWE-476",
+	cwe_name="NULL Pointer Dereference",
 	negative_example="return self.site.upper()  # AttributeError if site is None",
 	positive_example="return (self.get('site') or '').upper()",
 	telemetry_signatures=[
@@ -315,17 +337,24 @@ _td("1.1.5", "Functional Bugs", "Input Handling", "Null/empty input crashes",
 	ast_diff=(
 		"Wrap Attribute[.upper()] access in BoolOp[or Constant('')] "
 		"to guard against None: (expr or '').upper()"
-	))
+	),
+)
 
-_td("1.2.5", "Functional Bugs", "Workflow Errors", "Duplicate record creation",
+_td(
+	"1.2.5",
+	"Functional Bugs",
+	"Workflow Errors",
+	"Duplicate record creation",
 	"Record creation path lacks an idempotency check, risking duplicates",
-	["Step 1: Add frappe.db.exists() check before frappe.get_doc().insert()",
-	 "Step 2: Use a unique naming_series or unique constraint on the key field",
-	 "Step 3: Wrap the insert in a try/except frappe.DuplicateEntryError block"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
+	[
+		"Step 1: Add frappe.db.exists() check before frappe.get_doc().insert()",
+		"Step 2: Use a unique naming_series or unique constraint on the key field",
+		"Step 3: Wrap the insert in a try/except frappe.DuplicateEntryError block",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
 	negative_example=(
-		"doc = frappe.get_doc({'doctype': 'Lot', 'lot_number': lot_no})\n"
-		"doc.insert()  # no duplicate check"
+		"doc = frappe.get_doc({'doctype': 'Lot', 'lot_number': lot_no})\ndoc.insert()  # no duplicate check"
 	),
 	positive_example=(
 		"if not frappe.db.exists('Lot', {'lot_number': lot_no}):\n"
@@ -338,61 +367,73 @@ _td("1.2.5", "Functional Bugs", "Workflow Errors", "Duplicate record creation",
 		"UniqueConstraintError: Duplicate entry for lot_number",
 		"IntegrityError: Duplicate entry 'YAM-LOT-2024-00001'",
 	],
-	ast_diff=(
-		"Wrap Call[frappe.get_doc().insert()] in If[Call[frappe.db.exists](...)]"
-	))
+	ast_diff=("Wrap Call[frappe.get_doc().insert()] in If[Call[frappe.db.exists](...)]"),
+)
 
-_td("1.3.1", "Functional Bugs", "Feature Failures", "Search returning no results",
+_td(
+	"1.3.1",
+	"Functional Bugs",
+	"Feature Failures",
+	"Search returning no results",
 	"Global search DocType registration or title_field missing, so records are not indexed",
-	["Step 1: Add the DocType to global_search_doctypes in hooks.py",
-	 "Step 2: Set title_field on the DocType JSON to the most human-readable field",
-	 "Step 3: Run `bench build-search-index` to re-index existing records"],
-	cwe_id="N/A", cwe_name="Not applicable (UX/configuration issue)",
+	[
+		"Step 1: Add the DocType to global_search_doctypes in hooks.py",
+		"Step 2: Set title_field on the DocType JSON to the most human-readable field",
+		"Step 3: Run `bench build-search-index` to re-index existing records",
+	],
+	cwe_id="N/A",
+	cwe_name="Not applicable (UX/configuration issue)",
 	negative_example=(
-		"# hooks.py — Lot is NOT in global_search_doctypes\n"
-		"global_search_doctypes = {'Default': []}"
+		"# hooks.py — Lot is NOT in global_search_doctypes\nglobal_search_doctypes = {'Default': []}"
 	),
 	positive_example=(
-		"# hooks.py\n"
-		"global_search_doctypes = {'Default': [{'doctype': 'Lot'}, {'doctype': 'Site'}]}"
+		"# hooks.py\nglobal_search_doctypes = {'Default': [{'doctype': 'Lot'}, {'doctype': 'Site'}]}"
 	),
 	telemetry_signatures=[
 		"GlobalSearch returned 0 results for existing Lot name",
 		"build-search-index: skipping DocType Lot — no title_field",
 	],
-	ast_diff=(
-		"Extend List[global_search_doctypes['Default']] with Dict{'doctype': 'Lot'}"
-	))
+	ast_diff=("Extend List[global_search_doctypes['Default']] with Dict{'doctype': 'Lot'}"),
+)
 
 # ── 2. Logical Bugs ───────────────────────────────────────────────────────
-_td("2.1.5", "Logical Bugs", "Algorithm Errors", "Faulty recommendation logic",
+_td(
+	"2.1.5",
+	"Logical Bugs",
+	"Algorithm Errors",
+	"Faulty recommendation logic",
 	"Recommendation score or ranking algorithm produces incorrect ordering",
-	["Step 1: Write unit tests with known inputs and expected output rankings",
-	 "Step 2: Review score formula for sign errors or missing factors",
-	 "Step 3: Add a regression test that pins the expected top recommendation"],
-	cwe_id="CWE-682", cwe_name="Incorrect Calculation",
+	[
+		"Step 1: Write unit tests with known inputs and expected output rankings",
+		"Step 2: Review score formula for sign errors or missing factors",
+		"Step 3: Add a regression test that pins the expected top recommendation",
+	],
+	cwe_id="CWE-682",
+	cwe_name="Incorrect Calculation",
 	negative_example=(
-		"# sign error: subtracts bonus instead of adding\n"
-		"score = drought_tolerance - ph_bonus"
+		"# sign error: subtracts bonus instead of adding\nscore = drought_tolerance - ph_bonus"
 	),
-	positive_example=(
-		"score = drought_tolerance + ph_bonus  # correct additive scoring"
-	),
+	positive_example=("score = drought_tolerance + ph_bonus  # correct additive scoring"),
 	telemetry_signatures=[
 		"Top recommendation score is negative for all varieties",
 		"Ranking inverted: worst variety ranked first",
 	],
-	ast_diff=(
-		"Replace BinOp[drought_tolerance Sub ph_bonus] with "
-		"BinOp[drought_tolerance Add ph_bonus]"
-	))
+	ast_diff=("Replace BinOp[drought_tolerance Sub ph_bonus] with BinOp[drought_tolerance Add ph_bonus]"),
+)
 
-_td("2.2.1", "Logical Bugs", "Conditional Logic", "Misplaced if/else",
+_td(
+	"2.2.1",
+	"Logical Bugs",
+	"Conditional Logic",
+	"Misplaced if/else",
 	"An if/else branch is logically inverted or unreachable",
-	["Step 1: Trace the condition with True/False examples on paper",
-	 "Step 2: Add a unit test for each branch",
-	 "Step 3: Refactor to a guard-clause pattern for clarity"],
-	cwe_id="CWE-670", cwe_name="Always-Incorrect Control Flow Implementation",
+	[
+		"Step 1: Trace the condition with True/False examples on paper",
+		"Step 2: Add a unit test for each branch",
+		"Step 3: Refactor to a guard-clause pattern for clarity",
+	],
+	cwe_id="CWE-670",
+	cwe_name="Always-Incorrect Control Flow Implementation",
 	negative_example=(
 		"if self.site:\n"
 		"    pass  # inverted — should throw when site is MISSING\n"
@@ -400,24 +441,28 @@ _td("2.2.1", "Logical Bugs", "Conditional Logic", "Misplaced if/else",
 		"    frappe.throw(_('Site required'))"
 	),
 	positive_example=(
-		"if not self.get('site'):\n"
-		"    frappe.throw(_('Site required'), frappe.ValidationError)"
+		"if not self.get('site'):\n    frappe.throw(_('Site required'), frappe.ValidationError)"
 	),
 	telemetry_signatures=[
 		"Site-less record saved without triggering validation error",
 		"frappe.throw never reached despite missing site field",
 	],
-	ast_diff=(
-		"Invert UnaryOp[not] in If condition: "
-		"If(self.site) → If(not self.get('site'))"
-	))
+	ast_diff=("Invert UnaryOp[not] in If condition: If(self.site) → If(not self.get('site'))"),
+)
 
-_td("2.2.4", "Logical Bugs", "Conditional Logic", "Missing default cases",
+_td(
+	"2.2.4",
+	"Logical Bugs",
+	"Conditional Logic",
+	"Missing default cases",
 	"A broad except clause catches all errors without logging, hiding failures",
-	["Step 1: Replace bare `except Exception: return []` with logged handling",
-	 "Step 2: Add `frappe.log_error(title='…', message=frappe.get_traceback())`",
-	 "Step 3: Narrow the exception type if possible (e.g. frappe.DoesNotExistError)"],
-	cwe_id="CWE-390", cwe_name="Detection of Error Condition Without Action",
+	[
+		"Step 1: Replace bare `except Exception: return []` with logged handling",
+		"Step 2: Add `frappe.log_error(title='…', message=frappe.get_traceback())`",
+		"Step 3: Narrow the exception type if possible (e.g. frappe.DoesNotExistError)",
+	],
+	cwe_id="CWE-390",
+	cwe_name="Detection of Error Condition Without Action",
 	negative_example=(
 		"try:\n"
 		"    return get_recommendations(site)\n"
@@ -440,35 +485,46 @@ _td("2.2.4", "Logical Bugs", "Conditional Logic", "Missing default cases",
 	ast_diff=(
 		"Replace ExceptHandler[Exception, body=[Return([])]] with "
 		"ExceptHandler[Exception, body=[Call[frappe.log_error](...), Return([])]]"
-	))
+	),
+)
 
-_td("2.3.3", "Logical Bugs", "State Management", "Incorrect flag toggling",
+_td(
+	"2.3.3",
+	"Logical Bugs",
+	"State Management",
+	"Incorrect flag toggling",
 	"A boolean flag or DocType field that records state changes is not enabled",
-	["Step 1: Add `track_changes: 1` to the DocType JSON",
-	 "Step 2: Run `bench migrate` to activate change tracking in the DB",
-	 "Step 3: Verify the Version log is populated after editing a record"],
-	cwe_id="CWE-778", cwe_name="Insufficient Logging",
+	[
+		"Step 1: Add `track_changes: 1` to the DocType JSON",
+		"Step 2: Run `bench migrate` to activate change tracking in the DB",
+		"Step 3: Verify the Version log is populated after editing a record",
+	],
+	cwe_id="CWE-778",
+	cwe_name="Insufficient Logging",
 	negative_example='{"name": "Lot", "track_changes": 0}  # no audit trail',
 	positive_example='{"name": "Lot", "track_changes": 1}  # journalled',
 	telemetry_signatures=[
 		"Version log empty after modifying Lot status",
 		"Auditor: no change history for Lot YAM-LOT-2024-00001",
 	],
-	ast_diff=(
-		"In DocType JSON: replace KeyValue[track_changes: 0] with KeyValue[track_changes: 1]"
-	))
+	ast_diff=("In DocType JSON: replace KeyValue[track_changes: 0] with KeyValue[track_changes: 1]"),
+)
 
 # ── 3. Performance Bugs ───────────────────────────────────────────────────
-_td("3.1.3", "Performance Bugs", "Speed Issues", "Excessive API calls",
+_td(
+	"3.1.3",
+	"Performance Bugs",
+	"Speed Issues",
+	"Excessive API calls",
 	"Code makes N+1 DB calls inside a loop instead of a single bulk fetch",
-	["Step 1: Extract the loop body DB call to a single frappe.get_all() before the loop",
-	 "Step 2: Build a lookup dict keyed by record name",
-	 "Step 3: Profile with frappe.utils.perf.get_performance_log() to confirm improvement"],
-	cwe_id="N/A", cwe_name="Not applicable (performance/scalability issue)",
-	negative_example=(
-		"for lot in lots:\n"
-		"    qty = frappe.db.get_value('Lot', lot.name, 'qty_kg')  # N+1"
-	),
+	[
+		"Step 1: Extract the loop body DB call to a single frappe.get_all() before the loop",
+		"Step 2: Build a lookup dict keyed by record name",
+		"Step 3: Profile with frappe.utils.perf.get_performance_log() to confirm improvement",
+	],
+	cwe_id="N/A",
+	cwe_name="Not applicable (performance/scalability issue)",
+	negative_example=("for lot in lots:\n    qty = frappe.db.get_value('Lot', lot.name, 'qty_kg')  # N+1"),
 	positive_example=(
 		"lot_names = [l.name for l in lots]\n"
 		"rows = frappe.get_all('Lot', filters={'name': ['in', lot_names]}, fields=['name', 'qty_kg'])\n"
@@ -483,14 +539,22 @@ _td("3.1.3", "Performance Bugs", "Speed Issues", "Excessive API calls",
 	ast_diff=(
 		"Move Call[frappe.db.get_value] out of For[lot in lots] body "
 		"to a pre-loop Call[frappe.get_all] with Dict comprehension lookup"
-	))
+	),
+)
 
-_td("3.1.4", "Performance Bugs", "Speed Issues", "Unindexed DB queries",
+_td(
+	"3.1.4",
+	"Performance Bugs",
+	"Speed Issues",
+	"Unindexed DB queries",
 	"A frequently-filtered field has no database index defined",
-	["Step 1: Add `search_index: 1` to the field definition in the DocType JSON",
-	 "Step 2: Run `bench migrate` to create the index",
-	 "Step 3: Verify with EXPLAIN SELECT that the index is used"],
-	cwe_id="N/A", cwe_name="Not applicable (performance/DB tuning issue)",
+	[
+		"Step 1: Add `search_index: 1` to the field definition in the DocType JSON",
+		"Step 2: Run `bench migrate` to create the index",
+		"Step 3: Verify with EXPLAIN SELECT that the index is used",
+	],
+	cwe_id="N/A",
+	cwe_name="Not applicable (performance/DB tuning issue)",
 	negative_example='{"fieldname": "site", "fieldtype": "Link", "search_index": 0}',
 	positive_example='{"fieldname": "site", "fieldtype": "Link", "search_index": 1}',
 	telemetry_signatures=[
@@ -498,17 +562,24 @@ _td("3.1.4", "Performance Bugs", "Speed Issues", "Unindexed DB queries",
 		"slow query log: SELECT ... FROM tabLot WHERE site=? took 4.2s",
 	],
 	ast_diff=(
-		"In DocType JSON field definition: "
-		"replace KeyValue[search_index: 0] with KeyValue[search_index: 1]"
-	))
+		"In DocType JSON field definition: replace KeyValue[search_index: 0] with KeyValue[search_index: 1]"
+	),
+)
 
 # ── 4. Compatibility Bugs ─────────────────────────────────────────────────
-_td("4.3.2", "Compatibility Bugs", "Versioning", "Deprecated library usage",
+_td(
+	"4.3.2",
+	"Compatibility Bugs",
+	"Versioning",
+	"Deprecated library usage",
 	"Code uses a Frappe internal API that is deprecated or removed in the target version",
-	["Step 1: Check frappe/CHANGELOG.md for the deprecated API",
-	 "Step 2: Replace with the documented replacement",
-	 "Step 3: Add a CI check that imports the module with the target Frappe version"],
-	cwe_id="CWE-1104", cwe_name="Use of Unmaintained Third Party Components",
+	[
+		"Step 1: Check frappe/CHANGELOG.md for the deprecated API",
+		"Step 2: Replace with the documented replacement",
+		"Step 3: Add a CI check that imports the module with the target Frappe version",
+	],
+	cwe_id="CWE-1104",
+	cwe_name="Use of Unmaintained Third Party Components",
 	negative_example="frappe.call('frappe.client.get', doctype='Lot', name=name)",
 	positive_example="frappe.get_doc('Lot', name)",
 	telemetry_signatures=[
@@ -518,16 +589,24 @@ _td("4.3.2", "Compatibility Bugs", "Versioning", "Deprecated library usage",
 	ast_diff=(
 		"Replace Call[frappe.call](Constant('frappe.client.get'), ...) "
 		"with Call[frappe.get_doc](Constant('Lot'), name)"
-	))
+	),
+)
 
 # ── 5. Security Bugs ──────────────────────────────────────────────────────
-_td("5.1.3", "Security Bugs", "Authentication", "Token leakage",
+_td(
+	"5.1.3",
+	"Security Bugs",
+	"Authentication",
+	"Token leakage",
 	"A secret, token, or credential is hard-coded in source rather than read from config",
-	["Step 1: Remove the credential from source immediately",
-	 "Step 2: Rotate the leaked credential",
-	 "Step 3: Store it in frappe.conf or os.environ; never in .py or .json files",
-	 "Step 4: Add a secret-scan CI step (already in ci.yml)"],
-	cwe_id="CWE-312", cwe_name="Cleartext Storage of Sensitive Information",
+	[
+		"Step 1: Remove the credential from source immediately",
+		"Step 2: Rotate the leaked credential",
+		"Step 3: Store it in frappe.conf or os.environ; never in .py or .json files",
+		"Step 4: Add a secret-scan CI step (already in ci.yml)",
+	],
+	cwe_id="CWE-312",
+	cwe_name="Cleartext Storage of Sensitive Information",
 	negative_example='API_TOKEN = "sk-prod-abc123xyz789"  # committed to git',
 	positive_example=(
 		"API_TOKEN = os.environ.get('API_TOKEN') or frappe.conf.get('api_token')\n"
@@ -541,15 +620,23 @@ _td("5.1.3", "Security Bugs", "Authentication", "Token leakage",
 	ast_diff=(
 		"Replace Assign[Name=Constant(token_string)] with "
 		"Assign[Name=Call[os.environ.get](Constant(env_key))]"
-	))
+	),
+)
 
-_td("5.2.2", "Security Bugs", "Authorization", "Privilege escalation",
+_td(
+	"5.2.2",
+	"Security Bugs",
+	"Authorization",
+	"Privilege escalation",
 	"An AI or background module calls a Frappe write API directly, bypassing authorization",
-	["Step 1: Remove all frappe.get_doc/save/insert/submit calls from the ai/ module",
-	 "Step 2: Move write operations to the api/ wrapper behind @frappe.whitelist()",
-	 "Step 3: Add assert_site_access() in the API wrapper before any write",
-	 "Step 4: Confirm AI module imports do not include `frappe`"],
-	cwe_id="CWE-269", cwe_name="Improper Privilege Management",
+	[
+		"Step 1: Remove all frappe.get_doc/save/insert/submit calls from the ai/ module",
+		"Step 2: Move write operations to the api/ wrapper behind @frappe.whitelist()",
+		"Step 3: Add assert_site_access() in the API wrapper before any write",
+		"Step 4: Confirm AI module imports do not include `frappe`",
+	],
+	cwe_id="CWE-269",
+	cwe_name="Improper Privilege Management",
 	negative_example=(
 		"# ai/agr_cereal_001.py\n"
 		"import frappe\n"
@@ -570,15 +657,23 @@ _td("5.2.2", "Security Bugs", "Authorization", "Privilege escalation",
 	ast_diff=(
 		"Remove Import[frappe] and all Call[frappe.*] nodes from ai/ module; "
 		"replace with pure-Python return Constant(dict)"
-	))
+	),
+)
 
-_td("5.2.3", "Security Bugs", "Authorization", "Broken access control",
+_td(
+	"5.2.3",
+	"Security Bugs",
+	"Authorization",
+	"Broken access control",
 	"A DocType with site isolation is missing permission_query_conditions or has_permission registration",
-	["Step 1: Add the DocType to permission_query_conditions in hooks.py",
-	 "Step 2: Add the DocType to has_permission in hooks.py",
-	 "Step 3: Implement query-condition and has-permission functions in site_permissions.py",
-	 "Step 4: Write an AT-10 style test that confirms cross-site records are not visible"],
-	cwe_id="CWE-862", cwe_name="Missing Authorization",
+	[
+		"Step 1: Add the DocType to permission_query_conditions in hooks.py",
+		"Step 2: Add the DocType to has_permission in hooks.py",
+		"Step 3: Implement query-condition and has-permission functions in site_permissions.py",
+		"Step 4: Write an AT-10 style test that confirms cross-site records are not visible",
+	],
+	cwe_id="CWE-862",
+	cwe_name="Missing Authorization",
 	negative_example=(
 		"# hooks.py — Complaint is in PQC but not has_permission\n"
 		"permission_query_conditions = {'Complaint': '...'}\n"
@@ -592,16 +687,22 @@ _td("5.2.3", "Security Bugs", "Authorization", "Broken access control",
 		"User from Site A fetched Complaint belonging to Site B via direct GET",
 		"has_permission hook not registered for Complaint — bypass possible",
 	],
-	ast_diff=(
-		"Add KeyValue['Complaint': '...'] to Dict[has_permission] in hooks.py"
-	))
+	ast_diff=("Add KeyValue['Complaint': '...'] to Dict[has_permission] in hooks.py"),
+)
 
-_td("5.2.4", "Security Bugs", "Authorization", "Insecure direct object reference (IDOR)",
+_td(
+	"5.2.4",
+	"Security Bugs",
+	"Authorization",
+	"Insecure direct object reference (IDOR)",
 	"A DocType linked to a Lot allows cross-site access because lot.site is not validated",
-	["Step 1: Add lot_site = frappe.db.get_value('Lot', self.lot, 'site') in validate()",
-	 "Step 2: Throw ValidationError if lot_site != self.site",
-	 "Step 3: Add a unit test that attempts to create a cross-site linked record"],
-	cwe_id="CWE-639", cwe_name="Authorization Bypass Through User-Controlled Key",
+	[
+		"Step 1: Add lot_site = frappe.db.get_value('Lot', self.lot, 'site') in validate()",
+		"Step 2: Throw ValidationError if lot_site != self.site",
+		"Step 3: Add a unit test that attempts to create a cross-site linked record",
+	],
+	cwe_id="CWE-639",
+	cwe_name="Authorization Bypass Through User-Controlled Key",
 	negative_example=(
 		"def validate(self):\n"
 		"    # no cross-site lot check\n"
@@ -625,14 +726,22 @@ _td("5.2.4", "Security Bugs", "Authorization", "Insecure direct object reference
 		"Add If[self.get('lot')] block containing "
 		"Assign[lot_site=Call[frappe.db.get_value]] and "
 		"If[lot_site != self.site] → Call[frappe.throw]"
-	))
+	),
+)
 
-_td("5.3.3", "Security Bugs", "Data Protection", "Insecure storage",
+_td(
+	"5.3.3",
+	"Security Bugs",
+	"Data Protection",
+	"Insecure storage",
 	"Sensitive value (email, credential) is hard-coded inline instead of extracted to a constant or config",
-	["Step 1: Extract the value to a named module-level constant (e.g. _USER_A = '…')",
-	 "Step 2: For production secrets use frappe.conf.get() or os.environ.get()",
-	 "Step 3: Review all non-test Python files for remaining inline credentials"],
-	cwe_id="CWE-312", cwe_name="Cleartext Storage of Sensitive Information",
+	[
+		"Step 1: Extract the value to a named module-level constant (e.g. _USER_A = '…')",
+		"Step 2: For production secrets use frappe.conf.get() or os.environ.get()",
+		"Step 3: Review all non-test Python files for remaining inline credentials",
+	],
+	cwe_id="CWE-312",
+	cwe_name="Cleartext Storage of Sensitive Information",
 	negative_example=(
 		"# smoke.py\n"
 		"def run_smoke_test():\n"
@@ -652,16 +761,24 @@ _td("5.3.3", "Security Bugs", "Data Protection", "Insecure storage",
 	ast_diff=(
 		"Replace Constant(email_str) inside Call[login] with Name[_SMOKE_USER]; "
 		"add module-level Assign[_SMOKE_USER=Call[os.environ.get]]"
-	))
+	),
+)
 
 # ── 6. UI/UX Bugs ─────────────────────────────────────────────────────────
-_td("6.3.1", "UI/UX Bugs", "Interaction", "Unclear error messages",
+_td(
+	"6.3.1",
+	"UI/UX Bugs",
+	"Interaction",
+	"Unclear error messages",
 	"A user-facing error string is not wrapped in _() / __() and will not be translated",
-	["Step 1: Add `from frappe import _` to the Python file if missing",
-	 "Step 2: Wrap: frappe.throw(_('message'), ExcType)",
-	 "Step 3: For JavaScript use __('message') in frappe.msgprint / frappe.confirm",
-	 "Step 4: Run `bench update-translations` and verify ar.csv is updated"],
-	cwe_id="CWE-116", cwe_name="Improper Encoding or Escaping of Output",
+	[
+		"Step 1: Add `from frappe import _` to the Python file if missing",
+		"Step 2: Wrap: frappe.throw(_('message'), ExcType)",
+		"Step 3: For JavaScript use __('message') in frappe.msgprint / frappe.confirm",
+		"Step 4: Run `bench update-translations` and verify ar.csv is updated",
+	],
+	cwe_id="CWE-116",
+	cwe_name="Improper Encoding or Escaping of Output",
 	negative_example="frappe.throw('Validation failed — site is required')",
 	positive_example="frappe.throw(_('Validation failed — site is required'), frappe.ValidationError)",
 	telemetry_signatures=[
@@ -671,39 +788,50 @@ _td("6.3.1", "UI/UX Bugs", "Interaction", "Unclear error messages",
 	ast_diff=(
 		"Wrap Constant(str) arg of Call[frappe.throw] in Call[_](Constant(str)); "
 		"add Attr[frappe.ValidationError] as second arg"
-	))
+	),
+)
 
-_td("6.1.4", "UI/UX Bugs", "Layout", "Non-responsive design",
+_td(
+	"6.1.4",
+	"UI/UX Bugs",
+	"Layout",
+	"Non-responsive design",
 	"DocType is missing title_field, making records unidentifiable in link dropdowns",
-	["Step 1: Add `title_field` to the DocType JSON pointing to the best human-readable field",
-	 "Step 2: Run `bench migrate`",
-	 "Step 3: Open a Link field that references this DocType and verify the label is readable"],
-	cwe_id="N/A", cwe_name="Not applicable (UX/discoverability issue)",
+	[
+		"Step 1: Add `title_field` to the DocType JSON pointing to the best human-readable field",
+		"Step 2: Run `bench migrate`",
+		"Step 3: Open a Link field that references this DocType and verify the label is readable",
+	],
+	cwe_id="N/A",
+	cwe_name="Not applicable (UX/discoverability issue)",
 	negative_example='{"name": "Site", "fields": [...]}  # no title_field',
 	positive_example='{"name": "Site", "title_field": "site_name", "fields": [...]}',
 	telemetry_signatures=[
 		"Link dropdown shows 'SITE-001' instead of human-readable site name",
 		"frappe.get_meta: title_field is None for DocType Site",
 	],
-	ast_diff=(
-		"Add KeyValue[title_field: 'site_name'] to top-level Dict in DocType JSON"
-	))
+	ast_diff=("Add KeyValue[title_field: 'site_name'] to top-level Dict in DocType JSON"),
+)
 
 # ── 8. Syntax & Build Bugs ────────────────────────────────────────────────
-_td("8.2.1", "Syntax & Build Bugs", "Runtime", "Null pointer exceptions",
+_td(
+	"8.2.1",
+	"Syntax & Build Bugs",
+	"Runtime",
+	"Null pointer exceptions",
 	"Code calls a method or accesses an attribute on a value that could be None",
-	["Step 1: Add `if not value: return/raise` guard before using the value",
-	 "Step 2: Use `getattr(obj, 'attr', None)` instead of direct attribute access",
-	 "Step 3: Add a unit test that passes None for the nullable argument"],
-	cwe_id="CWE-476", cwe_name="NULL Pointer Dereference",
+	[
+		"Step 1: Add `if not value: return/raise` guard before using the value",
+		"Step 2: Use `getattr(obj, 'attr', None)` instead of direct attribute access",
+		"Step 3: Add a unit test that passes None for the nullable argument",
+	],
+	cwe_id="CWE-476",
+	cwe_name="NULL Pointer Dereference",
 	negative_example=(
 		"site = frappe.db.get_value('Lot', lot_name, 'site')\n"
 		"return site.upper()  # AttributeError if lot not found"
 	),
-	positive_example=(
-		"site = frappe.db.get_value('Lot', lot_name, 'site') or ''\n"
-		"return site.upper()"
-	),
+	positive_example=("site = frappe.db.get_value('Lot', lot_name, 'site') or ''\nreturn site.upper()"),
 	telemetry_signatures=[
 		"AttributeError: 'NoneType' object has no attribute 'upper' in lot.py:84",
 		"500 Internal Server Error: NoneType.upper() in /api/method/check_lot",
@@ -711,15 +839,23 @@ _td("8.2.1", "Syntax & Build Bugs", "Runtime", "Null pointer exceptions",
 	ast_diff=(
 		"Replace Attribute[site.upper()] with "
 		"Attribute[(site or '').upper()] — wrap in BoolOp[or Constant('')]"
-	))
+	),
+)
 
 # ── 10. Regression Bugs ───────────────────────────────────────────────────
-_td("10.1.1", "Regression Bugs", "Feature Breakage", "Login system failure",
+_td(
+	"10.1.1",
+	"Regression Bugs",
+	"Feature Breakage",
+	"Login system failure",
 	"Permission hook is registered for one dict (PQC) but missing from the other (has_permission), risking access regression",
-	["Step 1: Diff permission_query_conditions and has_permission keys in hooks.py",
-	 "Step 2: Add any missing DocType to the hook that lacks it",
-	 "Step 3: Run AT-10 automated check to confirm both hooks fire correctly"],
-	cwe_id="CWE-284", cwe_name="Improper Access Control",
+	[
+		"Step 1: Diff permission_query_conditions and has_permission keys in hooks.py",
+		"Step 2: Add any missing DocType to the hook that lacks it",
+		"Step 3: Run AT-10 automated check to confirm both hooks fire correctly",
+	],
+	cwe_id="CWE-284",
+	cwe_name="Improper Access Control",
 	negative_example=(
 		"permission_query_conditions = {'Lot': '...', 'Transfer': '...'}\n"
 		"has_permission = {'Lot': '...'}  # Transfer missing"
@@ -733,20 +869,27 @@ _td("10.1.1", "Regression Bugs", "Feature Breakage", "Login system failure",
 		"AT-10 regression: Transfer visible across site boundary via direct URL",
 	],
 	ast_diff=(
-		"Add KeyValue['Transfer': '...transfer_has_permission...'] "
-		"to Dict[has_permission] in hooks.py"
-	))
+		"Add KeyValue['Transfer': '...transfer_has_permission...'] to Dict[has_permission] in hooks.py"
+	),
+)
 
 # ── 11. Hardcoded Bugs ────────────────────────────────────────────────────
 # 11.1 Hardcoded Credentials
-_td("11.1.1", "Hardcoded Bugs", "Hardcoded Credentials", "Passwords",
+_td(
+	"11.1.1",
+	"Hardcoded Bugs",
+	"Hardcoded Credentials",
+	"Passwords",
 	"A password or secret value is hard-coded in source instead of read from environment/config",
-	["Step 1: Remove the hardcoded password from source immediately",
-	 "Step 2: Rotate the credential — treat it as compromised",
-	 "Step 3: Store it in frappe.conf or os.environ; read via frappe.conf.get('key') / os.environ.get('KEY')",
-	 "Step 4: Add the variable name to .env.example with a placeholder value",
-	 "Step 5: Add a secret-scan CI step to prevent recurrence"],
-	cwe_id="CWE-259", cwe_name="Use of Hard-coded Password",
+	[
+		"Step 1: Remove the hardcoded password from source immediately",
+		"Step 2: Rotate the credential — treat it as compromised",
+		"Step 3: Store it in frappe.conf or os.environ; read via frappe.conf.get('key') / os.environ.get('KEY')",
+		"Step 4: Add the variable name to .env.example with a placeholder value",
+		"Step 5: Add a secret-scan CI step to prevent recurrence",
+	],
+	cwe_id="CWE-259",
+	cwe_name="Use of Hard-coded Password",
 	negative_example='db_password = "P@ssw0rd123!"  # committed to git',
 	positive_example=(
 		"db_password = frappe.conf.get('db_password') or os.environ.get('DB_PASSWORD')\n"
@@ -760,16 +903,24 @@ _td("11.1.1", "Hardcoded Bugs", "Hardcoded Credentials", "Passwords",
 	ast_diff=(
 		"Replace Assign[Name=Constant(password_literal)] with "
 		"Assign[Name=BoolOp[Call[frappe.conf.get] or Call[os.environ.get]]]"
-	))
+	),
+)
 
-_td("11.1.2", "Hardcoded Bugs", "Hardcoded Credentials", "API Keys",
+_td(
+	"11.1.2",
+	"Hardcoded Bugs",
+	"Hardcoded Credentials",
+	"API Keys",
 	"An API key or secret is hard-coded in source instead of read from environment/config",
-	["Step 1: Remove the API key from source immediately and rotate it",
-	 "Step 2: Add it to .env as API_KEY=<value> and to .env.example as API_KEY=",
-	 "Step 3: Read via os.environ.get('API_KEY') or frappe.conf.get('api_key')",
-	 "Step 4: Restrict key privileges to only the necessary scopes",
-	 "Step 5: Set up automatic key rotation if the provider supports it"],
-	cwe_id="CWE-798", cwe_name="Use of Hard-coded Credentials",
+	[
+		"Step 1: Remove the API key from source immediately and rotate it",
+		"Step 2: Add it to .env as API_KEY=<value> and to .env.example as API_KEY=",
+		"Step 3: Read via os.environ.get('API_KEY') or frappe.conf.get('api_key')",
+		"Step 4: Restrict key privileges to only the necessary scopes",
+		"Step 5: Set up automatic key rotation if the provider supports it",
+	],
+	cwe_id="CWE-798",
+	cwe_name="Use of Hard-coded Credentials",
 	negative_example='api_key = "sk-abcdef1234567890"  # hardcoded in source',
 	positive_example=(
 		"api_key = os.environ.get('API_KEY') or frappe.conf.get('api_key')\n"
@@ -783,16 +934,24 @@ _td("11.1.2", "Hardcoded Bugs", "Hardcoded Credentials", "API Keys",
 	ast_diff=(
 		"Replace Assign[api_key=Constant(key_str)] with "
 		"Assign[api_key=Call[os.environ.get](Constant('API_KEY'))]"
-	))
+	),
+)
 
-_td("11.1.3", "Hardcoded Bugs", "Hardcoded Credentials", "Tokens",
+_td(
+	"11.1.3",
+	"Hardcoded Bugs",
+	"Hardcoded Credentials",
+	"Tokens",
 	"A JWT, OAuth, or refresh token is embedded in source code",
-	["Step 1: Invalidate the token immediately — it is compromised",
-	 "Step 2: Remove the token from all source files and version history",
-	 "Step 3: Use short-lived tokens generated at runtime; store only signing secrets in env",
-	 "Step 4: Set expiry on all tokens (JWT exp claim, OAuth TTL)",
-	 "Step 5: Implement token refresh logic that reads secrets from config"],
-	cwe_id="CWE-798", cwe_name="Use of Hard-coded Credentials",
+	[
+		"Step 1: Invalidate the token immediately — it is compromised",
+		"Step 2: Remove the token from all source files and version history",
+		"Step 3: Use short-lived tokens generated at runtime; store only signing secrets in env",
+		"Step 4: Set expiry on all tokens (JWT exp claim, OAuth TTL)",
+		"Step 5: Implement token refresh logic that reads secrets from config",
+	],
+	cwe_id="CWE-798",
+	cwe_name="Use of Hard-coded Credentials",
 	negative_example='auth_token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.XXXX"',
 	positive_example=(
 		"# JWT secret from env; token generated at runtime\n"
@@ -806,17 +965,25 @@ _td("11.1.3", "Hardcoded Bugs", "Hardcoded Credentials", "Tokens",
 	ast_diff=(
 		"Replace Assign[auth_token=Constant(jwt_literal)] with "
 		"Assign[auth_token=Call[jwt.encode](Dict, Name[JWT_SECRET])]"
-	))
+	),
+)
 
 # 11.2 Hardcoded Environment & Config
-_td("11.2.1", "Hardcoded Bugs", "Hardcoded Environment & Config", "Database",
+_td(
+	"11.2.1",
+	"Hardcoded Bugs",
+	"Hardcoded Environment & Config",
+	"Database",
 	"A database connection string, credentials, or schema name is hardcoded in source",
-	["Step 1: Extract the connection string to an environment variable (DATABASE_URL)",
-	 "Step 2: Use frappe.db or SQLAlchemy's from-env config; never build connection strings manually",
-	 "Step 3: Ensure test DB credentials are never the same as production",
-	 "Step 4: Add DATABASE_URL to .env.example with a safe placeholder",
-	 "Step 5: Rotate any DB credentials that were committed to version control"],
-	cwe_id="CWE-312", cwe_name="Cleartext Storage of Sensitive Information",
+	[
+		"Step 1: Extract the connection string to an environment variable (DATABASE_URL)",
+		"Step 2: Use frappe.db or SQLAlchemy's from-env config; never build connection strings manually",
+		"Step 3: Ensure test DB credentials are never the same as production",
+		"Step 4: Add DATABASE_URL to .env.example with a safe placeholder",
+		"Step 5: Rotate any DB credentials that were committed to version control",
+	],
+	cwe_id="CWE-312",
+	cwe_name="Cleartext Storage of Sensitive Information",
 	negative_example='conn = "mysql://root:pass@192.168.1.5/yam_prod"  # hardcoded',
 	positive_example=(
 		"conn = os.environ.get('DATABASE_URL')\n"
@@ -830,16 +997,24 @@ _td("11.2.1", "Hardcoded Bugs", "Hardcoded Environment & Config", "Database",
 	ast_diff=(
 		"Replace Assign[conn=Constant(dsn_str)] with "
 		"Assign[conn=Call[os.environ.get](Constant('DATABASE_URL'))]"
-	))
+	),
+)
 
-_td("11.2.2", "Hardcoded Bugs", "Hardcoded Environment & Config", "Server",
+_td(
+	"11.2.2",
+	"Hardcoded Bugs",
+	"Hardcoded Environment & Config",
+	"Server",
 	"A server IP address, hostname, port, or URL is hard-coded instead of read from config",
-	["Step 1: Extract the value to an environment variable (e.g. SERVICE_HOST, SERVICE_PORT)",
-	 "Step 2: Read via os.environ.get('SERVICE_HOST', 'localhost') with a safe default",
-	 "Step 3: Add the variable to .env.example",
-	 "Step 4: Update Docker Compose / k3s manifests to inject the env var",
-	 "Step 5: Verify all environments (dev/staging/prod) use separate values"],
-	cwe_id="CWE-656", cwe_name="Reliance on Security Through Obscurity",
+	[
+		"Step 1: Extract the value to an environment variable (e.g. SERVICE_HOST, SERVICE_PORT)",
+		"Step 2: Read via os.environ.get('SERVICE_HOST', 'localhost') with a safe default",
+		"Step 3: Add the variable to .env.example",
+		"Step 4: Update Docker Compose / k3s manifests to inject the env var",
+		"Step 5: Verify all environments (dev/staging/prod) use separate values",
+	],
+	cwe_id="CWE-656",
+	cwe_name="Reliance on Security Through Obscurity",
 	negative_example='host = "192.168.1.100"  # breaks when server moves',
 	positive_example='host = os.environ.get("SERVICE_HOST", "localhost")',
 	telemetry_signatures=[
@@ -849,16 +1024,24 @@ _td("11.2.2", "Hardcoded Bugs", "Hardcoded Environment & Config", "Server",
 	ast_diff=(
 		"Replace Assign[host=Constant(ip_str)] with "
 		"Assign[host=Call[os.environ.get](Constant('SERVICE_HOST'), Constant('localhost'))]"
-	))
+	),
+)
 
-_td("11.2.3", "Hardcoded Bugs", "Hardcoded Environment & Config", "Cloud",
+_td(
+	"11.2.3",
+	"Hardcoded Bugs",
+	"Hardcoded Environment & Config",
+	"Cloud",
 	"A cloud resource identifier (S3 bucket, IAM role, region, endpoint) is hardcoded in source",
-	["Step 1: Extract to an environment variable (S3_BUCKET, AWS_REGION, etc.)",
-	 "Step 2: Ensure different buckets/regions for dev, staging, and production",
-	 "Step 3: Never reference production cloud resources from development code",
-	 "Step 4: Apply least-privilege IAM policies — no wildcard resource ARNs",
-	 "Step 5: Add cloud resource names to .env.example"],
-	cwe_id="CWE-798", cwe_name="Use of Hard-coded Credentials",
+	[
+		"Step 1: Extract to an environment variable (S3_BUCKET, AWS_REGION, etc.)",
+		"Step 2: Ensure different buckets/regions for dev, staging, and production",
+		"Step 3: Never reference production cloud resources from development code",
+		"Step 4: Apply least-privilege IAM policies — no wildcard resource ARNs",
+		"Step 5: Add cloud resource names to .env.example",
+	],
+	cwe_id="CWE-798",
+	cwe_name="Use of Hard-coded Credentials",
 	negative_example='S3_BUCKET = "yam-production-backups"  # prod bucket in dev code',
 	positive_example='S3_BUCKET = os.environ.get("S3_BUCKET") or frappe.conf.get("s3_bucket")',
 	telemetry_signatures=[
@@ -868,21 +1051,27 @@ _td("11.2.3", "Hardcoded Bugs", "Hardcoded Environment & Config", "Cloud",
 	ast_diff=(
 		"Replace Assign[S3_BUCKET=Constant(bucket_name)] with "
 		"Assign[S3_BUCKET=Call[os.environ.get](Constant('S3_BUCKET'))]"
-	))
+	),
+)
 
 # 11.3 Hardcoded Business Logic
-_td("11.3.1", "Hardcoded Bugs", "Hardcoded Business Logic", "Workflow",
+_td(
+	"11.3.1",
+	"Hardcoded Bugs",
+	"Hardcoded Business Logic",
+	"Workflow",
 	"A business rule value (tax rate, discount %, shipping fee, trial period) is hardcoded in source",
-	["Step 1: Move the value to a Frappe Settings DocType or system configuration",
-	 "Step 2: Read it via frappe.db.get_single_value('Settings DocType', 'field')",
-	 "Step 3: Create a migration to populate the initial value in the DB",
-	 "Step 4: Add the Settings DocType to the relevant Workspace for admin access",
-	 "Step 5: Document which DocType field controls each business rule"],
-	cwe_id="CWE-656", cwe_name="Reliance on Security Through Obscurity",
-	negative_example='TAX_RATE = 0.15  # requires code change to update',
-	positive_example=(
-		"TAX_RATE = frappe.db.get_single_value('YAM Settings', 'vat_rate') or 0.15"
-	),
+	[
+		"Step 1: Move the value to a Frappe Settings DocType or system configuration",
+		"Step 2: Read it via frappe.db.get_single_value('Settings DocType', 'field')",
+		"Step 3: Create a migration to populate the initial value in the DB",
+		"Step 4: Add the Settings DocType to the relevant Workspace for admin access",
+		"Step 5: Document which DocType field controls each business rule",
+	],
+	cwe_id="CWE-656",
+	cwe_name="Reliance on Security Through Obscurity",
+	negative_example="TAX_RATE = 0.15  # requires code change to update",
+	positive_example=("TAX_RATE = frappe.db.get_single_value('YAM Settings', 'vat_rate') or 0.15"),
 	telemetry_signatures=[
 		"Tax calculation wrong after VAT rate changed — requires code deploy",
 		"YAM Settings.vat_rate ignored; hardcoded 0.15 used instead",
@@ -890,32 +1079,46 @@ _td("11.3.1", "Hardcoded Bugs", "Hardcoded Business Logic", "Workflow",
 	ast_diff=(
 		"Replace Assign[TAX_RATE=Constant(0.15)] with "
 		"Assign[TAX_RATE=Call[frappe.db.get_single_value]('YAM Settings', 'vat_rate')]"
-	))
+	),
+)
 
-_td("11.3.2", "Hardcoded Bugs", "Hardcoded Business Logic", "UI/UX",
+_td(
+	"11.3.2",
+	"Hardcoded Bugs",
+	"Hardcoded Business Logic",
+	"UI/UX",
 	"A UI string (label, message, description) is hardcoded without i18n wrapping",
-	["Step 1: Wrap Python strings in _('…') and JavaScript strings in __('…')",
-	 "Step 2: Run `bench update-translations` to export new strings",
-	 "Step 3: Add translations to translations/ar.csv for Arabic users",
-	 "Step 4: Avoid string concatenation inside _() — use named placeholders: _('Hello {0}').format(name)"],
-	cwe_id="CWE-116", cwe_name="Improper Encoding or Escaping of Output",
+	[
+		"Step 1: Wrap Python strings in _('…') and JavaScript strings in __('…')",
+		"Step 2: Run `bench update-translations` to export new strings",
+		"Step 3: Add translations to translations/ar.csv for Arabic users",
+		"Step 4: Avoid string concatenation inside _() — use named placeholders: _('Hello {0}').format(name)",
+	],
+	cwe_id="CWE-116",
+	cwe_name="Improper Encoding or Escaping of Output",
 	negative_example='frappe.msgprint("Record saved successfully")',
 	positive_example='frappe.msgprint(__("Record saved successfully"))',
 	telemetry_signatures=[
 		"Arabic user interface shows English label 'Record saved successfully'",
 		"bench update-translations: missing key 'Record saved successfully' in ar.csv",
 	],
-	ast_diff=(
-		"Wrap Constant(str) arg of Call[frappe.msgprint] in Call[__](Constant(str))"
-	))
+	ast_diff=("Wrap Constant(str) arg of Call[frappe.msgprint] in Call[__](Constant(str))"),
+)
 
-_td("11.3.3", "Hardcoded Bugs", "Hardcoded Business Logic", "Feature Flags",
+_td(
+	"11.3.3",
+	"Hardcoded Bugs",
+	"Hardcoded Business Logic",
+	"Feature Flags",
 	"A feature toggle, role check, or access limit is hardcoded in source instead of driven by config",
-	["Step 1: Replace the hardcoded check with a Frappe role or System Setting",
-	 "Step 2: Use frappe.has_role('Role Name') for role-based checks",
-	 "Step 3: Use frappe.db.get_single_value('Settings', 'upload_limit') for limits",
-	 "Step 4: Document the configuration knob in the admin guide"],
-	cwe_id="CWE-284", cwe_name="Improper Access Control",
+	[
+		"Step 1: Replace the hardcoded check with a Frappe role or System Setting",
+		"Step 2: Use frappe.has_role('Role Name') for role-based checks",
+		"Step 3: Use frappe.db.get_single_value('Settings', 'upload_limit') for limits",
+		"Step 4: Document the configuration knob in the admin guide",
+	],
+	cwe_id="CWE-284",
+	cwe_name="Improper Access Control",
 	negative_example=(
 		"ENABLE_SMS = True  # must re-deploy to toggle\n"
 		"if frappe.session.user == 'admin@yam.internal':  # hardcoded user check"
@@ -932,20 +1135,26 @@ _td("11.3.3", "Hardcoded Bugs", "Hardcoded Business Logic", "Feature Flags",
 		"Replace Assign[ENABLE_SMS=Constant(True)] with "
 		"Assign[ENABLE_SMS=Call[frappe.db.get_single_value]]; "
 		"replace Compare[session.user == email] with Call[frappe.has_role](role)"
-	))
+	),
+)
 
 # ── 12. Master Data Bugs ──────────────────────────────────────────────────
 # 12.1 Data Completeness
-_td("12.1.1", "Master Data Bugs", "Data Completeness", "Missing Records",
+_td(
+	"12.1.1",
+	"Master Data Bugs",
+	"Data Completeness",
+	"Missing Records",
 	"A required master record (e.g. Site, Crop, Warehouse) is referenced but does not exist",
-	["Step 1: Identify which master record is missing from the referenced DocType",
-	 "Step 2: Create the missing record via Frappe Desk or a fixture",
-	 "Step 3: Add a validation in the controller to raise a clear error when the reference is missing",
-	 "Step 4: Add the required records to demo fixtures (seed/) to prevent recurrence on fresh installs"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
-	negative_example=(
-		"self.site = 'Sana\\'a Silo'  # site may not exist in DB"
-	),
+	[
+		"Step 1: Identify which master record is missing from the referenced DocType",
+		"Step 2: Create the missing record via Frappe Desk or a fixture",
+		"Step 3: Add a validation in the controller to raise a clear error when the reference is missing",
+		"Step 4: Add the required records to demo fixtures (seed/) to prevent recurrence on fresh installs",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
+	negative_example=("self.site = 'Sana\\'a Silo'  # site may not exist in DB"),
 	positive_example=(
 		"if not frappe.db.exists('Site', self.get('site')):\n"
 		"    frappe.throw(_('Site {0} not found').format(self.site), frappe.ValidationError)"
@@ -957,36 +1166,47 @@ _td("12.1.1", "Master Data Bugs", "Data Completeness", "Missing Records",
 	ast_diff=(
 		"Add If[not Call[frappe.db.exists]('Site', self.site)] → Call[frappe.throw] "
 		"before any use of self.site as a foreign key"
-	))
+	),
+)
 
-_td("12.1.2", "Master Data Bugs", "Data Completeness", "Incomplete Attributes",
+_td(
+	"12.1.2",
+	"Master Data Bugs",
+	"Data Completeness",
+	"Incomplete Attributes",
 	"A master record is missing one or more mandatory attributes (unit, currency, category, etc.)",
-	["Step 1: Identify which attribute is missing",
-	 "Step 2: Mark the field reqd:1 in the DocType JSON so the form enforces it",
-	 "Step 3: Add a Python validate() check for the field",
-	 "Step 4: Update existing incomplete records via a data migration patch"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
+	[
+		"Step 1: Identify which attribute is missing",
+		"Step 2: Mark the field reqd:1 in the DocType JSON so the form enforces it",
+		"Step 3: Add a Python validate() check for the field",
+		"Step 4: Update existing incomplete records via a data migration patch",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
 	negative_example='{"fieldname": "unit_of_measure", "reqd": 0}  # optional — allows blank',
 	positive_example='{"fieldname": "unit_of_measure", "reqd": 1}  # mandatory',
 	telemetry_signatures=[
 		"Calculation error: unit_of_measure is blank for Lot YAM-LOT-2024-00042",
 		"Invoice line item has no unit — pricing engine returns zero",
 	],
-	ast_diff=(
-		"In DocType JSON field definition: "
-		"replace KeyValue[reqd: 0] with KeyValue[reqd: 1]"
-	))
+	ast_diff=("In DocType JSON field definition: replace KeyValue[reqd: 0] with KeyValue[reqd: 1]"),
+)
 
-_td("12.1.3", "Master Data Bugs", "Data Completeness", "Orphan Records",
+_td(
+	"12.1.3",
+	"Master Data Bugs",
+	"Data Completeness",
+	"Orphan Records",
 	"A child or transaction record references a master that no longer exists",
-	["Step 1: Run a DB audit query: SELECT name FROM tab WHERE parent_field NOT IN (SELECT name FROM tabParent)",
-	 "Step 2: Fix or delete orphan records",
-	 "Step 3: Add a DB-level FK constraint or a Frappe link validation",
-	 "Step 4: Add a scheduled job to detect and alert on new orphans"],
-	cwe_id="CWE-459", cwe_name="Incomplete Cleanup",
-	negative_example=(
-		"frappe.db.delete('Lot', lot_name)  # QCTests and ScaleTickets left orphaned"
-	),
+	[
+		"Step 1: Run a DB audit query: SELECT name FROM tab WHERE parent_field NOT IN (SELECT name FROM tabParent)",
+		"Step 2: Fix or delete orphan records",
+		"Step 3: Add a DB-level FK constraint or a Frappe link validation",
+		"Step 4: Add a scheduled job to detect and alert on new orphans",
+	],
+	cwe_id="CWE-459",
+	cwe_name="Incomplete Cleanup",
+	negative_example=("frappe.db.delete('Lot', lot_name)  # QCTests and ScaleTickets left orphaned"),
 	positive_example=(
 		"# Use frappe.delete_doc which cascades child DocType deletes\n"
 		"frappe.delete_doc('Lot', lot_name, delete_permanently=True)"
@@ -998,19 +1218,25 @@ _td("12.1.3", "Master Data Bugs", "Data Completeness", "Orphan Records",
 	ast_diff=(
 		"Replace Call[frappe.db.delete](Constant('Lot'), name) with "
 		"Call[frappe.delete_doc](Constant('Lot'), name, delete_permanently=True)"
-	))
+	),
+)
 
 # 12.2 Data Accuracy
-_td("12.2.1", "Master Data Bugs", "Data Accuracy", "Incorrect Values",
+_td(
+	"12.2.1",
+	"Master Data Bugs",
+	"Data Accuracy",
+	"Incorrect Values",
 	"A master record contains a factually wrong value (wrong tax rate, wrong conversion factor, etc.)",
-	["Step 1: Identify the correct value from an authoritative source",
-	 "Step 2: Correct the record and document the change in a version note",
-	 "Step 3: Add a range/sanity validator in the controller (e.g. 0 < tax_rate <= 100)",
-	 "Step 4: If the value is variable, move it to a configurable Settings DocType"],
-	cwe_id="CWE-682", cwe_name="Incorrect Calculation",
-	negative_example=(
-		"# YAM Settings record has vat_rate = 0.25 — wrong for Yemen (should be 0.15)"
-	),
+	[
+		"Step 1: Identify the correct value from an authoritative source",
+		"Step 2: Correct the record and document the change in a version note",
+		"Step 3: Add a range/sanity validator in the controller (e.g. 0 < tax_rate <= 100)",
+		"Step 4: If the value is variable, move it to a configurable Settings DocType",
+	],
+	cwe_id="CWE-682",
+	cwe_name="Incorrect Calculation",
+	negative_example=("# YAM Settings record has vat_rate = 0.25 — wrong for Yemen (should be 0.15)"),
 	positive_example=(
 		"def validate(self):\n"
 		"    if not (0 < (self.vat_rate or 0) <= 1):\n"
@@ -1023,18 +1249,25 @@ _td("12.2.1", "Master Data Bugs", "Data Accuracy", "Incorrect Values",
 	ast_diff=(
 		"Add If[not(0 < self.vat_rate <= 1)] → Call[frappe.throw] "
 		"in FunctionDef[validate] of YAM Settings controller"
-	))
+	),
+)
 
-_td("12.2.3", "Master Data Bugs", "Data Accuracy", "Outdated Data",
+_td(
+	"12.2.3",
+	"Master Data Bugs",
+	"Data Accuracy",
+	"Outdated Data",
 	"A master record that should have been deactivated (expired contract, obsolete product, retired employee) is still active",
-	["Step 1: Add an expiry_date or is_active field to the DocType",
-	 "Step 2: Add a scheduled job that sets is_active=0 when expiry_date < today",
-	 "Step 3: Filter all list views by is_active=1 by default",
-	 "Step 4: Notify the responsible user 30 days before expiry"],
-	cwe_id="N/A", cwe_name="Not applicable (data lifecycle/governance issue)",
+	[
+		"Step 1: Add an expiry_date or is_active field to the DocType",
+		"Step 2: Add a scheduled job that sets is_active=0 when expiry_date < today",
+		"Step 3: Filter all list views by is_active=1 by default",
+		"Step 4: Notify the responsible user 30 days before expiry",
+	],
+	cwe_id="N/A",
+	cwe_name="Not applicable (data lifecycle/governance issue)",
 	negative_example=(
-		"# Device DocType has no is_active or expiry field\n"
-		"{'fieldname': 'status'}  # manual status only"
+		"# Device DocType has no is_active or expiry field\n{'fieldname': 'status'}  # manual status only"
 	),
 	positive_example=(
 		"{'fieldname': 'is_active', 'fieldtype': 'Check', 'default': '1'},\n"
@@ -1045,18 +1278,25 @@ _td("12.2.3", "Master Data Bugs", "Data Accuracy", "Outdated Data",
 		"Scale ticket linked to decommissioned device — measurement unreliable",
 	],
 	ast_diff=(
-		"Add Dict[fieldname=is_active, fieldtype=Check, default=1] "
-		"to fields list in Device DocType JSON"
-	))
+		"Add Dict[fieldname=is_active, fieldtype=Check, default=1] to fields list in Device DocType JSON"
+	),
+)
 
 # 12.3 Data Consistency
-_td("12.3.1", "Master Data Bugs", "Data Consistency", "Cross-System Inconsistency",
+_td(
+	"12.3.1",
+	"Master Data Bugs",
+	"Data Consistency",
+	"Cross-System Inconsistency",
 	"The same real-world entity has different IDs, names, or codes in different system modules",
-	["Step 1: Identify the canonical source of truth for the entity",
-	 "Step 2: Sync or migrate other systems to use the canonical ID",
-	 "Step 3: Implement a cross-module validation that raises an alert on mismatch",
-	 "Step 4: Document the master-system mapping in architecture docs"],
-	cwe_id="CWE-116", cwe_name="Improper Encoding or Escaping of Output",
+	[
+		"Step 1: Identify the canonical source of truth for the entity",
+		"Step 2: Sync or migrate other systems to use the canonical ID",
+		"Step 3: Implement a cross-module validation that raises an alert on mismatch",
+		"Step 4: Document the master-system mapping in architecture docs",
+	],
+	cwe_id="CWE-116",
+	cwe_name="Improper Encoding or Escaping of Output",
 	negative_example=(
 		"erp_lot_code = lot.name          # 'YAM-LOT-2024-00001'\n"
 		"crm_lot_code = lot.external_ref  # 'LOT-24-001' — mismatch"
@@ -1074,18 +1314,24 @@ _td("12.3.1", "Master Data Bugs", "Data Consistency", "Cross-System Inconsistenc
 	ast_diff=(
 		"Add If[lot.external_ref != canonical_id] → Call[frappe.log_error] "
 		"after Assign[canonical_id=lot.name]"
-	))
-
-_td("12.3.3", "Master Data Bugs", "Data Consistency", "Duplication",
-	"The same real-world entity appears as two or more separate master records",
-	["Step 1: Add unique constraints on natural key fields (name, code, email)",
-	 "Step 2: Run a deduplication script to merge duplicate records",
-	 "Step 3: Update all references from duplicate records to the canonical record",
-	 "Step 4: Enable frappe.DuplicateEntryError detection in the controller"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
-	negative_example=(
-		"# Two Site records: 'Sana'a Silo' and 'Sanaa Silo' — same physical site"
 	),
+)
+
+_td(
+	"12.3.3",
+	"Master Data Bugs",
+	"Data Consistency",
+	"Duplication",
+	"The same real-world entity appears as two or more separate master records",
+	[
+		"Step 1: Add unique constraints on natural key fields (name, code, email)",
+		"Step 2: Run a deduplication script to merge duplicate records",
+		"Step 3: Update all references from duplicate records to the canonical record",
+		"Step 4: Enable frappe.DuplicateEntryError detection in the controller",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
+	negative_example=("# Two Site records: 'Sana'a Silo' and 'Sanaa Silo' — same physical site"),
 	positive_example=(
 		"def validate(self):\n"
 		"    if frappe.db.exists('Site', {'site_name': self.site_name, 'name': ['!=', self.name]}):\n"
@@ -1098,19 +1344,25 @@ _td("12.3.3", "Master Data Bugs", "Data Consistency", "Duplication",
 	ast_diff=(
 		"Add If[Call[frappe.db.exists]('Site', {'site_name': self.site_name, ...})] "
 		"→ Call[frappe.throw] in FunctionDef[validate]"
-	))
+	),
+)
 
 # 12.4 Referential Integrity
-_td("12.4.1", "Master Data Bugs", "Referential Integrity", "Broken Links",
+_td(
+	"12.4.1",
+	"Master Data Bugs",
+	"Referential Integrity",
+	"Broken Links",
 	"A record contains a Link field pointing to a master that has been deleted or renamed",
-	["Step 1: Add a cascade-on-delete or restrict-on-delete policy to the Link field",
-	 "Step 2: Run an integrity check script to find broken links",
-	 "Step 3: Add a validate() check: if link_value and not frappe.db.exists(...): frappe.throw(...)",
-	 "Step 4: Schedule a daily integrity report for critical master links"],
-	cwe_id="CWE-459", cwe_name="Incomplete Cleanup",
-	negative_example=(
-		"self.lot = 'YAM-LOT-2024-00001'  # lot may have been deleted"
-	),
+	[
+		"Step 1: Add a cascade-on-delete or restrict-on-delete policy to the Link field",
+		"Step 2: Run an integrity check script to find broken links",
+		"Step 3: Add a validate() check: if link_value and not frappe.db.exists(...): frappe.throw(...)",
+		"Step 4: Schedule a daily integrity report for critical master links",
+	],
+	cwe_id="CWE-459",
+	cwe_name="Incomplete Cleanup",
+	negative_example=("self.lot = 'YAM-LOT-2024-00001'  # lot may have been deleted"),
 	positive_example=(
 		"if self.get('lot') and not frappe.db.exists('Lot', self.lot):\n"
 		"    frappe.throw(_('Lot {0} not found — it may have been deleted').format(self.lot))"
@@ -1122,19 +1374,24 @@ _td("12.4.1", "Master Data Bugs", "Referential Integrity", "Broken Links",
 	ast_diff=(
 		"Add If[self.get('lot') and not Call[frappe.db.exists]('Lot', self.lot)] "
 		"→ Call[frappe.throw] in FunctionDef[validate]"
-	))
-
-_td("12.4.3", "Master Data Bugs", "Referential Integrity", "Foreign Key Violations",
-	"A transaction record references a master ID that does not exist in the master table",
-	["Step 1: Add DB-level FK constraints where possible (InnoDB supports them)",
-	 "Step 2: Add a Frappe validate() check before insert/update",
-	 "Step 3: Add a data audit script to find and report existing violations",
-	 "Step 4: Prevent orphan creation by using frappe.db.exists() before saving"],
-	cwe_id="CWE-20", cwe_name="Improper Input Validation",
-	negative_example=(
-		"doc.lot = 'NONEXISTENT-LOT-ID'\n"
-		"doc.save()  # no FK check — corrupts data"
 	),
+)
+
+_td(
+	"12.4.3",
+	"Master Data Bugs",
+	"Referential Integrity",
+	"Foreign Key Violations",
+	"A transaction record references a master ID that does not exist in the master table",
+	[
+		"Step 1: Add DB-level FK constraints where possible (InnoDB supports them)",
+		"Step 2: Add a Frappe validate() check before insert/update",
+		"Step 3: Add a data audit script to find and report existing violations",
+		"Step 4: Prevent orphan creation by using frappe.db.exists() before saving",
+	],
+	cwe_id="CWE-20",
+	cwe_name="Improper Input Validation",
+	negative_example=("doc.lot = 'NONEXISTENT-LOT-ID'\ndoc.save()  # no FK check — corrupts data"),
 	positive_example=(
 		"if doc.lot and not frappe.db.exists('Lot', doc.lot):\n"
 		"    frappe.throw(_('Invalid lot reference: {0}').format(doc.lot), frappe.ValidationError)\n"
@@ -1145,18 +1402,25 @@ _td("12.4.3", "Master Data Bugs", "Referential Integrity", "Foreign Key Violatio
 		"Data audit: 3 QCTests reference non-existent Lots",
 	],
 	ast_diff=(
-		"Add If[not Call[frappe.db.exists]('Lot', doc.lot)] → Call[frappe.throw] "
-		"before Call[doc.save()]"
-	))
+		"Add If[not Call[frappe.db.exists]('Lot', doc.lot)] → Call[frappe.throw] before Call[doc.save()]"
+	),
+)
 
 # 12.5 Governance & Compliance
-_td("12.5.1", "Master Data Bugs", "Governance & Compliance", "Policy Violations",
+_td(
+	"12.5.1",
+	"Master Data Bugs",
+	"Governance & Compliance",
+	"Policy Violations",
 	"A master record is missing a compliance-required attribute (certificate, KYC, approval status)",
-	["Step 1: Define which fields are compliance-required and mark them reqd:1",
-	 "Step 2: Add a before_submit validator that blocks submission if compliance fields are empty",
-	 "Step 3: Add compliance fields to the relevant document checklist",
-	 "Step 4: Generate a compliance report listing all records with missing data"],
-	cwe_id="CWE-284", cwe_name="Improper Access Control",
+	[
+		"Step 1: Define which fields are compliance-required and mark them reqd:1",
+		"Step 2: Add a before_submit validator that blocks submission if compliance fields are empty",
+		"Step 3: Add compliance fields to the relevant document checklist",
+		"Step 4: Generate a compliance report listing all records with missing data",
+	],
+	cwe_id="CWE-284",
+	cwe_name="Improper Access Control",
 	negative_example=(
 		"# Certificate field is optional — vendor can be approved without one\n"
 		"{'fieldname': 'compliance_certificate', 'reqd': 0}"
@@ -1173,34 +1437,47 @@ _td("12.5.1", "Master Data Bugs", "Governance & Compliance", "Policy Violations"
 	ast_diff=(
 		"Add FunctionDef[before_submit] with If[not self.compliance_certificate] "
 		"→ Call[frappe.throw] to controller class"
-	))
+	),
+)
 
-_td("12.5.2", "Master Data Bugs", "Governance & Compliance", "Audit Failures",
+_td(
+	"12.5.2",
+	"Master Data Bugs",
+	"Governance & Compliance",
+	"Audit Failures",
 	"A master DocType has no change log (track_changes disabled), so unauthorized edits are undetectable",
-	["Step 1: Enable track_changes:1 in the DocType JSON",
-	 "Step 2: Run bench migrate to activate journalling",
-	 "Step 3: Add a permission check that restricts edits to authorized roles",
-	 "Step 4: Add a daily report of master data changes for auditor review"],
-	cwe_id="CWE-778", cwe_name="Insufficient Logging",
+	[
+		"Step 1: Enable track_changes:1 in the DocType JSON",
+		"Step 2: Run bench migrate to activate journalling",
+		"Step 3: Add a permission check that restricts edits to authorized roles",
+		"Step 4: Add a daily report of master data changes for auditor review",
+	],
+	cwe_id="CWE-778",
+	cwe_name="Insufficient Logging",
 	negative_example='{"name": "Device", "track_changes": 0}  # no audit trail',
 	positive_example='{"name": "Device", "track_changes": 1}  # all edits journalled',
 	telemetry_signatures=[
 		"Auditor: no Version log entries for Device YAM-DEV-2024-00001",
 		"ISO 22000 audit: unauthorised Device record edit undetectable",
 	],
-	ast_diff=(
-		"In master DocType JSON: "
-		"replace KeyValue[track_changes: 0] with KeyValue[track_changes: 1]"
-	))
+	ast_diff=("In master DocType JSON: replace KeyValue[track_changes: 0] with KeyValue[track_changes: 1]"),
+)
 
-_td("12.5.3", "Master Data Bugs", "Governance & Compliance", "Security",
+_td(
+	"12.5.3",
+	"Master Data Bugs",
+	"Governance & Compliance",
+	"Security",
 	"Master data contains sensitive values (credentials, PII) that are stored or exposed insecurely",
-	["Step 1: Identify all sensitive fields (password, tax_id, bank_account)",
-	 "Step 2: Mark sensitive fields as password type or enable field encryption",
-	 "Step 3: Remove sensitive data from API responses (use frappe.has_permission checks)",
-	 "Step 4: Ensure sensitive fields are excluded from global search indexing",
-	 "Step 5: Add data-at-rest encryption for fields that hold PII"],
-	cwe_id="CWE-312", cwe_name="Cleartext Storage of Sensitive Information",
+	[
+		"Step 1: Identify all sensitive fields (password, tax_id, bank_account)",
+		"Step 2: Mark sensitive fields as password type or enable field encryption",
+		"Step 3: Remove sensitive data from API responses (use frappe.has_permission checks)",
+		"Step 4: Ensure sensitive fields are excluded from global search indexing",
+		"Step 5: Add data-at-rest encryption for fields that hold PII",
+	],
+	cwe_id="CWE-312",
+	cwe_name="Cleartext Storage of Sensitive Information",
 	negative_example=(
 		"# Site DocType exposes all fields including sensitive ones\n"
 		"frappe.get_all('Site', fields=['*'])  # returns tax_id, bank_account, etc."
@@ -1216,7 +1493,8 @@ _td("12.5.3", "Master Data Bugs", "Governance & Compliance", "Security",
 	ast_diff=(
 		"Replace Constant('*') in Call[frappe.get_all](fields=['*']) with "
 		"List[Constant('name'), Constant('site_type'), Constant('site_name')]"
-	))
+	),
+)
 
 
 # ---------------------------------------------------------------------------
@@ -1306,7 +1584,9 @@ class QCReport:
 					"bug_type": f.bug_type,
 					"cwe_id": TAXONOMY[f.bug_code].cwe_id if f.bug_code in TAXONOMY else "",
 					"cwe_name": TAXONOMY[f.bug_code].cwe_name if f.bug_code in TAXONOMY else "",
-					"training_coverage": _compute_coverage(TAXONOMY[f.bug_code]) if f.bug_code in TAXONOMY else 0.0,
+					"training_coverage": _compute_coverage(TAXONOMY[f.bug_code])
+					if f.bug_code in TAXONOMY
+					else 0.0,
 					"file": f.file,
 					"line": f.line,
 					"message": f.message,
@@ -1556,6 +1836,7 @@ class TrainingDataset:
 	Usage::
 
 	    from tools.frappe_skill_agent import TrainingDataset, TAXONOMY
+
 	    TrainingDataset.to_jsonld_file("/tmp/training.jsonld.json")
 
 	    # Export a subset (e.g. only Security bugs)
@@ -1589,9 +1870,7 @@ class TrainingDataset:
 			node["cwe:name"] = defn.cwe_name
 			cwe_num = defn.cwe_id.replace("CWE-", "")
 			if cwe_num.isdigit():
-				node["cwe:reference"] = {
-					"@id": f"https://cwe.mitre.org/data/definitions/{cwe_num}.html"
-				}
+				node["cwe:reference"] = {"@id": f"https://cwe.mitre.org/data/definitions/{cwe_num}.html"}
 		return node
 
 	@staticmethod
@@ -1699,17 +1978,19 @@ def check_missing_translations(report: QCReport, py_file: str, base: str) -> Non
 	)
 	for lineno, line in enumerate(lines, 1):
 		if pattern.search(line):
-			report.add(_finding(
-				severity="critical",
-				rule_id="FS-001",
-				bug_code="6.3.1",
-				file=rel,
-				line=lineno,
-				message=(
-					"frappe.throw() uses a raw string — not translatable. "
-					"Arabic/RTL users will see English error text."
-				),
-			))
+			report.add(
+				_finding(
+					severity="critical",
+					rule_id="FS-001",
+					bug_code="6.3.1",
+					file=rel,
+					line=lineno,
+					message=(
+						"frappe.throw() uses a raw string — not translatable. "
+						"Arabic/RTL users will see English error text."
+					),
+				)
+			)
 
 
 def check_missing_js_translations(report: QCReport, js_file: str, base: str) -> None:
@@ -1724,22 +2005,24 @@ def check_missing_js_translations(report: QCReport, js_file: str, base: str) -> 
 	for lineno, line in enumerate(lines, 1):
 		for p in patterns:
 			if p.search(line):
-				report.add(_finding(
-					severity="high",
-					rule_id="FS-002",
-					bug_code="6.3.1",
-					file=rel,
-					line=lineno,
-					message=(
-						"User-facing JavaScript string not wrapped in __(). "
-						"The string will not be translated for Arabic users."
-					),
-					planned_response=[
-						"Step 1: Wrap the string: __('message')",
-						"Step 2: Run `bench update-translations` to export the new string",
-						"Step 3: Add the Arabic translation to translations/ar.csv",
-					],
-				))
+				report.add(
+					_finding(
+						severity="high",
+						rule_id="FS-002",
+						bug_code="6.3.1",
+						file=rel,
+						line=lineno,
+						message=(
+							"User-facing JavaScript string not wrapped in __(). "
+							"The string will not be translated for Arabic users."
+						),
+						planned_response=[
+							"Step 1: Wrap the string: __('message')",
+							"Step 2: Run `bench update-translations` to export the new string",
+							"Step 3: Add the Arabic translation to translations/ar.csv",
+						],
+					)
+				)
 				break
 
 
@@ -1752,18 +2035,20 @@ def check_doctype_json_site_required(report: QCReport, json_file: str, base: str
 	fields = {f.get("fieldname"): f for f in data.get("fields", [])}
 	dt_name = data.get("name", json_file)
 	if "site" in fields and not fields["site"].get("reqd"):
-		report.add(_finding(
-			severity="medium",
-			rule_id="FS-003",
-			bug_code="1.1.1",
-			file=rel,
-			line=None,
-			message=(
-				f"DocType '{dt_name}': 'site' field is not marked reqd:1. "
-				"The form will not show a required asterisk and client-side "
-				"validation will not block save before the server is reached."
-			),
-		))
+		report.add(
+			_finding(
+				severity="medium",
+				rule_id="FS-003",
+				bug_code="1.1.1",
+				file=rel,
+				line=None,
+				message=(
+					f"DocType '{dt_name}': 'site' field is not marked reqd:1. "
+					"The form will not show a required asterisk and client-side "
+					"validation will not block save before the server is reached."
+				),
+			)
+		)
 
 
 def check_doctype_json_title_field(report: QCReport, json_file: str, base: str) -> None:
@@ -1776,18 +2061,20 @@ def check_doctype_json_title_field(report: QCReport, json_file: str, base: str) 
 	rel = _rel(json_file, base)
 	dt_name = data.get("name", json_file)
 	if not data.get("title_field"):
-		report.add(_finding(
-			severity="low",
-			rule_id="FS-004",
-			bug_code="6.1.4",
-			file=rel,
-			line=None,
-			message=(
-				f"DocType '{dt_name}': missing 'title_field'. "
-				"Link dropdowns will show the auto-generated series name "
-				"instead of a human-readable label."
-			),
-		))
+		report.add(
+			_finding(
+				severity="low",
+				rule_id="FS-004",
+				bug_code="6.1.4",
+				file=rel,
+				line=None,
+				message=(
+					f"DocType '{dt_name}': missing 'title_field'. "
+					"Link dropdowns will show the auto-generated series name "
+					"instead of a human-readable label."
+				),
+			)
+		)
 
 
 def check_doctype_json_track_changes(report: QCReport, json_file: str, base: str) -> None:
@@ -1801,18 +2088,20 @@ def check_doctype_json_track_changes(report: QCReport, json_file: str, base: str
 	rel = _rel(json_file, base)
 	dt_name = data.get("name", json_file)
 	if not data.get("track_changes"):
-		report.add(_finding(
-			severity="medium",
-			rule_id="FS-005",
-			bug_code="2.3.3",
-			file=rel,
-			line=None,
-			message=(
-				f"DocType '{dt_name}': track_changes not enabled. "
-				"Field-level changes will not be journalled — this is a "
-				"HACCP/ISO 22000 audit trail requirement."
-			),
-		))
+		report.add(
+			_finding(
+				severity="medium",
+				rule_id="FS-005",
+				bug_code="2.3.3",
+				file=rel,
+				line=None,
+				message=(
+					f"DocType '{dt_name}': track_changes not enabled. "
+					"Field-level changes will not be journalled — this is a "
+					"HACCP/ISO 22000 audit trail requirement."
+				),
+			)
+		)
 
 
 def check_hardcoded_emails(report: QCReport, py_file: str, base: str) -> None:
@@ -1830,18 +2119,20 @@ def check_hardcoded_emails(report: QCReport, py_file: str, base: str) -> None:
 		if constant_def_re.match(line):
 			continue
 		if email_re.search(line):
-			report.add(_finding(
-				severity="high",
-				rule_id="FS-006",
-				bug_code="5.3.3",
-				file=rel,
-				line=lineno,
-				message=(
-					"Hardcoded email address in non-test source. "
-					"If the address needs to change, every occurrence must be "
-					"updated manually — error-prone and hard to audit."
-				),
-			))
+			report.add(
+				_finding(
+					severity="high",
+					rule_id="FS-006",
+					bug_code="5.3.3",
+					file=rel,
+					line=lineno,
+					message=(
+						"Hardcoded email address in non-test source. "
+						"If the address needs to change, every occurrence must be "
+						"updated manually — error-prone and hard to audit."
+					),
+				)
+			)
 
 
 def check_default_in_validate_not_before_insert(report: QCReport, py_file: str, base: str) -> None:
@@ -1853,9 +2144,7 @@ def check_default_in_validate_not_before_insert(report: QCReport, py_file: str, 
 	has_validate = "def validate" in content
 	if not has_validate or has_before_insert:
 		return
-	default_in_validate = re.compile(
-		r"def validate\s*\(self[^)]*\).*?(?=def |\Z)", re.DOTALL
-	)
+	default_in_validate = re.compile(r"def validate\s*\(self[^)]*\).*?(?=def |\Z)", re.DOTALL)
 	match = default_in_validate.search(content)
 	if not match:
 		return
@@ -1863,18 +2152,20 @@ def check_default_in_validate_not_before_insert(report: QCReport, py_file: str, 
 	assignment_re = re.compile(r"self\.\w+\s*=\s*['\"](\w+)['\"]")
 	assignments = assignment_re.findall(validate_block)
 	if assignments:
-		report.add(_finding(
-			severity="medium",
-			rule_id="FS-007",
-			bug_code="1.1.2",
-			file=rel,
-			line=None,
-			message=(
-				f"Field(s) {assignments} receive default values in validate() "
-				"but there is no before_insert(). Programmatic inserts that "
-				"skip validate() will save blank values to the DB."
-			),
-		))
+		report.add(
+			_finding(
+				severity="medium",
+				rule_id="FS-007",
+				bug_code="1.1.2",
+				file=rel,
+				line=None,
+				message=(
+					f"Field(s) {assignments} receive default values in validate() "
+					"but there is no before_insert(). Programmatic inserts that "
+					"skip validate() will save blank values to the DB."
+				),
+			)
+		)
 
 
 def check_broad_except(report: QCReport, py_file: str, base: str) -> None:
@@ -1891,18 +2182,20 @@ def check_broad_except(report: QCReport, py_file: str, base: str) -> None:
 		elif in_except:
 			if stripped and not stripped.startswith("#"):
 				if re.match(r"(return \[\]|return None|return|pass)\s*$", stripped):
-					report.add(_finding(
-						severity="medium",
-						rule_id="FS-008",
-						bug_code="2.2.4",
-						file=rel,
-						line=except_lineno,
-						message=(
-							"Broad 'except Exception' swallows all errors silently. "
-							"DB connection failures, permission errors, and bugs will "
-							"be hidden and produce incorrect empty results."
-						),
-					))
+					report.add(
+						_finding(
+							severity="medium",
+							rule_id="FS-008",
+							bug_code="2.2.4",
+							file=rel,
+							line=except_lineno,
+							message=(
+								"Broad 'except Exception' swallows all errors silently. "
+								"DB connection failures, permission errors, and bugs will "
+								"be hidden and produce incorrect empty results."
+							),
+						)
+					)
 				in_except = False
 			elif stripped:
 				in_except = False
@@ -1918,25 +2211,26 @@ def check_missing_cross_site_lot_validation(report: QCReport, py_file: str, base
 	rel = _rel(py_file, base)
 	content = "".join(lines)
 	has_lot = bool(
-		re.search(r"""self\.get\s*\(\s*['"]lot['"]\s*\)""", content)
-		or re.search(r"""self\.lot\b""", content)
+		re.search(r"""self\.get\s*\(\s*['"]lot['"]\s*\)""", content) or re.search(r"""self\.lot\b""", content)
 	)
 	if not has_lot:
 		return
 	has_check = bool(re.search(r"""frappe\.db\.get_value\s*\(\s*['"]Lot['"]""", content))
 	if not has_check:
-		report.add(_finding(
-			severity="high",
-			rule_id="FS-009",
-			bug_code="5.2.4",
-			file=rel,
-			line=None,
-			message=(
-				"DocType accesses self.lot but has no cross-site lot.site "
-				"consistency check. A record from Site A can be linked to a "
-				"Lot from Site B, breaking data isolation."
-			),
-		))
+		report.add(
+			_finding(
+				severity="high",
+				rule_id="FS-009",
+				bug_code="5.2.4",
+				file=rel,
+				line=None,
+				message=(
+					"DocType accesses self.lot but has no cross-site lot.site "
+					"consistency check. A record from Site A can be linked to a "
+					"Lot from Site B, breaking data isolation."
+				),
+			)
+		)
 
 
 def check_ai_writes_frappe(report: QCReport, py_file: str, base: str) -> None:
@@ -1950,18 +2244,20 @@ def check_ai_writes_frappe(report: QCReport, py_file: str, base: str) -> None:
 	)
 	for lineno, line in enumerate(lines, 1):
 		if forbidden.search(line):
-			report.add(_finding(
-				severity="critical",
-				rule_id="FS-010",
-				bug_code="5.2.2",
-				file=rel,
-				line=lineno,
-				message=(
-					"AI module calls a Frappe write API. This violates the "
-					"AI-is-assistive-only rule and can cause autonomous DB "
-					"writes that bypass authorization checks."
-				),
-			))
+			report.add(
+				_finding(
+					severity="critical",
+					rule_id="FS-010",
+					bug_code="5.2.2",
+					file=rel,
+					line=lineno,
+					message=(
+						"AI module calls a Frappe write API. This violates the "
+						"AI-is-assistive-only rule and can cause autonomous DB "
+						"writes that bypass authorization checks."
+					),
+				)
+			)
 
 
 def check_perm_query_has_permission_parity(hooks_file: str, report: QCReport, base: str) -> None:
@@ -1977,31 +2273,35 @@ def check_perm_query_has_permission_parity(hooks_file: str, report: QCReport, ba
 	pqc_doctypes = set(re.findall(r"""["']([^"']+)["']\s*:""", pqc_block.group(1)))
 	hp_doctypes = set(re.findall(r"""["']([^"']+)["']\s*:""", hp_block.group(1)))
 	for dt in sorted(pqc_doctypes - hp_doctypes):
-		report.add(_finding(
-			severity="critical",
-			rule_id="FS-011",
-			bug_code="5.2.3",
-			file=rel,
-			line=None,
-			message=(
-				f"DocType '{dt}' is in permission_query_conditions but NOT "
-				"in has_permission. List-view isolation works but a direct "
-				"document GET by name will bypass site isolation."
-			),
-		))
+		report.add(
+			_finding(
+				severity="critical",
+				rule_id="FS-011",
+				bug_code="5.2.3",
+				file=rel,
+				line=None,
+				message=(
+					f"DocType '{dt}' is in permission_query_conditions but NOT "
+					"in has_permission. List-view isolation works but a direct "
+					"document GET by name will bypass site isolation."
+				),
+			)
+		)
 	for dt in sorted(hp_doctypes - pqc_doctypes):
-		report.add(_finding(
-			severity="critical",
-			rule_id="FS-011",
-			bug_code="10.1.1",
-			file=rel,
-			line=None,
-			message=(
-				f"DocType '{dt}' is in has_permission but NOT in "
-				"permission_query_conditions. Direct-read isolation works but "
-				"list-view queries will return all records regardless of site."
-			),
-		))
+		report.add(
+			_finding(
+				severity="critical",
+				rule_id="FS-011",
+				bug_code="10.1.1",
+				file=rel,
+				line=None,
+				message=(
+					f"DocType '{dt}' is in has_permission but NOT in "
+					"permission_query_conditions. Direct-read isolation works but "
+					"list-view queries will return all records regardless of site."
+				),
+			)
+		)
 
 
 # ── FS-012 / 11.1.x — Hardcoded credential patterns ──────────────────────
@@ -2041,17 +2341,19 @@ def check_hardcoded_credentials(report: QCReport, py_file: str, base: str) -> No
 				code = "11.1.3"
 			else:
 				code = "5.1.3"
-			report.add(_finding(
-				severity="critical",
-				rule_id="FS-012",
-				bug_code=code,
-				file=rel,
-				line=lineno,
-				message=(
-					f"Hardcoded credential detected: `{snippet[:60]}…` "
-					"Treat this value as compromised and rotate it immediately."
-				),
-			))
+			report.add(
+				_finding(
+					severity="critical",
+					rule_id="FS-012",
+					bug_code=code,
+					file=rel,
+					line=lineno,
+					message=(
+						f"Hardcoded credential detected: `{snippet[:60]}…` "
+						"Treat this value as compromised and rotate it immediately."
+					),
+				)
+			)
 
 
 # ── FS-013 / 11.2.2 — Hardcoded server / IP / URL ────────────────────────
@@ -2075,17 +2377,19 @@ def check_hardcoded_server_config(report: QCReport, py_file: str, base: str) -> 
 		if line.lstrip().startswith("#"):
 			continue
 		if _IP_LITERAL_RE.search(line) or _LOCALHOST_RE.search(line):
-			report.add(_finding(
-				severity="high",
-				rule_id="FS-013",
-				bug_code="11.2.2",
-				file=rel,
-				line=lineno,
-				message=(
-					"Hardcoded server address (IP or localhost) detected. "
-					"The code will break when deployed to staging or production."
-				),
-			))
+			report.add(
+				_finding(
+					severity="high",
+					rule_id="FS-013",
+					bug_code="11.2.2",
+					file=rel,
+					line=lineno,
+					message=(
+						"Hardcoded server address (IP or localhost) detected. "
+						"The code will break when deployed to staging or production."
+					),
+				)
+			)
 
 
 # ── FS-014 / 11.2.1 — Hardcoded DB connection strings ────────────────────
@@ -2111,17 +2415,19 @@ def check_hardcoded_db_config(report: QCReport, py_file: str, base: str) -> None
 			continue
 		if _DB_URL_RE.search(line) or _DB_HOST_RE.search(line):
 			if not _SAFE_CREDENTIAL_RE.search(line):
-				report.add(_finding(
-					severity="high",
-					rule_id="FS-014",
-					bug_code="11.2.1",
-					file=rel,
-					line=lineno,
-					message=(
-						"Hardcoded database connection string or host detected. "
-						"Production DB credentials will be exposed in version control."
-					),
-				))
+				report.add(
+					_finding(
+						severity="high",
+						rule_id="FS-014",
+						bug_code="11.2.1",
+						file=rel,
+						line=lineno,
+						message=(
+							"Hardcoded database connection string or host detected. "
+							"Production DB credentials will be exposed in version control."
+						),
+					)
+				)
 
 
 # ── FS-015 / 11.3.1 — Hardcoded business-logic values ────────────────────
@@ -2133,24 +2439,29 @@ _BIZ_LOGIC_RE = re.compile(
 
 def check_hardcoded_business_logic(report: QCReport, py_file: str, base: str) -> None:
 	"""FS-015 / 11.3.1: Hardcoded business-rule values (tax, discount, trial period, etc.)."""
+	fname = os.path.basename(py_file)
+	if fname.startswith("test_"):
+		return
 	lines = _read_lines(py_file)
 	rel = _rel(py_file, base)
 	for lineno, line in enumerate(lines, 1):
 		if line.lstrip().startswith("#"):
 			continue
 		if _BIZ_LOGIC_RE.search(line):
-			report.add(_finding(
-				severity="medium",
-				rule_id="FS-015",
-				bug_code="11.3.1",
-				file=rel,
-				line=lineno,
-				message=(
-					"Hardcoded business-rule value detected (tax rate, discount, "
-					"upload limit, etc.). Business rules change; they must be "
-					"configurable via a Settings DocType or environment variable."
-				),
-			))
+			report.add(
+				_finding(
+					severity="medium",
+					rule_id="FS-015",
+					bug_code="11.3.1",
+					file=rel,
+					line=lineno,
+					message=(
+						"Hardcoded business-rule value detected (tax rate, discount, "
+						"upload limit, etc.). Business rules change; they must be "
+						"configurable via a Settings DocType or environment variable."
+					),
+				)
+			)
 
 
 # ── FS-016 / 11.2.3 — Hardcoded cloud resource identifiers ───────────────
@@ -2175,17 +2486,19 @@ def check_hardcoded_cloud_config(report: QCReport, py_file: str, base: str) -> N
 			continue
 		if _CLOUD_RE.search(line) or _REGION_LITERAL_RE.search(line):
 			if not _SAFE_CREDENTIAL_RE.search(line):
-				report.add(_finding(
-					severity="medium",
-					rule_id="FS-016",
-					bug_code="11.2.3",
-					file=rel,
-					line=lineno,
-					message=(
-						"Hardcoded cloud resource identifier (bucket, region, IAM role) "
-						"detected. Different environments must use different resources."
-					),
-				))
+				report.add(
+					_finding(
+						severity="medium",
+						rule_id="FS-016",
+						bug_code="11.2.3",
+						file=rel,
+						line=lineno,
+						message=(
+							"Hardcoded cloud resource identifier (bucket, region, IAM role) "
+							"detected. Different environments must use different resources."
+						),
+					)
+				)
 
 
 # ── FS-017 / 12.5.2 — Master DocType missing audit trail ─────────────────
@@ -2208,18 +2521,20 @@ def check_master_doctype_audit_trail(report: QCReport, json_file: str, base: str
 	rel = _rel(json_file, base)
 	dt_name = data.get("name", json_file)
 	if not data.get("track_changes"):
-		report.add(_finding(
-			severity="medium",
-			rule_id="FS-017",
-			bug_code="12.5.2",
-			file=rel,
-			line=None,
-			message=(
-				f"Master DocType '{dt_name}': track_changes not enabled. "
-				"Unauthorized edits to master data cannot be detected — "
-				"a HACCP/ISO 22000 governance failure."
-			),
-		))
+		report.add(
+			_finding(
+				severity="medium",
+				rule_id="FS-017",
+				bug_code="12.5.2",
+				file=rel,
+				line=None,
+				message=(
+					f"Master DocType '{dt_name}': track_changes not enabled. "
+					"Unauthorized edits to master data cannot be detected — "
+					"a HACCP/ISO 22000 governance failure."
+				),
+			)
+		)
 
 
 # ── FS-018 / 12.1.2 — Master DocType missing required attributes ──────────
@@ -2239,18 +2554,20 @@ def check_master_doctype_required_fields(report: QCReport, json_file: str, base:
 	dt_name = data.get("name", json_file)
 	# Every master that can become "stale" should have a lifecycle status field
 	if not any(fn in field_names for fn in ("status", "is_active", "enabled", "disabled")):
-		report.add(_finding(
-			severity="low",
-			rule_id="FS-018",
-			bug_code="12.1.2",
-			file=rel,
-			line=None,
-			message=(
-				f"Master DocType '{dt_name}' has no lifecycle status field "
-				"(status / is_active / enabled). Obsolete master records "
-				"cannot be deactivated without deleting them."
-			),
-		))
+		report.add(
+			_finding(
+				severity="low",
+				rule_id="FS-018",
+				bug_code="12.1.2",
+				file=rel,
+				line=None,
+				message=(
+					f"Master DocType '{dt_name}' has no lifecycle status field "
+					"(status / is_active / enabled). Obsolete master records "
+					"cannot be deactivated without deleting them."
+				),
+			)
+		)
 
 
 # ── FS-019 / 11.3.3 — Hardcoded feature flags / role checks ─────────────
@@ -2258,44 +2575,49 @@ def check_master_doctype_required_fields(report: QCReport, json_file: str, base:
 _FEATURE_FLAG_RE = re.compile(
 	r"""(?i)(?:is_beta|is_experimental|show_feature|enable_|disable_)\s*=\s*(?:True|False|1|0)\b"""
 )
-_INLINE_ROLE_CHECK_RE = re.compile(
-	r"""frappe\.session\.user\s*==\s*['"](?!Administrator)[^'"]+['"]"""
-)
+_INLINE_ROLE_CHECK_RE = re.compile(r"""frappe\.session\.user\s*==\s*['"](?!Administrator)[^'"]+['"]""")
 
 
 def check_hardcoded_feature_flags(report: QCReport, py_file: str, base: str) -> None:
 	"""FS-019 / 11.3.3: Hardcoded feature toggle or inline user/role check."""
+	fname = os.path.basename(py_file)
+	if fname.startswith("test_"):
+		return
 	lines = _read_lines(py_file)
 	rel = _rel(py_file, base)
 	for lineno, line in enumerate(lines, 1):
 		if line.lstrip().startswith("#"):
 			continue
 		if _FEATURE_FLAG_RE.search(line):
-			report.add(_finding(
-				severity="low",
-				rule_id="FS-019",
-				bug_code="11.3.3",
-				file=rel,
-				line=lineno,
-				message=(
-					"Hardcoded feature flag (True/False/1/0) detected. "
-					"Feature toggles should be driven by a System Setting or "
-					"custom DocType field, not hardcoded in source."
-				),
-			))
+			report.add(
+				_finding(
+					severity="low",
+					rule_id="FS-019",
+					bug_code="11.3.3",
+					file=rel,
+					line=lineno,
+					message=(
+						"Hardcoded feature flag (True/False/1/0) detected. "
+						"Feature toggles should be driven by a System Setting or "
+						"custom DocType field, not hardcoded in source."
+					),
+				)
+			)
 		elif _INLINE_ROLE_CHECK_RE.search(line):
-			report.add(_finding(
-				severity="medium",
-				rule_id="FS-019",
-				bug_code="11.3.3",
-				file=rel,
-				line=lineno,
-				message=(
-					"Inline user-identity check detected "
-					"(frappe.session.user == 'specific@email'). "
-					"Use frappe.has_role('Role Name') for role-based access control."
-				),
-			))
+			report.add(
+				_finding(
+					severity="medium",
+					rule_id="FS-019",
+					bug_code="11.3.3",
+					file=rel,
+					line=lineno,
+					message=(
+						"Inline user-identity check detected "
+						"(frappe.session.user == 'specific@email'). "
+						"Use frappe.has_role('Role Name') for role-based access control."
+					),
+				)
+			)
 
 
 # ── FS-020 / Auto-learning — unclassified suspicious patterns ─────────────
@@ -2306,29 +2628,39 @@ _AUTO_LEARN_PATTERNS: list[tuple[re.Pattern, str, str, str, str]] = [
 	# (pattern, category, subcategory, bug_type, description)
 	(
 		re.compile(r"""(?i)cors_origins?\s*=\s*['"]\*['"]"""),
-		"Hardcoded Bugs", "Hardcoded Environment & Config", "Server",
+		"Hardcoded Bugs",
+		"Hardcoded Environment & Config",
+		"Server",
 		"Wildcard CORS origin detected — allows any domain to call the API",
 	),
 	(
 		re.compile(r"""(?i)debug\s*=\s*True\b"""),
-		"Security Bugs", "Data Protection", "Insecure storage",
+		"Security Bugs",
+		"Data Protection",
+		"Insecure storage",
 		"DEBUG=True may expose tracebacks and sensitive data to end-users",
 	),
 	(
 		re.compile(r"""(?i)ssl_verify\s*=\s*False\b|verify\s*=\s*False\b"""),
-		"Security Bugs", "Authentication", "Token leakage",
+		"Security Bugs",
+		"Authentication",
+		"Token leakage",
 		"SSL verification disabled — man-in-the-middle attacks become possible",
 	),
 	(
 		re.compile(r"""(?i)allow_all_origins\s*=\s*True\b"""),
-		"Hardcoded Bugs", "Hardcoded Environment & Config", "Server",
+		"Hardcoded Bugs",
+		"Hardcoded Environment & Config",
+		"Server",
 		"allow_all_origins=True disables CORS protection entirely",
 	),
 	# This pattern maps to a Concurrency category not yet in TAXONOMY;
 	# it will generate a LearnedRule (auto-learning) rather than a QCFinding.
 	(
 		re.compile(r"""(?i)threading\.Thread\s*\("""),
-		"Concurrency Bugs", "Threading", "Thread leaks",
+		"Concurrency Bugs",
+		"Threading",
+		"Thread leaks",
 		"Direct threading.Thread creation detected — ensure proper lifecycle management to prevent leaks",
 	),
 ]
@@ -2354,14 +2686,16 @@ def check_auto_learn_patterns(report: QCReport, py_file: str, base: str) -> None
 				)
 				if existing:
 					# Emit a regular finding using the existing taxonomy
-					report.add(_finding(
-						severity="high",
-						rule_id="FS-020",
-						bug_code=existing.code,
-						file=rel,
-						line=lineno,
-						message=f"{desc} — `{snippet}`",
-					))
+					report.add(
+						_finding(
+							severity="high",
+							rule_id="FS-020",
+							bug_code=existing.code,
+							file=rel,
+							line=lineno,
+							message=f"{desc} — `{snippet}`",
+						)
+					)
 				else:
 					# Propose a new rule (auto-learning)
 					learned = propose_bug_type(
@@ -2388,8 +2722,14 @@ def check_auto_learn_patterns(report: QCReport, py_file: str, base: str) -> None
 # ---------------------------------------------------------------------------
 
 
-def run_qc(app_path: str) -> QCReport:
-	"""Run all QC checks on the given app path and return a QCReport."""
+def run_qc(app_path: str, scope: str = "all") -> QCReport:
+	"""Run QC checks on the given app path and return a QCReport.
+
+	scope:
+	- "all": server + client checks (default)
+	- "server": Python + hooks parity checks only
+	- "client": JavaScript + DocType JSON checks only
+	"""
 	report = QCReport(app_path=app_path)
 	base = app_path
 
@@ -2397,45 +2737,77 @@ def run_qc(app_path: str) -> QCReport:
 	json_files = _iter_json_files(app_path)
 	js_files = _iter_js_files(app_path)
 
-	for py_file in py_files:
-		check_missing_translations(report, py_file, base)
-		check_hardcoded_emails(report, py_file, base)
-		check_default_in_validate_not_before_insert(report, py_file, base)
-		check_broad_except(report, py_file, base)
-		check_missing_cross_site_lot_validation(report, py_file, base)
-		check_ai_writes_frappe(report, py_file, base)
-		# New checks: v3
-		check_hardcoded_credentials(report, py_file, base)
-		check_hardcoded_server_config(report, py_file, base)
-		check_hardcoded_db_config(report, py_file, base)
-		check_hardcoded_business_logic(report, py_file, base)
-		check_hardcoded_cloud_config(report, py_file, base)
-		check_hardcoded_feature_flags(report, py_file, base)
-		check_auto_learn_patterns(report, py_file, base)
+	if scope in ("all", "server"):
+		for py_file in py_files:
+			check_missing_translations(report, py_file, base)
+			check_hardcoded_emails(report, py_file, base)
+			check_default_in_validate_not_before_insert(report, py_file, base)
+			check_broad_except(report, py_file, base)
+			check_missing_cross_site_lot_validation(report, py_file, base)
+			check_ai_writes_frappe(report, py_file, base)
+			check_hardcoded_credentials(report, py_file, base)
+			check_hardcoded_server_config(report, py_file, base)
+			check_hardcoded_db_config(report, py_file, base)
+			check_hardcoded_business_logic(report, py_file, base)
+			check_hardcoded_cloud_config(report, py_file, base)
+			check_hardcoded_feature_flags(report, py_file, base)
+			check_auto_learn_patterns(report, py_file, base)
 
-	for js_file in js_files:
-		check_missing_js_translations(report, js_file, base)
+		hooks_candidates = [
+			os.path.join(app_path, "hooks.py"),
+			os.path.join(app_path, "..", "hooks.py"),
+		]
+		for hf in hooks_candidates:
+			if os.path.exists(hf):
+				check_perm_query_has_permission_parity(hf, report, base)
+				break
 
-	for json_file in json_files:
-		check_doctype_json_site_required(report, json_file, base)
-		check_doctype_json_title_field(report, json_file, base)
-		check_doctype_json_track_changes(report, json_file, base)
-		# New checks: v3
-		check_master_doctype_audit_trail(report, json_file, base)
-		check_master_doctype_required_fields(report, json_file, base)
+	if scope in ("all", "client"):
+		for js_file in js_files:
+			check_missing_js_translations(report, js_file, base)
 
-	hooks_candidates = [
-		os.path.join(app_path, "hooks.py"),
-		os.path.join(app_path, "..", "hooks.py"),
-	]
-	for hf in hooks_candidates:
-		if os.path.exists(hf):
-			check_perm_query_has_permission_parity(hf, report, base)
-			break
+		for json_file in json_files:
+			check_doctype_json_site_required(report, json_file, base)
+			check_doctype_json_title_field(report, json_file, base)
+			check_doctype_json_track_changes(report, json_file, base)
+			check_master_doctype_audit_trail(report, json_file, base)
+			check_master_doctype_required_fields(report, json_file, base)
 
 	order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 	report.findings.sort(key=lambda f: (order.get(f.severity, 99), f.file, f.line or 0))
 	return report
+
+
+def append_daily_list(report: QCReport, output_path: str, scope: str) -> None:
+	"""Append a dated QC findings list to a markdown file for daily tracking."""
+	parent = os.path.dirname(output_path)
+	if parent:
+		os.makedirs(parent, exist_ok=True)
+
+	summary = report.to_dict()["summary"]
+	today = date.today().isoformat()
+	lines = [
+		f"## {today} — Frappe Skill Agent ({scope})",
+		f"- Result: {'PASSED' if report.passed() else 'FAILED'}",
+		(
+			"- Findings: "
+			f"total={summary['total']} critical={summary['critical']} high={summary['high']} "
+			f"medium={summary['medium']} low={summary['low']}"
+		),
+	]
+
+	if report.findings:
+		lines.append("- List:")
+		for finding in report.findings:
+			location = f"{finding.file}:{finding.line}" if finding.line else finding.file
+			lines.append(f"  - [{finding.severity.upper()}] {finding.rule_id} {location} — {finding.message}")
+	else:
+		lines.append("- List: No findings.")
+
+	lines.append("")
+
+	with open(output_path, "a", encoding="utf-8") as handle:
+		handle.write("\n".join(lines))
 
 
 # ---------------------------------------------------------------------------
@@ -2446,7 +2818,7 @@ def run_qc(app_path: str) -> QCReport:
 def print_text_report(report: QCReport, *, verbose: bool = False) -> None:
 	s = report.to_dict()["summary"]
 	cov = s.get("taxonomy_coverage", {})
-	print(f"\n{'='*72}")
+	print(f"\n{'=' * 72}")
 	print("  Frappe Skill QC Agent — Report")
 	print(f"  App path : {report.app_path}")
 	print(f"  Result   : {'✅ PASSED' if report.passed() else '❌ FAILED'}")
@@ -2463,8 +2835,10 @@ def print_text_report(report: QCReport, *, verbose: bool = False) -> None:
 			f"avg score {cov.get('avg_score', 0):.3f})"
 		)
 	if s["learned_rules_proposed"]:
-		print(f"  Auto-learned: {s['learned_rules_proposed']} new rule(s) proposed (use --save-learned to persist)")
-	print(f"{'='*72}\n")
+		print(
+			f"  Auto-learned: {s['learned_rules_proposed']} new rule(s) proposed (use --save-learned to persist)"
+		)
+	print(f"{'=' * 72}\n")
 
 	if not report.findings:
 		print("No issues found.\n")
@@ -2492,14 +2866,16 @@ def print_text_report(report: QCReport, *, verbose: bool = False) -> None:
 			print()
 
 	if report.learned_rules:
-		print(f"{'─'*72}")
+		print(f"{'─' * 72}")
 		print(f"  🤖 Auto-Learned Rules ({len(report.learned_rules)} proposed)")
-		print(f"{'─'*72}\n")
+		print(f"{'─' * 72}\n")
 		for lr in report.learned_rules:
 			conf_icon = {"high": "🔴", "medium": "🟠", "low": "🟡"}.get(lr.confidence, "⚪")
 			loc = f"{lr.file}:{lr.line}" if lr.line else lr.file
 			print(f"{conf_icon} [PROPOSED / {lr.suggested_code}] {lr.confidence.upper()} confidence  {loc}")
-			print(f"   Category  : {lr.suggested_category} › {lr.suggested_subcategory} › {lr.suggested_bug_type}")
+			print(
+				f"   Category  : {lr.suggested_category} › {lr.suggested_subcategory} › {lr.suggested_bug_type}"
+			)
 			print(f"   Pattern   : {lr.observed_pattern}")
 			print(f"   Message   : {lr.proposed_message}")
 			if verbose:
@@ -2544,6 +2920,12 @@ def main() -> int:
 		help="Output format (default: text)",
 	)
 	parser.add_argument(
+		"--scope",
+		choices=["all", "server", "client"],
+		default="all",
+		help="Scan scope: all (default), server (Python/hooks), or client (JS/DocType JSON)",
+	)
+	parser.add_argument(
 		"--verbose",
 		action="store_true",
 		help="Show planned response steps for every finding (default: only for critical/high)",
@@ -2567,6 +2949,11 @@ def main() -> int:
 			"telemetry signatures, and AST diffs for every bug type."
 		),
 	)
+	parser.add_argument(
+		"--daily-list",
+		metavar="PATH",
+		help="Append a dated markdown findings list to PATH (useful for once-daily server checks)",
+	)
 	args = parser.parse_args()
 
 	# Load external taxonomy extensions before scanning
@@ -2583,7 +2970,7 @@ def main() -> int:
 		print(f"Error: app-path does not exist: {app_path}", file=sys.stderr)
 		return 2
 
-	report = run_qc(app_path)
+	report = run_qc(app_path, scope=args.scope)
 
 	if args.format == "json":
 		print_json_report(report)
@@ -2607,6 +2994,10 @@ def main() -> int:
 		print(f"\nSaved {len(report.learned_rules)} learned rule(s) to {args.save_learned}", file=sys.stderr)
 	elif args.save_learned:
 		print("\nNo new rules to save.", file=sys.stderr)
+
+	if args.daily_list:
+		append_daily_list(report, args.daily_list, args.scope)
+		print(f"\nDaily findings list appended to {args.daily_list}", file=sys.stderr)
 
 	return 0 if report.passed() else 1
 

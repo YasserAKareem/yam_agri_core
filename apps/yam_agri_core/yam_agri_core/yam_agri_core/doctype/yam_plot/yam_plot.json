@@ -4,11 +4,13 @@
   "module": "YAM Agri Core",
   "custom": 1,
   "title_field": "plot_name",
+  "track_changes": 1,
   "fields": [
     {"fieldname": "plot_name", "fieldtype": "Data", "label": "Plot Name"},
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "area_ha", "fieldtype": "Float", "label": "Area (ha)"},
     {"fieldname": "last_crop", "fieldtype": "Link", "options": "Crop", "label": "Last Crop"},
+    {"fieldname": "is_active", "fieldtype": "Check", "label": "Is Active", "default": 1},
     {"fieldname": "boundary_geojson", "fieldtype": "Code", "label": "Boundary GeoJSON", "options": "JSON"}
   ],
   "permissions": [

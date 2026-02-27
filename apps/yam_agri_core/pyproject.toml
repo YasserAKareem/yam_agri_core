@@ -14,8 +14,8 @@ build-backend = "flit_core.buildapi"
 name = "yam_agri_core"
 
 [tool.bench.frappe-dependencies]
-frappe = ">=15.0.0-dev"
-erpnext = ">=15.0.0-dev"
+frappe = ">=16.0.0-dev"
+erpnext = ">=16.0.0-dev"
 
 [project.urls]
 Homepage = "https://github.com/YasserAKareem/yam_agri_core"

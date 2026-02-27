@@ -4,12 +4,15 @@
   "module": "YAM Agri Core",
   "custom": 1,
   "autoname": "field:variety_name",
+  "title_field": "variety_name",
+  "track_changes": 1,
   "fields": [
-    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site"},
+    {"fieldname": "site", "fieldtype": "Link", "options": "Site", "label": "Site", "reqd": 1},
     {"fieldname": "crop", "fieldtype": "Link", "options": "Crop", "label": "Crop"},
     {"fieldname": "variety_name", "fieldtype": "Data", "label": "Variety Name"},
     {"fieldname": "maturity_days", "fieldtype": "Int", "label": "Maturity (days)"},
     {"fieldname": "drought_tolerance", "fieldtype": "Float", "label": "Drought Tolerance (0-5)"},
+    {"fieldname": "is_active", "fieldtype": "Check", "label": "Is Active", "default": 1},
     {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
   ],
   "permissions": [

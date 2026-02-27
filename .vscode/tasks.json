@@ -91,6 +91,28 @@
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Frappe Skill Agent: Daily server-side list",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "tools/frappe_skill_agent.py",
+        "--scope",
+        "server",
+        "--daily-list",
+        "artifacts/evidence/qc_daily/server_qc_daily.md"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
     }
   ]
 }

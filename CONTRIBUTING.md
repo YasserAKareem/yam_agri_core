@@ -95,16 +95,16 @@ Before opening a PR confirm:
 
 Add at least one test (unit or integration) per new function. Place tests under
 `apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/` (Frappe convention: tests live inside the
-app module). Run from the repo root with:
+app module).
 
+Run pure-Python tests (fast, no DB):
 ```bash
 python -m pytest apps/yam_agri_core/yam_agri_core/yam_agri_core/tests/ -v
 ```
 
-Or, inside a running bench:
-
+Run Frappe integration tests (requires Docker stack):
 ```bash
-bench --site <site> run-tests --app yam_agri_core
+bash infra/docker/run.sh bench --site localhost run-tests --app yam_agri_core
 ```
 
 ---

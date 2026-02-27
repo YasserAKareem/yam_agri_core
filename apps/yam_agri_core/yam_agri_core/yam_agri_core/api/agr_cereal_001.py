@@ -64,16 +64,13 @@ def get_variety_recommendations(
 
 
 def _get_varieties(*, site: str, crop: str) -> list[dict]:
-	try:
-		if frappe.db.exists("DocType", "YAM Crop Variety"):
-			rows = frappe.get_all(
-				"YAM Crop Variety",
-				filters={"site": site, "crop": crop},
-				fields=["variety_name", "maturity_days", "drought_tolerance"],
-				limit=500,
-			)
-			return rows or []
-	except Exception:
-		return []
+	if frappe.db.exists("DocType", "YAM Crop Variety"):
+		rows = frappe.get_all(
+			"YAM Crop Variety",
+			filters={"site": site, "crop": crop},
+			fields=["variety_name", "maturity_days", "drought_tolerance"],
+			limit=500,
+		)
+		return rows or []
 
 	return []

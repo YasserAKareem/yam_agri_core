@@ -24,9 +24,9 @@
     { "doctype": "Observation", "limit": 20 }
   ],
   "bench_execute": [
-    "yam_agri_core.yam_agri_core.smoke.run_at02_automated_check",
-    "yam_agri_core.yam_agri_core.smoke.run_at06_automated_check",
-    "yam_agri_core.yam_agri_core.smoke.run_at10_automated_check",
-    "yam_agri_core.yam_agri_core.smoke.run_phase2_smoke"
+    "yam_agri_core.yam_agri_core.health.checks.run_at02_automated_check",
+    "yam_agri_core.yam_agri_core.health.checks.run_at06_automated_check",
+    "yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check",
+    "yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke"
   ]
 }

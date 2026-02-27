@@ -741,7 +741,7 @@ grep "__version__" apps/yam_agri_core/yam_agri_core/__init__.py
 
 ### CI / Frappe Skill Agent QC
 
-**Script:** `python tools/frappe_skill_agent.py`  
+**Script:** `python tools/frappe_skill_agent.py`
 **Exit code meaning:** `0` = pass (0 critical, 0 high); `1` = fail; `2` = config error
 
 **Note:** The job uses `continue-on-error: true` so it never blocks merges, but the owner
@@ -752,9 +752,11 @@ expects 0 critical and 0 high findings before a PR is approved.
 | `FS-001 CRITICAL dev_seed.py / smoke.py / seed/*.py` — raw `frappe.throw()` strings | `frappe.throw()` called with a plain string, not wrapped in `_()`. Breaks Arabic translations. | `frappe.throw(_("message"))` or `frappe.throw(_("msg: {0}").format(var))`. `from frappe import _` must be present. |
 | `FS-006 HIGH smoke.py` — hardcoded email in non-test code | Inline `"user@example.com"` literal duplicated in production code instead of using the module-level constant. | Replace with the existing `_AT10_USER_A` / `_AT10_USER_B` constants (defined at top of `smoke.py`). |
 | `FS-012 CRITICAL tests/test_frappe_skill_agent.py` — fake credentials flagged | `check_hardcoded_credentials()` lacked a test-file skip, so intentional test fixtures (`password = "…"`) triggered false positives. | Add `if os.path.basename(py_file).startswith("test_"): return` at the top of `check_hardcoded_credentials()`. Pattern: same as FS-013/015/016. |
+| `FS-015/FS-019 MEDIUM tests/test_frappe_skill_agent.py` — test fixture false positives | `check_hardcoded_business_logic()` and `check_hardcoded_feature_flags()` scanned test fixtures that intentionally contain hardcoded examples. | Add `if os.path.basename(py_file).startswith("test_"): return` at the top of both checks to exclude fixtures from production-rule findings. |
 | `FS-020 HIGH tests/test_frappe_skill_agent.py` — auto-learn patterns in test code | `check_auto_learn_patterns()` also lacked a test-file skip. | Same fix: add `startswith("test_")` guard at the top of `check_auto_learn_patterns()`. |
 | `FS-011 CRITICAL hooks.py` — PQC/has_permission out of sync | New DocType added to `permission_query_conditions` but not `has_permission` (or vice versa). | Add BOTH entries in `hooks.py` for every DocType with a `site` field. See §6. |
 | `FS-009 HIGH *.py` — missing lot-site cross-check | Controller has a `lot` link field but never validates `lot.site == self.site`. | Add cross-site check inside `validate()` (pattern in §8). |
+| `FS-008 MEDIUM metadata_export.py / workspace_setup.py` — silent broad exception handlers | Broad `except Exception` with `pass` or fallback return hid real runtime failures. | Replace with explicit pre-checks (`frappe.db.exists`) and deterministic control flow; avoid silent `except Exception`. |
 
 **Quick diagnostic:**
 ```bash
