@@ -125,6 +125,10 @@ def site_tolerance_policy_query_conditions(user: str) -> str | None:
 	return build_site_query_condition("Site Tolerance Policy", user=user)
 
 
+def ai_interaction_log_query_conditions(user: str) -> str | None:
+	return build_site_query_condition("AI Interaction Log", user=user)
+
+
 def location_query_conditions(user: str) -> str | None:
 	user = user or frappe.session.user
 

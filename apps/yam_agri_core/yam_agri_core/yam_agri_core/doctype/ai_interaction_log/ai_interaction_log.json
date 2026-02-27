@@ -1,0 +1,149 @@
+{
+  "doctype": "DocType",
+  "name": "AI Interaction Log",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "autoname": "naming_series:",
+  "title_field": "source_name",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Naming Series",
+      "options": "AIL-.YYYY.-",
+      "default": "AIL-.YYYY.-"
+    },
+    {
+      "fieldname": "timestamp",
+      "fieldtype": "Datetime",
+      "label": "Timestamp",
+      "default": "Now",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "site",
+      "fieldtype": "Link",
+      "label": "Site",
+      "options": "Site",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "requested_by",
+      "fieldtype": "Link",
+      "label": "Requested By",
+      "options": "User",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "source_doctype",
+      "fieldtype": "Link",
+      "label": "Source DocType",
+      "options": "DocType",
+      "reqd": 1
+    },
+    {
+      "fieldname": "source_name",
+      "fieldtype": "Dynamic Link",
+      "label": "Source Record",
+      "options": "source_doctype",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "task",
+      "fieldtype": "Data",
+      "label": "Task",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "endpoint",
+      "fieldtype": "Data",
+      "label": "Gateway Endpoint"
+    },
+    {
+      "fieldname": "provider",
+      "fieldtype": "Data",
+      "label": "Provider"
+    },
+    {
+      "fieldname": "model_used",
+      "fieldtype": "Data",
+      "label": "Model Used"
+    },
+    {
+      "fieldname": "prompt_hash",
+      "fieldtype": "Data",
+      "label": "Prompt Hash"
+    },
+    {
+      "fieldname": "response_hash",
+      "fieldtype": "Data",
+      "label": "Response Hash"
+    },
+    {
+      "fieldname": "redaction_applied",
+      "fieldtype": "Check",
+      "label": "Redaction Applied",
+      "default": 0
+    },
+    {
+      "fieldname": "redaction_count",
+      "fieldtype": "Int",
+      "label": "Redaction Count",
+      "default": 0
+    },
+    {
+      "fieldname": "tokens_used",
+      "fieldtype": "Int",
+      "label": "Estimated Tokens",
+      "default": 0
+    },
+    {
+      "fieldname": "warning_text",
+      "fieldtype": "Small Text",
+      "label": "Warning"
+    },
+    {
+      "fieldname": "decision",
+      "fieldtype": "Select",
+      "label": "Decision",
+      "options": "Pending\nAccepted\nRejected",
+      "default": "Pending",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "decided_by",
+      "fieldtype": "Link",
+      "label": "Decided By",
+      "options": "User",
+      "read_only": 1
+    },
+    {
+      "fieldname": "decided_at",
+      "fieldtype": "Datetime",
+      "label": "Decided At",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "QA Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    }
+  ]
+}

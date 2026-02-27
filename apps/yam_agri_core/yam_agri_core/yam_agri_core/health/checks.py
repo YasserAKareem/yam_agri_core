@@ -1538,3 +1538,226 @@ def run_at08_automated_check() -> dict:
 		"status": "pass" if pass_checks else "fail",
 		"evidence": evidence,
 	}
+
+
+def run_at11_automated_check() -> dict:
+	"""Execute automated AT-11 checks for AI assistive-only governance + audit log."""
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == _AT10_USER_A:
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"lot": None,
+		"assistive_only": False,
+		"decision_required": False,
+		"lot_status_before": "",
+		"lot_status_after": "",
+		"lot_status_unchanged": False,
+		"log_created": False,
+		"log_source_matches": False,
+		"log_decision_pending": False,
+		"decision_update_ok": False,
+		"interaction_log": "",
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		from yam_agri_core.yam_agri_core.api import ai_assist
+
+		if not frappe.db.exists("DocType", "AI Interaction Log"):
+			evidence["error"] = "AI Interaction Log DocType missing"
+		else:
+			tag = frappe.utils.now_datetime().strftime("%H%M%S")
+			lot_doc = frappe.get_doc(
+				{
+					"doctype": "Lot",
+					"lot_number": f"AT11-LOT-{tag}-{site_a[-4:]}",
+					"site": site_a,
+					"qty_kg": 100,
+					"status": "Draft",
+				}
+			).insert(ignore_permissions=True)
+			evidence["lot"] = lot_doc.name
+			evidence["lot_status_before"] = str(lot_doc.get("status") or "")
+
+			ai_result = ai_assist.get_lot_compliance_suggestion(lot_doc.name)
+			lot_doc.reload()
+
+			evidence["assistive_only"] = bool(ai_result.get("assistive_only"))
+			evidence["decision_required"] = bool(ai_result.get("decision_required"))
+			evidence["lot_status_after"] = str(lot_doc.get("status") or "")
+			evidence["lot_status_unchanged"] = (
+				evidence["lot_status_before"] == evidence["lot_status_after"]
+			)
+
+			interaction_log = str(ai_result.get("interaction_log") or "")
+			evidence["interaction_log"] = interaction_log
+			if interaction_log and frappe.db.exists("AI Interaction Log", interaction_log):
+				log_doc = frappe.get_doc("AI Interaction Log", interaction_log)
+				evidence["log_created"] = True
+				evidence["log_source_matches"] = (
+					str(log_doc.get("source_doctype") or "") == "Lot"
+					and str(log_doc.get("source_name") or "") == lot_doc.name
+				)
+				evidence["log_decision_pending"] = str(log_doc.get("decision") or "") == "Pending"
+
+				decision_result = ai_assist.set_ai_interaction_decision(interaction_log, "rejected")
+				evidence["decision_update_ok"] = bool(decision_result.get("ok")) and str(
+					decision_result.get("decision") or ""
+				) == "Rejected"
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+	finally:
+		frappe.set_user(original_user)
+
+	pass_checks = all(
+		[
+			bool(evidence.get("lot")),
+			evidence.get("assistive_only"),
+			evidence.get("decision_required"),
+			evidence.get("lot_status_unchanged"),
+			evidence.get("log_created"),
+			evidence.get("log_source_matches"),
+			evidence.get("log_decision_pending"),
+			evidence.get("decision_update_ok"),
+			not evidence.get("error"),
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_at12_automated_check() -> dict:
+	"""Execute automated AT-12 checks for redaction enforcement in AI gateway calls."""
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == _AT10_USER_A:
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	evidence = {
+		"site": site_a,
+		"provider": "",
+		"redaction_applied": False,
+		"redaction_count": 0,
+		"prompt_hash_present": False,
+		"response_hash_present": False,
+		"error": None,
+	}
+
+	try:
+		from yam_agri_core.yam_agri_core.api import ai_assist
+
+		gateway_result = ai_assist._call_ai_gateway(  # noqa: SLF001
+			{
+				"task": "chat",
+				"site": site_a,
+				"record_type": "Lot",
+				"record_name": "AT12-REDACTION",
+				"message": "contact qa@example.com customer_id: CUST-900 price USD 120",
+				"context": "gps 15.12345, 44.98765 phone +967 777 123 456",
+				"user": "Administrator",
+				"max_tokens": 256,
+				"template_id": "general_assistant",
+			},
+			endpoint_path="/chat",
+		)
+
+		evidence["provider"] = str(gateway_result.get("provider") or "")
+		evidence["redaction_applied"] = bool(gateway_result.get("redaction_applied") or False)
+		evidence["redaction_count"] = int(gateway_result.get("redaction_count") or 0)
+		evidence["prompt_hash_present"] = bool(str(gateway_result.get("prompt_hash") or "").strip())
+		evidence["response_hash_present"] = bool(str(gateway_result.get("response_hash") or "").strip())
+	except Exception as exc:
+		return {
+			"status": "blocked",
+			"reason": "AI gateway redaction probe unavailable",
+			"evidence": {
+				**evidence,
+				"error": frappe.as_unicode(exc),
+			},
+		}
+
+	pass_checks = all(
+		[
+			evidence["redaction_applied"],
+			evidence["redaction_count"] > 0,
+			evidence["prompt_hash_present"],
+			evidence["response_hash_present"],
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
+def run_phase6_governance_automated_check() -> dict:
+	"""Run the Phase 6 governance acceptance bundle in one command."""
+	at11 = run_at11_automated_check()
+	at12 = run_at12_automated_check()
+	statuses = [at11.get("status"), at12.get("status")]
+
+	if "fail" in statuses:
+		status = "fail"
+	elif "blocked" in statuses:
+		status = "blocked"
+	else:
+		status = "pass"
+
+	return {
+		"status": status,
+		"checks": {
+			"at11": at11.get("status"),
+			"at12": at12.get("status"),
+		},
+		"evidence": {
+			"at11": at11.get("evidence"),
+			"at12": at12.get("evidence"),
+		},
+	}
+
+
+def run_phase6_smoke() -> dict:
+	"""Backward-compatible alias for Phase 6 governance acceptance bundle."""
+	return run_phase6_governance_automated_check()

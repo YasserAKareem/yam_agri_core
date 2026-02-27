@@ -142,6 +142,10 @@ def site_tolerance_policy_has_permission(
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
 
+def ai_interaction_log_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
+
+
 def location_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
 	location = None
 	if isinstance(doc, dict):

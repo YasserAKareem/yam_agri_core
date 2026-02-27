@@ -143,9 +143,12 @@ class SuggestResponse(BaseModel):
 	task: str
 	suggestion: str
 	provider: str
+	model: str
+	template_id: str
 	assistive_only: bool
 	redaction_applied: bool
 	redaction_count: int
+	tokens_used: int
 	prompt_hash: str
 	response_hash: str
 	decision_required: bool
@@ -184,6 +187,7 @@ class ChatResponse(BaseModel):
 	decision_required: bool
 	redaction_applied: bool
 	redaction_count: int
+	tokens_used: int
 	prompt_hash: str
 	response_hash: str
 	timestamp: str
@@ -195,6 +199,10 @@ def _utc_now_iso() -> str:
 
 def _sha256_text(value: str) -> str:
 	return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _estimate_tokens(*parts: str) -> int:
+	return max(0, sum(len(part or "") for part in parts) // 4)
 
 
 def _safe_json_dumps(value: Any) -> str:
@@ -526,6 +534,7 @@ async def suggest(payload: SuggestRequest) -> SuggestResponse:
 
 	suggestion_text = _clean_assistant_prefix(suggestion_text)
 	response_hash = _sha256_text(suggestion_text)
+	tokens_used = _estimate_tokens(full_prompt, suggestion_text)
 	_STATE["requests_total"] = int(_STATE["requests_total"]) + 1
 	if redaction_count > 0:
 		_STATE["requests_redacted"] = int(_STATE["requests_redacted"]) + 1
@@ -537,9 +546,12 @@ async def suggest(payload: SuggestRequest) -> SuggestResponse:
 		task=task,
 		suggestion=suggestion_text,
 		provider=provider,
+		model=model,
+		template_id=template_id,
 		assistive_only=True,
 		redaction_applied=redaction_count > 0,
 		redaction_count=redaction_count,
+		tokens_used=tokens_used,
 		prompt_hash=prompt_hash,
 		response_hash=response_hash,
 		decision_required=True,
@@ -603,6 +615,7 @@ async def chat(payload: ChatRequest) -> ChatResponse:
 	reply = _clean_assistant_prefix(reply)
 	prompt_hash = _sha256_text(full_prompt)
 	response_hash = _sha256_text(reply)
+	tokens_used = _estimate_tokens(full_prompt, reply)
 
 	_STATE["requests_total"] = int(_STATE["requests_total"]) + 1
 	if redaction_count > 0:
@@ -621,6 +634,7 @@ async def chat(payload: ChatRequest) -> ChatResponse:
 		decision_required=True,
 		redaction_applied=redaction_count > 0,
 		redaction_count=redaction_count,
+		tokens_used=tokens_used,
 		prompt_hash=prompt_hash,
 		response_hash=response_hash,
 		timestamp=_utc_now_iso(),
