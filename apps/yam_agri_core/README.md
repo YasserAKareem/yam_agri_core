@@ -22,8 +22,8 @@ bench --site <your-site> install-app yam_agri_core
 
 ## Requirements
 
-- Frappe ≥ 15.x
-- ERPNext ≥ 15.x
+- Frappe ≥ 16.x
+- ERPNext ≥ 16.x
 - Frappe Agriculture app
 
 ## Key DocTypes

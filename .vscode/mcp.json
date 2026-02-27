@@ -14,7 +14,7 @@
     "frappe-api": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "args": ["-y", "fetch-mcp"],
       "env": {
         "ALLOWED_HOSTS": "localhost,dev.local,127.0.0.1"
       }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Installer"
+  short_description: "Install project dependencies safely"
+  default_prompt: "Use $installer to detect a project stack and run the safest dependency install commands."

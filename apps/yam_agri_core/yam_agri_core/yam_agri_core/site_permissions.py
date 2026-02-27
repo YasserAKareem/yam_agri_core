@@ -337,7 +337,28 @@ def _site_has_permission(site: str | None, user: str | None = None) -> bool:
 
 
 def _doctype_has_site_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
-	return _site_has_permission(_extract_doc_site(doc), user=user)
+	user = user or frappe.session.user
+
+	if user in ("Administrator",):
+		return True
+
+	if _user_has_role("System Manager", user=user):
+		return True
+
+	if doc is None:
+		return bool(get_allowed_sites(user=user))
+
+	site = _extract_doc_site(doc)
+	if site:
+		return _site_has_permission(site, user=user)
+
+	docname = doc.get("name") if isinstance(doc, dict) else getattr(doc, "name", None)
+	doctype = doc.get("doctype") if isinstance(doc, dict) else getattr(doc, "doctype", None)
+	if docname and doctype and frappe.db.exists(doctype, docname):
+		doc_site = frappe.db.get_value(doctype, docname, "site")
+		return _site_has_permission(doc_site, user=user)
+
+	return False
 
 
 def site_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:

@@ -12,6 +12,20 @@ from frappe import _
 from yam_agri_core.yam_agri_core.site_permissions import assert_site_access, resolve_site
 
 QA_MANAGER_ROLE = "QA Manager"
+SYSTEM_MANAGER_ROLE = "System Manager"
+ADMIN_ROLE = "Administrator"
+SCALE_IMPORT_ALLOWED_ROLES = (QA_MANAGER_ROLE, SYSTEM_MANAGER_ROLE, ADMIN_ROLE)
+ARTIFACT_ROOT_DIR = "artifacts"
+
+
+def _assert_role_gate(*, allowed_roles: tuple[str, ...], action_label: str) -> None:
+	current_roles = set(frappe.get_roles(frappe.session.user) or [])
+	if current_roles.intersection(set(allowed_roles)):
+		return
+	frappe.throw(
+		_("Only users with role(s) {0} may {1}.").format(", ".join(allowed_roles), action_label),
+		frappe.PermissionError,
+	)
 
 
 def _resolve_repo_root() -> Path:
@@ -23,11 +37,23 @@ def _resolve_repo_root() -> Path:
 	return Path.cwd()
 
 
-def _resolve_output_path(relative_or_absolute_path: str) -> Path:
-	p = Path(relative_or_absolute_path)
-	if p.is_absolute():
-		return p
-	return _resolve_repo_root() / relative_or_absolute_path
+def _resolve_output_path(relative_path: str) -> Path:
+	repo_root = _resolve_repo_root().resolve()
+	artifacts_root = (repo_root / ARTIFACT_ROOT_DIR).resolve()
+	requested = Path((relative_path or "").strip())
+	if requested.is_absolute():
+		frappe.throw(_("artifact_file must be a relative path under artifacts/"), frappe.ValidationError)
+
+	resolved = (repo_root / requested).resolve()
+	try:
+		resolved.relative_to(artifacts_root)
+	except ValueError:
+		frappe.throw(_("artifact_file must stay inside artifacts/"), frappe.ValidationError)
+
+	if resolved.suffix.lower() != ".json":
+		frappe.throw(_("artifact_file must be a .json path"), frappe.ValidationError)
+
+	return resolved
 
 
 def _safe_float(value: Any) -> float | None:
@@ -157,7 +183,7 @@ def _ensure_nonconformance_for_mismatch(
 			"capa_description": description,
 		}
 	)
-	nc.insert(ignore_permissions=True)
+	nc.insert()
 	return str(nc.name)
 
 
@@ -232,6 +258,7 @@ def import_scale_tickets_csv(
 
 	site_name = resolve_site(site)
 	assert_site_access(site_name)
+	_assert_role_gate(allowed_roles=SCALE_IMPORT_ALLOWED_ROLES, action_label=_("import scale tickets"))
 
 	tolerance_pct = _fetch_site_tolerance_pct(site_name, override_policy=tolerance_policy)
 	rows = _parse_csv_rows(csv_content)
@@ -368,7 +395,7 @@ def import_scale_tickets_csv(
 					),
 				}
 			)
-			ticket.insert(ignore_permissions=True)
+			ticket.insert()
 			ticket_name = str(ticket.name)
 			summary["scale_tickets_created"] += 1
 
@@ -408,9 +435,6 @@ def import_scale_tickets_csv(
 			}
 		)
 
-	if int(dry_run) != 1:
-		frappe.db.commit()
-
 	artifact_path = ""
 	if int(write_artifact) == 1:
 		artifact_path = _write_import_artifact(
@@ -440,15 +464,17 @@ def close_nonconformance_with_qa(nc_name: str) -> dict[str, Any]:
 	if not nc_name:
 		frappe.throw(_("Nonconformance name is required"), frappe.ValidationError)
 
-	if not frappe.has_role(QA_MANAGER_ROLE):
-		frappe.throw(
-			_("Only a user with role '{0}' may close Nonconformance").format(QA_MANAGER_ROLE),
-			frappe.PermissionError,
-		)
+	_assert_role_gate(
+		allowed_roles=(QA_MANAGER_ROLE, SYSTEM_MANAGER_ROLE, ADMIN_ROLE),
+		action_label=_("close Nonconformance"),
+	)
 
 	nc = frappe.get_doc("Nonconformance", nc_name)
+	site_name = str(nc.get("site") or "").strip()
+	if not site_name:
+		frappe.throw(_("Nonconformance must belong to a Site"), frappe.ValidationError)
+	assert_site_access(site_name)
 	nc.status = "Closed"
-	nc.save(ignore_permissions=True)
-	frappe.db.commit()
+	nc.save()
 
 	return {"status": "ok", "nonconformance": nc.name, "new_status": nc.status}

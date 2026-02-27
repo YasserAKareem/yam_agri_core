@@ -6,7 +6,15 @@ from typing import Any
 import frappe
 from frappe import _
 
-from yam_agri_core.yam_agri_core.site_permissions import assert_site_access, resolve_site
+from yam_agri_core.yam_agri_core.site_permissions import assert_site_access, get_allowed_sites, resolve_site
+
+MAX_SUMMARY_LIMIT = 500
+
+
+def _has_global_site_access(user: str) -> bool:
+	if user == "Administrator":
+		return True
+	return "System Manager" in set(frappe.get_roles(user) or [])
 
 
 @frappe.whitelist()
@@ -26,16 +34,35 @@ def get_observation_executive_summary(
 		site_name = resolve_site(site)
 		assert_site_access(site_name)
 		filters["site"] = site_name
+	else:
+		user = frappe.session.user
+		if not _has_global_site_access(user):
+			allowed_sites = get_allowed_sites(user=user)
+			if not allowed_sites:
+				return {
+					"status": "ok",
+					"include_quarantine": int(include_quarantine),
+					"row_count": 0,
+					"quality_distribution": {},
+					"alert_candidates": 0,
+					"rows": [],
+				}
+			filters["site"] = ["in", allowed_sites]
 
 	if int(include_quarantine) != 1:
 		filters["quality_flag"] = ["!=", "Quarantine"]
+
+	try:
+		safe_limit = max(1, min(int(limit), MAX_SUMMARY_LIMIT))
+	except (TypeError, ValueError):
+		safe_limit = 200
 
 	rows = frappe.get_all(
 		"Observation",
 		filters=filters,
 		fields=["name", "site", "device", "observation_type", "value", "unit", "quality_flag", "raw_payload"],
 		order_by="modified desc",
-		limit_page_length=max(1, int(limit)),
+		limit_page_length=safe_limit,
 	)
 
 	by_quality: dict[str, int] = {}

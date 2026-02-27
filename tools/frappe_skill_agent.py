@@ -50,6 +50,7 @@ import json
 import os
 import re
 import sys
+from datetime import date
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -2721,8 +2722,14 @@ def check_auto_learn_patterns(report: QCReport, py_file: str, base: str) -> None
 # ---------------------------------------------------------------------------
 
 
-def run_qc(app_path: str) -> QCReport:
-	"""Run all QC checks on the given app path and return a QCReport."""
+def run_qc(app_path: str, scope: str = "all") -> QCReport:
+	"""Run QC checks on the given app path and return a QCReport.
+
+	scope:
+	- "all": server + client checks (default)
+	- "server": Python + hooks parity checks only
+	- "client": JavaScript + DocType JSON checks only
+	"""
 	report = QCReport(app_path=app_path)
 	base = app_path
 
@@ -2730,45 +2737,77 @@ def run_qc(app_path: str) -> QCReport:
 	json_files = _iter_json_files(app_path)
 	js_files = _iter_js_files(app_path)
 
-	for py_file in py_files:
-		check_missing_translations(report, py_file, base)
-		check_hardcoded_emails(report, py_file, base)
-		check_default_in_validate_not_before_insert(report, py_file, base)
-		check_broad_except(report, py_file, base)
-		check_missing_cross_site_lot_validation(report, py_file, base)
-		check_ai_writes_frappe(report, py_file, base)
-		# New checks: v3
-		check_hardcoded_credentials(report, py_file, base)
-		check_hardcoded_server_config(report, py_file, base)
-		check_hardcoded_db_config(report, py_file, base)
-		check_hardcoded_business_logic(report, py_file, base)
-		check_hardcoded_cloud_config(report, py_file, base)
-		check_hardcoded_feature_flags(report, py_file, base)
-		check_auto_learn_patterns(report, py_file, base)
+	if scope in ("all", "server"):
+		for py_file in py_files:
+			check_missing_translations(report, py_file, base)
+			check_hardcoded_emails(report, py_file, base)
+			check_default_in_validate_not_before_insert(report, py_file, base)
+			check_broad_except(report, py_file, base)
+			check_missing_cross_site_lot_validation(report, py_file, base)
+			check_ai_writes_frappe(report, py_file, base)
+			check_hardcoded_credentials(report, py_file, base)
+			check_hardcoded_server_config(report, py_file, base)
+			check_hardcoded_db_config(report, py_file, base)
+			check_hardcoded_business_logic(report, py_file, base)
+			check_hardcoded_cloud_config(report, py_file, base)
+			check_hardcoded_feature_flags(report, py_file, base)
+			check_auto_learn_patterns(report, py_file, base)
 
-	for js_file in js_files:
-		check_missing_js_translations(report, js_file, base)
+		hooks_candidates = [
+			os.path.join(app_path, "hooks.py"),
+			os.path.join(app_path, "..", "hooks.py"),
+		]
+		for hf in hooks_candidates:
+			if os.path.exists(hf):
+				check_perm_query_has_permission_parity(hf, report, base)
+				break
 
-	for json_file in json_files:
-		check_doctype_json_site_required(report, json_file, base)
-		check_doctype_json_title_field(report, json_file, base)
-		check_doctype_json_track_changes(report, json_file, base)
-		# New checks: v3
-		check_master_doctype_audit_trail(report, json_file, base)
-		check_master_doctype_required_fields(report, json_file, base)
+	if scope in ("all", "client"):
+		for js_file in js_files:
+			check_missing_js_translations(report, js_file, base)
 
-	hooks_candidates = [
-		os.path.join(app_path, "hooks.py"),
-		os.path.join(app_path, "..", "hooks.py"),
-	]
-	for hf in hooks_candidates:
-		if os.path.exists(hf):
-			check_perm_query_has_permission_parity(hf, report, base)
-			break
+		for json_file in json_files:
+			check_doctype_json_site_required(report, json_file, base)
+			check_doctype_json_title_field(report, json_file, base)
+			check_doctype_json_track_changes(report, json_file, base)
+			check_master_doctype_audit_trail(report, json_file, base)
+			check_master_doctype_required_fields(report, json_file, base)
 
 	order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 	report.findings.sort(key=lambda f: (order.get(f.severity, 99), f.file, f.line or 0))
 	return report
+
+
+def append_daily_list(report: QCReport, output_path: str, scope: str) -> None:
+	"""Append a dated QC findings list to a markdown file for daily tracking."""
+	parent = os.path.dirname(output_path)
+	if parent:
+		os.makedirs(parent, exist_ok=True)
+
+	summary = report.to_dict()["summary"]
+	today = date.today().isoformat()
+	lines = [
+		f"## {today} — Frappe Skill Agent ({scope})",
+		f"- Result: {'PASSED' if report.passed() else 'FAILED'}",
+		(
+			"- Findings: "
+			f"total={summary['total']} critical={summary['critical']} high={summary['high']} "
+			f"medium={summary['medium']} low={summary['low']}"
+		),
+	]
+
+	if report.findings:
+		lines.append("- List:")
+		for finding in report.findings:
+			location = f"{finding.file}:{finding.line}" if finding.line else finding.file
+			lines.append(f"  - [{finding.severity.upper()}] {finding.rule_id} {location} — {finding.message}")
+	else:
+		lines.append("- List: No findings.")
+
+	lines.append("")
+
+	with open(output_path, "a", encoding="utf-8") as handle:
+		handle.write("\n".join(lines))
 
 
 # ---------------------------------------------------------------------------
@@ -2881,6 +2920,12 @@ def main() -> int:
 		help="Output format (default: text)",
 	)
 	parser.add_argument(
+		"--scope",
+		choices=["all", "server", "client"],
+		default="all",
+		help="Scan scope: all (default), server (Python/hooks), or client (JS/DocType JSON)",
+	)
+	parser.add_argument(
 		"--verbose",
 		action="store_true",
 		help="Show planned response steps for every finding (default: only for critical/high)",
@@ -2904,6 +2949,11 @@ def main() -> int:
 			"telemetry signatures, and AST diffs for every bug type."
 		),
 	)
+	parser.add_argument(
+		"--daily-list",
+		metavar="PATH",
+		help="Append a dated markdown findings list to PATH (useful for once-daily server checks)",
+	)
 	args = parser.parse_args()
 
 	# Load external taxonomy extensions before scanning
@@ -2920,7 +2970,7 @@ def main() -> int:
 		print(f"Error: app-path does not exist: {app_path}", file=sys.stderr)
 		return 2
 
-	report = run_qc(app_path)
+	report = run_qc(app_path, scope=args.scope)
 
 	if args.format == "json":
 		print_json_report(report)
@@ -2944,6 +2994,10 @@ def main() -> int:
 		print(f"\nSaved {len(report.learned_rules)} learned rule(s) to {args.save_learned}", file=sys.stderr)
 	elif args.save_learned:
 		print("\nNo new rules to save.", file=sys.stderr)
+
+	if args.daily_list:
+		append_daily_list(report, args.daily_list, args.scope)
+		print(f"\nDaily findings list appended to {args.daily_list}", file=sys.stderr)
 
 	return 0 if report.passed() else 1
 
