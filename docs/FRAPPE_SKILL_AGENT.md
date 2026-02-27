@@ -1,7 +1,7 @@
 # Frappe Skill Agent — Developer Guide
 
-> **Version:** v4 · **File:** `tools/frappe_skill_agent.py`  
-> **Maintained by:** YAM Agri Core team  
+> **Version:** v4 · **File:** `tools/frappe_skill_agent.py`
+> **Maintained by:** YAM Agri Core team
 > **Last updated:** 2026-02-24
 
 ---

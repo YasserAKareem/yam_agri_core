@@ -423,7 +423,9 @@ def season_policy_has_permission(doc, user: str | None = None, permission_type: 
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
 
-def site_tolerance_policy_has_permission(doc, user: str | None = None, permission_type: str | None = None) -> bool:
+def site_tolerance_policy_has_permission(
+	doc, user: str | None = None, permission_type: str | None = None
+) -> bool:
 	return _doctype_has_site_permission(doc, user=user, permission_type=permission_type)
 
 
