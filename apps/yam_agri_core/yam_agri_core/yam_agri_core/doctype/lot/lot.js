@@ -1,6 +1,3 @@
-// Lot — client-side form controller
-// Frappe calls frappe.ui.form.on("<DocType>", { event: handler })
-
 function yamGetAiPromptTemplates() {
 	return new Promise((resolve) => {
 		frappe.call({
@@ -32,6 +29,53 @@ function yamGetAiModels() {
 	});
 }
 
+function yamSubmitAiDecision(interactionLog, decision) {
+	if (!interactionLog) {
+		return;
+	}
+
+	frappe.call({
+		method: "yam_agri_core.yam_agri_core.api.ai_assist.set_ai_interaction_decision",
+		args: {
+			interaction_log: interactionLog,
+			decision,
+		},
+		callback(r) {
+			const data = (r && r.message) || {};
+			if (data.ok) {
+				frappe.show_alert({
+					message: __("AI decision logged: {0}", [data.decision || decision]),
+					indicator: "green",
+				});
+				return;
+			}
+
+			frappe.show_alert({
+				message: __("AI decision log update is not available."),
+				indicator: "orange",
+			});
+		},
+		error() {
+			frappe.show_alert({
+				message: __("Could not update AI decision log."),
+				indicator: "red",
+			});
+		},
+	});
+}
+
+function yamPromptAiDecision(interactionLog) {
+	if (!interactionLog) {
+		return;
+	}
+
+	frappe.confirm(
+		__("Do you accept this AI suggestion?"),
+		() => yamSubmitAiDecision(interactionLog, "accepted"),
+		() => yamSubmitAiDecision(interactionLog, "rejected")
+	);
+}
+
 async function yamOpenLotAiChatDialog(frm) {
 	if (frm.is_new()) {
 		frappe.msgprint({
@@ -44,7 +88,7 @@ async function yamOpenLotAiChatDialog(frm) {
 
 	const [templates, modelPayload] = await Promise.all([yamGetAiPromptTemplates(), yamGetAiModels()]);
 	const modelOptions = modelPayload.models.length ? modelPayload.models.join("\n") : "";
-	const defaultModel = modelPayload.defaultModel || (modelPayload.models[0] || "");
+	const defaultModel = modelPayload.defaultModel || modelPayload.models[0] || "";
 	const templateOptions = templates.map((item) => item.template_id).join("\n");
 	const defaultTemplate = templates.find((item) => item.template_id === "lot_compliance")
 		? "lot_compliance"
@@ -140,21 +184,25 @@ async function yamOpenLotAiChatDialog(frm) {
 						(msg.gateway && msg.gateway.template_id) || values.template_id || ""
 					);
 					const redactionCount = Number((msg.gateway && msg.gateway.redaction_count) || 0);
+					const interactionLog = frappe.utils.escape_html(msg.interaction_log || "");
 
 					frappe.msgprint({
 						title: __("AI Assistant Chat"),
 						message:
 							warning +
-							`<div><strong>${__("Assistive only — Review required")}</strong></div>` +
+							`<div><strong>${__("Assistive only - Review required")}</strong></div>` +
 							`<div style="margin-top:8px;white-space:pre-wrap;">${reply}</div>` +
 							`<hr>` +
 							`<div>${__("Provider")}: ${provider}</div>` +
 							`<div>${__("Model")}: ${model || __("Default")}</div>` +
 							`<div>${__("Template")}: ${templateId || __("Default")}</div>` +
-							`<div style="margin-top:8px;color:#667085;">${__("Redactions")}: ${redactionCount}</div>`,
+							`<div style="margin-top:8px;color:#667085;">${__("Redactions")}: ${redactionCount}</div>` +
+							`<div style="color:#667085;">${__("Interaction Log")}: ${interactionLog || __("Not available")}</div>`,
 						wide: true,
 					});
+
 					dialog.hide();
+					yamPromptAiDecision(msg.interaction_log || "");
 				},
 			});
 		},
@@ -164,14 +212,11 @@ async function yamOpenLotAiChatDialog(frm) {
 }
 
 frappe.ui.form.on("Lot", {
-	// Store the original status when the form loads so we can roll back safely
 	onload(frm) {
 		frm._yam_original_status = frm.doc.status;
 	},
 
-	// Fired when the form is first loaded/refreshed
 	refresh(frm) {
-		// Track status for rollback in the status handler
 		frm._yam_original_status = frm.doc.status;
 
 		if (frm.is_new()) {
@@ -184,44 +229,50 @@ frappe.ui.form.on("Lot", {
 			frm.add_custom_button(
 				__("AI Compliance Suggestion"),
 				() => {
-				frappe.call({
-					method: "yam_agri_core.yam_agri_core.api.ai_assist.get_lot_compliance_suggestion",
-					args: { lot: frm.doc.name },
-					freeze: true,
-					freeze_message: __("Generating assistive compliance suggestion..."),
-					callback(r) {
-						const msg = r.message || {};
-						if (!msg.ok) {
+					frappe.call({
+						method: "yam_agri_core.yam_agri_core.api.ai_assist.get_lot_compliance_suggestion",
+						args: { lot: frm.doc.name },
+						freeze: true,
+						freeze_message: __("Generating assistive compliance suggestion..."),
+						callback(r) {
+							const msg = r.message || {};
+							if (!msg.ok) {
+								frappe.msgprint({
+									title: __("AI Suggestion"),
+									message: __("No suggestion available."),
+									indicator: "orange",
+								});
+								return;
+							}
+
+							const counts = (msg.findings && msg.findings.counts) || {};
+							const warning = msg.warning
+								? `<div style="margin-bottom:8px;color:#b54708;">${frappe.utils.escape_html(msg.warning)}</div>`
+								: "";
+							const suggestion = frappe.utils.escape_html(msg.suggestion || "");
+							const provider = frappe.utils.escape_html(msg.provider || "");
+							const redactionCount = Number((msg.gateway && msg.gateway.redaction_count) || 0);
+							const interactionLog = frappe.utils.escape_html(msg.interaction_log || "");
+
 							frappe.msgprint({
-								title: __("AI Suggestion"),
-								message: __("No suggestion available."),
-								indicator: "orange",
+								title: __("AI Compliance Suggestion"),
+								message:
+									warning +
+									`<div><strong>${__("Assistive only - Review required")}</strong></div>` +
+									`<div style="margin-top:8px;white-space:pre-wrap;">${suggestion}</div>` +
+									`<hr>` +
+									`<div>${__("Missing/Stale Tests")}: ${counts.missing_or_stale_tests || 0}</div>` +
+									`<div>${__("Missing/Expired Required Certificates")}: ${counts.missing_or_expired_required_certificates || 0}</div>` +
+									`<div>${__("Expired Certificates")}: ${counts.expired_certificates || 0}</div>` +
+									`<div>${__("Open Nonconformance")}: ${counts.open_nonconformance || 0}</div>` +
+									`<div style="margin-top:8px;color:#667085;">${__("Provider")}: ${provider} | ${__("Redactions")}: ${redactionCount}</div>` +
+									`<div style="color:#667085;">${__("Interaction Log")}: ${interactionLog || __("Not available")}</div>`,
+								wide: true,
 							});
-							return;
-						}
 
-						const counts = (msg.findings && msg.findings.counts) || {};
-						const warning = msg.warning ? `<div style="margin-bottom:8px;color:#b54708;">${frappe.utils.escape_html(msg.warning)}</div>` : "";
-						const suggestion = frappe.utils.escape_html(msg.suggestion || "");
-						const provider = frappe.utils.escape_html(msg.provider || "");
-						const redactionCount = Number((msg.gateway && msg.gateway.redaction_count) || 0);
-
-						frappe.msgprint({
-							title: __("AI Compliance Suggestion"),
-							message:
-								warning +
-								`<div><strong>${__("Assistive only — Review required")}</strong></div>` +
-								`<div style="margin-top:8px;white-space:pre-wrap;">${suggestion}</div>` +
-								`<hr>` +
-								`<div>${__("Missing/Stale Tests")}: ${counts.missing_or_stale_tests || 0}</div>` +
-								`<div>${__("Missing/Expired Required Certificates")}: ${counts.missing_or_expired_required_certificates || 0}</div>` +
-								`<div>${__("Expired Certificates")}: ${counts.expired_certificates || 0}</div>` +
-								`<div>${__("Open Nonconformance")}: ${counts.open_nonconformance || 0}</div>` +
-								`<div style="margin-top:8px;color:#667085;">${__("Provider")}: ${provider} | ${__("Redactions")}: ${redactionCount}</div>`,
-							wide: true,
-						});
-					},
-				});
+							yamPromptAiDecision(msg.interaction_log || "");
+						},
+					});
 				},
 				__("AI")
 			);
@@ -235,7 +286,6 @@ frappe.ui.form.on("Lot", {
 			);
 		}
 
-		// Show a "Dispatch" action button only for QA Managers when the lot is ready
 		if (frm.doc.status === "For Dispatch" && frappe.user.has_role("QA Manager")) {
 			frm.add_custom_button(__("Mark Dispatched"), () => {
 				frappe.confirm(
@@ -248,17 +298,11 @@ frappe.ui.form.on("Lot", {
 			});
 		}
 
-		// Show linked QC tests count in the dashboard area
 		if (!frm.is_new()) {
-			frm.dashboard.add_comment(
-				__("Check the QC Tests and Certificates tabs for traceability details."),
-				"blue",
-				true
-			);
+			frm.dashboard.add_comment(__("Check the QC Tests and Certificates tabs for traceability details."), "blue", true);
 		}
 	},
 
-	// Fired when the status field changes
 	status(frm) {
 		if (["Accepted", "Rejected"].includes(frm.doc.status) && !frappe.user.has_role("QA Manager")) {
 			frappe.msgprint({
@@ -266,15 +310,12 @@ frappe.ui.form.on("Lot", {
 				message: __("Only a QA Manager may set Lot status to {0}.", [frm.doc.status]),
 				indicator: "red",
 			});
-			// Roll back to the last known safe status captured in onload/refresh
 			frm.set_value("status", frm._yam_original_status || "Draft");
 		}
 	},
 
-	// Auto-fill site from the user's default Site permission when creating new
 	before_save(frm) {
 		if (frm.is_new() && !frm.doc.site) {
-			// Use frappe.perm.get_user_permissions() — available in Frappe 14+
 			const perms =
 				typeof frappe.perm !== "undefined" && typeof frappe.perm.get_user_permissions === "function"
 					? frappe.perm.get_user_permissions()

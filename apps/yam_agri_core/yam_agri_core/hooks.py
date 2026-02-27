@@ -42,6 +42,8 @@ doctype_js = {
 	"Lot": "yam_agri_core/doctype/lot/lot.js",
 	"Site": "yam_agri_core/doctype/site/site.js",
 	"QCTest": "yam_agri_core/doctype/qc_test/qc_test.js",
+	"Nonconformance": "yam_agri_core/doctype/nonconformance/nonconformance.js",
+	"EvidencePack": "yam_agri_core/doctype/evidence_pack/evidence_pack.js",
 }
 
 permission_query_conditions = {
@@ -60,6 +62,7 @@ permission_query_conditions = {
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_query_conditions",
 	"Season Policy": "yam_agri_core.yam_agri_core.site_permissions.season_policy_query_conditions",
 	"Site Tolerance Policy": "yam_agri_core.yam_agri_core.site_permissions.site_tolerance_policy_query_conditions",
+	"AI Interaction Log": "yam_agri_core.yam_agri_core.site_permissions.ai_interaction_log_query_conditions",
 	"YAM Plot": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_query_conditions",
 	"YAM Soil Test": "yam_agri_core.yam_agri_core.site_permissions.yam_soil_test_query_conditions",
 	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_query_conditions",
@@ -87,6 +90,7 @@ has_permission = {
 	"Complaint": "yam_agri_core.yam_agri_core.site_permissions.complaint_has_permission",
 	"Season Policy": "yam_agri_core.yam_agri_core.site_permissions.season_policy_has_permission",
 	"Site Tolerance Policy": "yam_agri_core.yam_agri_core.site_permissions.site_tolerance_policy_has_permission",
+	"AI Interaction Log": "yam_agri_core.yam_agri_core.site_permissions.ai_interaction_log_has_permission",
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_has_permission",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_has_permission",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_has_permission",
@@ -114,6 +118,7 @@ global_search_doctypes = {
 		{"doctype": "Complaint", "index": 10},
 		{"doctype": "Season Policy", "index": 11},
 		{"doctype": "Site Tolerance Policy", "index": 12},
+		{"doctype": "AI Interaction Log", "index": 13},
 	],
 }
 
