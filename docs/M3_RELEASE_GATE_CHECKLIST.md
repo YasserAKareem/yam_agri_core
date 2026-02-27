@@ -23,8 +23,8 @@ This checklist defines the minimum release-gate routine for Milestone 3.
 ## Execution Steps (per release candidate)
 
 1. Run acceptance checks
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at01_automated_check`
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at01_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
 2. Run CI-aligned local checks
    - `ruff check apps/yam_agri_core`
    - `ruff format apps/yam_agri_core --check`

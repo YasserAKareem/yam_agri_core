@@ -699,12 +699,12 @@ Run from the repository root via docker wrapper:
 
 1. `bash infra/docker/run.sh preflight`
 2. `Copy-Item artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json -Force`
-3. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
-4. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset --kwargs '{"limit":250,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
-5. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
-6. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
-7. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
-8. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
+3. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
+4. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset --kwargs '{"limit":250,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
+5. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1,"dataset_file":"apps/yam_agri_core/yam_agri_core/yam_agri_core/seed/phase4_yemen_sample_data_250.json"}'`
+6. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at02_automated_check`
+7. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at06_automated_check`
+8. `bash infra/docker/run.sh bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
 9. `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.phase4_at02_at06.json`
 10. `python tools/refresh_wbs_milestones.py`
 11. `python tools/prefill_wbs_categories.py`

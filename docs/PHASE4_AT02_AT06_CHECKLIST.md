@@ -19,7 +19,7 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
   - `yam_agri_core`
   - `yam_agri_qms_trace`
 - AT-10 readiness is complete:
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.get_at10_readiness`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.get_at10_readiness`
   - expected `{"status":"ready" ...}`
 
 ## Artifact Locations
@@ -34,7 +34,7 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 
 ### Command
 
-- `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
+- `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at02_automated_check`
 
 ### Expected result
 
@@ -51,7 +51,7 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 
 ### Command
 
-- `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
+- `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at06_automated_check`
 
 ### Expected result
 
@@ -69,17 +69,17 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 ## Full Regression Bundle (single run window)
 
 1. Seed balanced dataset:
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
 2. (Optional) Import static Yemen dataset (250 records):
-  - `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250}'`
-  - Custom file path: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250,"dataset_file":"artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json"}'`
-  - Verify inserted coverage: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset --kwargs '{"limit":250}'`
-  - Gate PASS/FAIL check (throws on mismatch): `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1}'`
+  - `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250}'`
+  - Custom file path: `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_phase4_yemen_dataset --kwargs '{"confirm":1,"limit":250,"dataset_file":"artifacts/evidence/phase4_at02_at06/phase4_yemen_sample_data_250.json"}'`
+  - Verify inserted coverage: `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset --kwargs '{"limit":250}'`
+  - Gate PASS/FAIL check (throws on mismatch): `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.verify_phase4_yemen_dataset_gate --kwargs '{"limit":250,"strict":1}'`
 3. Run acceptance checks:
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at02_automated_check`
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at06_automated_check`
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_at10_automated_check`
-   - `bench --site localhost execute yam_agri_core.yam_agri_core.smoke.run_phase2_smoke`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at02_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at06_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_at10_automated_check`
+   - `bench --site localhost execute yam_agri_core.yam_agri_core.health.checks.run_phase2_smoke`
 4. Capture visual/report artifacts:
    - `python tools/evidence_capture/run_evidence_collector.py --scenario tools/evidence_capture/scenario.phase4_at02_at06.json`
 
@@ -114,7 +114,7 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 - Tester: Copilot (automated)
 - Commit SHA: `5b2dbb8` (baseline prior to this implementation batch)
 - Seed result:
-  - Command: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
+  - Command: `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":140}'`
   - Result: `{"status":"ok","seed_tag":"20260224115220","target_records":140,"core_total":144,"created_records":0}`
 - AT-02: PASS
   - Result: `status=pass`
@@ -146,7 +146,7 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 - Environment: dev (`localhost`, docker bench wrapper)
 - Tester: Copilot (automated)
 - Seed result:
-  - Command: `bench --site localhost execute yam_agri_core.yam_agri_core.dev_seed.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":180}'`
+  - Command: `bench --site localhost execute yam_agri_core.yam_agri_core.seed.dev_data.seed_m4_balanced_samples --kwargs '{"confirm":1,"target_records":180}'`
   - Result: `{"status":"ok","seed_tag":"20260224115833","target_records":180,"core_total":182,"created_records":19}`
 - Validation checks:
   - `run_at02_automated_check`: `status=pass`
@@ -180,10 +180,10 @@ This checklist is the repeatable validation baseline for Phase 4 dispatch-gate r
 - Tester: Copilot (automated)
 - Commit SHA: `16537b118c4edbea8bf2fb1d6532fd1643e429e4`
 - Bench commands requested:
-  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_m4_gate_automated_check`
-  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_at03_automated_check`
-  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_at04_automated_check`
-  - `bench --site localsite execute yam_agri_core.yam_agri_core.smoke.run_at05_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.health.checks.run_m4_gate_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.health.checks.run_at03_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.health.checks.run_at04_automated_check`
+  - `bench --site localsite execute yam_agri_core.yam_agri_core.health.checks.run_at05_automated_check`
 - Result:
   - `run_m4_gate_automated_check`: BLOCKED (`404 Not Found: localsite does not exist`)
   - `run_at03_automated_check`: BLOCKED (`404 Not Found: localsite does not exist`)
