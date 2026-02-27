@@ -1,0 +1,55 @@
+{
+  "doctype": "DocType",
+  "name": "EvidencePack Linked Document",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "istable": 1,
+  "editable_grid": 1,
+  "fields": [
+    {
+      "fieldname": "source_doctype",
+      "fieldtype": "Link",
+      "options": "DocType",
+      "label": "Source DocType",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "source_name",
+      "fieldtype": "Dynamic Link",
+      "options": "source_doctype",
+      "label": "Source Record",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "site",
+      "fieldtype": "Link",
+      "options": "Site",
+      "label": "Site",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "document_date",
+      "fieldtype": "Datetime",
+      "label": "Document Date",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Data",
+      "label": "Status"
+    },
+    {
+      "fieldname": "attachment_count",
+      "fieldtype": "Int",
+      "label": "Attachments",
+      "default": 0
+    },
+    {
+      "fieldname": "summary",
+      "fieldtype": "Small Text",
+      "label": "Summary"
+    }
+  ]
+}

@@ -29,25 +29,212 @@ function yamEpSubmitAiDecision(interactionLog, decision) {
 	});
 }
 
-function yamEpPromptAiDecision(interactionLog) {
+function yamEpPromptAiDecision(frm, interactionLog, suggestionText) {
 	if (!interactionLog) {
 		return;
 	}
 
 	frappe.confirm(
 		__("Do you accept this AI evidence summary suggestion?"),
-		() => yamEpSubmitAiDecision(interactionLog, "accepted"),
+		() => {
+			const finalize = () => yamEpSubmitAiDecision(interactionLog, "accepted");
+			if (!suggestionText) {
+				finalize();
+				return;
+			}
+
+			frm.set_value("approved_ai_narrative", suggestionText);
+			if (!frm.is_dirty()) {
+				finalize();
+				return;
+			}
+
+			frm
+				.save()
+				.then(() => {
+					finalize();
+				})
+				.catch(() => {
+					frappe.show_alert({
+						message: __("Narrative was not saved, but decision will still be logged."),
+						indicator: "orange",
+					});
+					finalize();
+				});
+		},
 		() => yamEpSubmitAiDecision(interactionLog, "rejected")
+	);
+}
+
+function yamOpenFileIfAvailable(fileUrl, label) {
+	if (!fileUrl) {
+		frappe.msgprint({
+			title: label,
+			message: __("No file available yet. Generate it first."),
+			indicator: "orange",
+		});
+		return;
+	}
+	window.open(fileUrl, "_blank");
+}
+
+function yamGenerateEvidencePack(frm) {
+	frappe.call({
+		method: "yam_agri_core.yam_agri_core.api.evidence_pack.generate_evidence_pack_links",
+		args: { evidence_pack: frm.doc.name, rebuild: 1, include_quarantine: 1 },
+		freeze: true,
+		freeze_message: __("Building EvidencePack links..."),
+		callback(r) {
+			const msg = (r && r.message) || {};
+			if (!msg.ok) {
+				frappe.msgprint({
+					title: __("EvidencePack Builder"),
+					message: __("Could not generate linked documents."),
+					indicator: "red",
+				});
+				return;
+			}
+
+			const counts = msg.counts || {};
+			frappe.msgprint({
+				title: __("EvidencePack Builder"),
+				message:
+					`<div><strong>${__("Status")}</strong>: ${frappe.utils.escape_html(msg.status || "")}</div>` +
+					`<div><strong>${__("Linked Records")}</strong>: ${msg.record_count || 0}</div>` +
+					`<div style="margin-top:8px;">${__("QCTest")}: ${counts.QCTest || 0}</div>` +
+					`<div>${__("Certificate")}: ${counts.Certificate || 0}</div>` +
+					`<div>${__("ScaleTicket")}: ${counts.ScaleTicket || 0}</div>` +
+					`<div>${__("Observation")}: ${counts.Observation || 0}</div>` +
+					`<div>${__("Nonconformance")}: ${counts.Nonconformance || 0}</div>`,
+				wide: true,
+			});
+			frm.reload_doc();
+		},
+	});
+}
+
+function yamExportEvidencePdf(frm) {
+	frappe.call({
+		method: "yam_agri_core.yam_agri_core.api.evidence_pack.export_evidence_pack_pdf",
+		args: { evidence_pack: frm.doc.name },
+		freeze: true,
+		freeze_message: __("Rendering EvidencePack PDF..."),
+		callback(r) {
+			const msg = (r && r.message) || {};
+			if (!msg.ok) {
+				frappe.msgprint({
+					title: __("EvidencePack PDF"),
+					message: __("PDF export failed."),
+					indicator: "red",
+				});
+				return;
+			}
+
+			yamOpenFileIfAvailable(msg.pdf_file, __("EvidencePack PDF"));
+			frm.reload_doc();
+		},
+	});
+}
+
+function yamExportEvidenceZip(frm) {
+	frappe.call({
+		method: "yam_agri_core.yam_agri_core.api.evidence_pack.export_evidence_pack_zip",
+		args: { evidence_pack: frm.doc.name },
+		freeze: true,
+		freeze_message: __("Building EvidencePack ZIP..."),
+		callback(r) {
+			const msg = (r && r.message) || {};
+			if (!msg.ok) {
+				frappe.msgprint({
+					title: __("EvidencePack ZIP"),
+					message: __("ZIP export failed."),
+					indicator: "red",
+				});
+				return;
+			}
+
+			yamOpenFileIfAvailable(msg.zip_file, __("EvidencePack ZIP"));
+			frm.reload_doc();
+		},
+	});
+}
+
+function yamMarkEvidencePackSent(frm) {
+	frappe.confirm(
+		__("Mark this EvidencePack as Sent?"),
+		() => {
+			frappe.call({
+				method: "yam_agri_core.yam_agri_core.api.evidence_pack.mark_evidence_pack_sent",
+				args: { evidence_pack: frm.doc.name },
+				freeze: true,
+				freeze_message: __("Updating status..."),
+				callback(r) {
+					const msg = (r && r.message) || {};
+					if (!msg.ok) {
+						frappe.msgprint({
+							title: __("EvidencePack"),
+							message: __("Status update failed."),
+							indicator: "red",
+						});
+						return;
+					}
+					frm.reload_doc();
+				},
+			});
+		},
+		() => {}
 	);
 }
 
 frappe.ui.form.on("EvidencePack", {
 	refresh(frm) {
 		if (frm.is_new()) {
-			frm.set_intro(__("Save this EvidencePack first, then use AI Narrative Summary."), "orange");
+			frm.set_intro(__("Save this EvidencePack first, then generate links/PDF/ZIP and AI summary."), "orange");
 			return;
 		}
 		frm.set_intro("");
+
+		frm.add_custom_button(
+			__("Generate Linked Evidence"),
+			() => {
+				yamGenerateEvidencePack(frm);
+			},
+			__("Evidence")
+		);
+
+		frm.add_custom_button(
+			__("Export PDF"),
+			() => {
+				yamExportEvidencePdf(frm);
+			},
+			__("Evidence")
+		);
+
+		frm.add_custom_button(
+			__("Export ZIP"),
+			() => {
+				yamExportEvidenceZip(frm);
+			},
+			__("Evidence")
+		);
+
+		if (["Ready", "Prepared"].includes(frm.doc.status)) {
+			frm.add_custom_button(
+				__("Mark Sent"),
+				() => {
+					yamMarkEvidencePackSent(frm);
+				},
+				__("Evidence")
+			);
+		}
+
+		frm.add_custom_button(
+			__("Auditor Portal Stub"),
+			() => {
+				window.open("/evidence-pack-auditor", "_blank");
+			},
+			__("Evidence")
+		);
 
 		frm.add_custom_button(
 			__("AI Narrative Summary"),
@@ -93,7 +280,7 @@ frappe.ui.form.on("EvidencePack", {
 							wide: true,
 						});
 
-						yamEpPromptAiDecision(msg.interaction_log || "");
+						yamEpPromptAiDecision(frm, msg.interaction_log || "", msg.suggestion || "");
 					},
 				});
 			},

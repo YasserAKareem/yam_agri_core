@@ -1540,6 +1540,200 @@ def run_at08_automated_check() -> dict:
 	}
 
 
+def run_at09_automated_check() -> dict:
+	"""Execute automated AT-09 checks for EvidencePack builder + PDF/ZIP export."""
+	readiness = get_at10_readiness()
+	if readiness.get("status") != "ready":
+		return {
+			"status": "blocked",
+			"reason": "AT-10 readiness is not complete (required to resolve Site A)",
+			"readiness": readiness,
+		}
+
+	site_a = None
+	for permission_entry in readiness["site_permissions"]["entries"]:
+		if permission_entry["user"] == _AT10_USER_A:
+			site_a = permission_entry["for_value"]
+			break
+
+	if not site_a:
+		return {
+			"status": "blocked",
+			"reason": "Could not resolve Site A from user permissions",
+			"readiness": readiness,
+		}
+
+	original_user = frappe.session.user
+	evidence = {
+		"site": site_a,
+		"evidence_pack": "",
+		"lot": "",
+		"device": "",
+		"linked_record_count": 0,
+		"counts": {},
+		"required_sources_present": False,
+		"pdf_file": "",
+		"zip_file": "",
+		"status_after_generate": "",
+		"status_after_send": "",
+		"error": None,
+	}
+
+	try:
+		frappe.set_user("Administrator")
+		from yam_agri_core.yam_agri_core.api import evidence_pack as evidence_pack_api
+
+		from_date = frappe.utils.add_days(frappe.utils.nowdate(), -1)
+		to_date = frappe.utils.add_days(frappe.utils.nowdate(), 1)
+		tag = frappe.utils.now_datetime().strftime("%H%M%S")
+
+		lot_doc = frappe.get_doc(
+			{
+				"doctype": "Lot",
+				"lot_number": f"AT09-LOT-{tag}-{site_a[-4:]}",
+				"site": site_a,
+				"qty_kg": 150,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+		evidence["lot"] = lot_doc.name
+
+		device_name = frappe.db.get_value("Device", {"site": site_a, "status": "Active"}, "name")
+		if not device_name:
+			device_name = (
+				frappe.get_doc(
+					{
+						"doctype": "Device",
+						"device_name": f"AT09-DEV-{site_a[-4:]}",
+						"site": site_a,
+						"device_type": "Scale",
+						"status": "Active",
+					}
+				)
+				.insert(ignore_permissions=True)
+				.name
+			)
+		evidence["device"] = str(device_name)
+
+		frappe.get_doc(
+			{
+				"doctype": "QCTest",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"test_type": "Moisture",
+				"test_date": frappe.utils.nowdate(),
+				"pass_fail": "Pass",
+			}
+		).insert(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "Certificate",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"cert_type": "Organic",
+				"expiry_date": to_date,
+			}
+		).insert(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "ScaleTicket",
+				"ticket_number": f"AT09-TKT-{tag}",
+				"site": site_a,
+				"device": device_name,
+				"lot": lot_doc.name,
+				"ticket_datetime": frappe.utils.now_datetime(),
+				"gross_kg": 110,
+				"tare_kg": 10,
+				"net_kg": 100,
+			}
+		).insert(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "Observation",
+				"site": site_a,
+				"device": device_name,
+				"observed_at": frappe.utils.now_datetime(),
+				"observation_type": "temperature",
+				"value": 28,
+				"unit": "C",
+				"quality_flag": "OK",
+				"raw_payload": json.dumps({"at": "AT09"}),
+			}
+		).insert(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "Nonconformance",
+				"lot": lot_doc.name,
+				"site": site_a,
+				"status": "Open",
+				"capa_description": f"AT09-NC-{tag}",
+			}
+		).insert(ignore_permissions=True)
+
+		evidence_pack_doc = frappe.get_doc(
+			{
+				"doctype": "EvidencePack",
+				"title": f"AT09 Evidence {tag}",
+				"site": site_a,
+				"lot": lot_doc.name,
+				"from_date": from_date,
+				"to_date": to_date,
+				"status": "Draft",
+			}
+		).insert(ignore_permissions=True)
+		evidence["evidence_pack"] = evidence_pack_doc.name
+
+		generate_result = evidence_pack_api.generate_evidence_pack_links(
+			evidence_pack=evidence_pack_doc.name,
+			rebuild=1,
+			include_quarantine=1,
+		)
+		evidence["linked_record_count"] = int(generate_result.get("record_count") or 0)
+		evidence["counts"] = generate_result.get("counts") or {}
+		evidence["status_after_generate"] = str(generate_result.get("status") or "")
+		evidence["required_sources_present"] = all(
+			[
+				int(evidence["counts"].get("QCTest") or 0) > 0,
+				int(evidence["counts"].get("Certificate") or 0) > 0,
+				int(evidence["counts"].get("ScaleTicket") or 0) > 0,
+				int(evidence["counts"].get("Observation") or 0) > 0,
+				int(evidence["counts"].get("Nonconformance") or 0) > 0,
+			]
+		)
+
+		pdf_result = evidence_pack_api.export_evidence_pack_pdf(evidence_pack_doc.name)
+		zip_result = evidence_pack_api.export_evidence_pack_zip(evidence_pack_doc.name)
+		send_result = evidence_pack_api.mark_evidence_pack_sent(evidence_pack_doc.name)
+
+		evidence["pdf_file"] = str(pdf_result.get("pdf_file") or "")
+		evidence["zip_file"] = str(zip_result.get("zip_file") or "")
+		evidence["status_after_send"] = str(send_result.get("status") or "")
+
+	except Exception as exc:
+		evidence["error"] = frappe.as_unicode(exc)
+	finally:
+		frappe.set_user(original_user)
+
+	pass_checks = all(
+		[
+			bool(evidence.get("evidence_pack")),
+			bool(evidence.get("lot")),
+			evidence.get("linked_record_count", 0) > 0,
+			evidence.get("required_sources_present"),
+			bool(str(evidence.get("pdf_file") or "").strip()),
+			bool(str(evidence.get("zip_file") or "").strip()),
+			evidence.get("status_after_generate") in {"Ready", "Prepared", "Approved", "Sent"},
+			evidence.get("status_after_send") in {"Sent", "Approved"},
+			not evidence.get("error"),
+		]
+	)
+
+	return {
+		"status": "pass" if pass_checks else "fail",
+		"evidence": evidence,
+	}
+
+
 def run_at11_automated_check() -> dict:
 	"""Execute automated AT-11 checks for AI assistive-only governance + audit log."""
 	readiness = get_at10_readiness()
@@ -1761,3 +1955,8 @@ def run_phase6_governance_automated_check() -> dict:
 def run_phase6_smoke() -> dict:
 	"""Backward-compatible alias for Phase 6 governance acceptance bundle."""
 	return run_phase6_governance_automated_check()
+
+
+def run_phase7_smoke() -> dict:
+	"""Run Phase 7 acceptance smoke check (AT-09 EvidencePack generation/export)."""
+	return run_at09_automated_check()

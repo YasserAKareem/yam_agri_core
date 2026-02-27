@@ -1,0 +1,43 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+  <h2>{{ title }}</h2>
+  <p>{{ portal_message }}</p>
+
+  {% if user == "Guest" %}
+  <p><a href="/login">Sign in</a> to preview the internal read-only view.</p>
+  {% endif %}
+
+  {% if records %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>EvidencePack</th>
+          <th>Site</th>
+          <th>Date Range</th>
+          <th>Status</th>
+          <th>Records</th>
+          <th>PDF</th>
+          <th>ZIP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in records %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.site }}</td>
+          <td>{{ row.from_date }} to {{ row.to_date }}</td>
+          <td>{{ row.status }}</td>
+          <td>{{ row.record_count or 0 }}</td>
+          <td>{% if row.pdf_file %}<a href="{{ row.pdf_file }}" target="_blank">Download</a>{% else %}-{% endif %}</td>
+          <td>{% if row.zip_file %}<a href="{{ row.zip_file }}" target="_blank">Download</a>{% else %}-{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
