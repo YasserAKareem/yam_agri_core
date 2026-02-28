@@ -69,8 +69,8 @@ GitHub Copilot Agent mode. The following servers are configured:
 | Server ID | What it does | Prerequisite |
 |---|---|---|
 | `github` | Full GitHub MCP server via Copilot API — search code, read issues, open PRs | GitHub Copilot subscription |
-| `frappe-filesystem` | Read and write files in the workspace — Copilot can reference any project file without copy-paste | `npx` (Node.js installed) |
-| `frappe-api` | Fetch HTTP URLs — lets Copilot call the local Frappe REST API during a session | Dev stack running (`bash run.sh up`) |
+| `frappe-filesystem` | Read and write files in the workspace — Copilot can reference any project file without copy-paste | Python + Node.js (`npx`), launched via `tools/mcp/launch_mcp.py` |
+| `frappe-api` | Fetch HTTP URLs — lets Copilot call the local Frappe REST API during a session | Python + Node.js (`npx`), Dev stack running (`bash run.sh up`) |
 
 ### How to activate MCP in VS Code
 
@@ -180,12 +180,12 @@ bash run.sh up
 #    a. Stop everything
 bash run.sh down
 #    b. Start only the database to let InnoDB crash-recovery run
-docker compose -f docker-compose.yaml up db
+docker compose -f docker-compose.yml up db
 #    c. Watch logs; once MariaDB says "ready for connections", restart all
 bash run.sh up
 ```
 
-> **Prevention**: The `docker-compose.yaml` uses `restart: always` on all
+> **Prevention**: The `docker-compose.yml` uses `restart: always` on all
 > services so they come back automatically after a clean power-restore reboot.
 > The risk is **mid-write corruption** — see the backup section below.
 
@@ -227,7 +227,7 @@ If you see the system becoming sluggish, stop non-essential services:
 
 ```bash
 # Stop only mock services to free memory
-docker compose -f docker-compose.yaml stop mock_iot mock_scale
+docker compose -f docker-compose.yml stop mock_iot mock_scale
 ```
 
 ### VPN access (remote / staging)

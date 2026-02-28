@@ -117,7 +117,7 @@ bash run.sh up
 
 # If MariaDB reports corruption:
 bash run.sh down
-docker compose -f docker-compose.yaml up db        # InnoDB crash recovery
+docker compose -f docker-compose.yml up db        # InnoDB crash recovery
 # Wait for "ready for connections" in logs, then:
 bash run.sh up
 ```

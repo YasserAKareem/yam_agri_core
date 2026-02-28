@@ -46,6 +46,13 @@ bash infra/docker/run.sh up
 bash infra/docker/run.sh init
 ```
 
+## Runtime Contract (Canonical)
+
+- Use `infra/docker/run.sh` as the primary entrypoint for dev runtime operations.
+- Treat `infra/docker/docker-compose.yml` as the canonical compose file for local operations.
+- Use WSL or Git Bash on Windows for shell workflows to avoid path translation drift.
+- For MCP stdio servers, use `.vscode/mcp.json` with `tools/mcp/launch_mcp.py` (not direct `npx`).
+
 ## Core DocTypes (V1.1)
 
 | DocType | Purpose |

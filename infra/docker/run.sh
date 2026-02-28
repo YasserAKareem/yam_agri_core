@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Default compose filename (prefer .yaml but fallback to .yml)
-DOCKER_COMPOSE_FILE="docker-compose.yaml"
-# Backwards-compatible fallback: some checkouts use .yml
+# Default compose filename (canonical project file)
+DOCKER_COMPOSE_FILE="docker-compose.yml"
+# Backwards-compatible fallback: some local setups may still use .yaml
 if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
-  if [ -f "docker-compose.yml" ]; then
-    DOCKER_COMPOSE_FILE="docker-compose.yml"
+  if [ -f "docker-compose.yaml" ]; then
+    DOCKER_COMPOSE_FILE="docker-compose.yaml"
   fi
 fi
 DOTENV_CONFIG_FILE=".env"

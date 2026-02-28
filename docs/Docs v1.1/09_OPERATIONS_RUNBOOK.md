@@ -38,13 +38,13 @@ bash run.sh down
 bash run.sh logs
 
 # View logs for specific service
-docker compose -f docker-compose.yaml logs -f frappe
+docker compose -f docker-compose.yml logs -f backend
 
 # Open shell in Frappe container
 bash run.sh shell
 
 # Restart a single service
-docker compose -f docker-compose.yaml restart frappe
+docker compose -f docker-compose.yml restart backend
 ```
 
 ### 2.2 Service Health Check
@@ -53,7 +53,7 @@ docker compose -f docker-compose.yaml restart frappe
 # Show running containers and health status
 bash run.sh status
 # or
-docker compose -f docker-compose.yaml ps
+docker compose -f docker-compose.yml ps
 
 # Check Frappe is responding
 curl -s http://localhost:8000/api/method/frappe.ping | python3 -m json.tool
@@ -67,7 +67,7 @@ curl -s http://localhost:8000/api/method/frappe.ping | python3 -m json.tool
 docker stats --no-stream
 
 # If memory is low, stop non-essential mock services
-docker compose -f docker-compose.yaml stop mock_iot mock_scale
+docker compose -f docker-compose.yml stop mock_iot mock_scale
 
 # Check MariaDB memory
 docker exec -it <mariadb_container> mysql -u root -p -e "SHOW STATUS LIKE 'Innodb_buffer_pool%';"
@@ -201,10 +201,10 @@ bench --site ${SITE_NAME} migrate
 bash run.sh down
 
 # 2. Start only MariaDB to let InnoDB recovery run
-docker compose -f docker-compose.yaml up db
+docker compose -f docker-compose.yml up db
 
 # 3. Watch logs for recovery messages
-docker compose -f docker-compose.yaml logs -f db
+docker compose -f docker-compose.yml logs -f db
 # Look for: "InnoDB: Recovery complete"
 # And then: "ready for connections"
 

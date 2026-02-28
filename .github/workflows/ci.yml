@@ -147,6 +147,10 @@ jobs:
           fi
           exit 0
 
+      - name: Runtime consistency check (MCP + compose contract)
+        run: |
+          python tools/check_runtime_consistency.py
+
   # ── 6. Python unit tests (pure-Python, no live Frappe server needed) ───
   python-tests:
     name: Python unit tests

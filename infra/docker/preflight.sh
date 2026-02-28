@@ -33,9 +33,9 @@ else
 fi
 
 # Try to inspect compose file images (non-destructive)
-DOCKER_COMPOSE_FILE="docker-compose.yaml"
-if [ ! -f "$DOCKER_COMPOSE_FILE" ] && [ -f "docker-compose.yml" ]; then
-  DOCKER_COMPOSE_FILE="docker-compose.yml"
+DOCKER_COMPOSE_FILE="docker-compose.yml"
+if [ ! -f "$DOCKER_COMPOSE_FILE" ] && [ -f "docker-compose.yaml" ]; then
+  DOCKER_COMPOSE_FILE="docker-compose.yaml"
 fi
 
 if [ -f "$DOCKER_COMPOSE_FILE" ]; then
