@@ -37,13 +37,13 @@ cp .env.example .env
 # edit .env with strong passwords and staging host values
 ```
 
-2. Validate staging host reachability:
+1. Validate staging host reachability:
 
 ```bash
 ./check_staging_access.sh <staging_host> <ssh_user>
 ```
 
-2a. If WireGuard/DNS is currently blocked on your workstation, run unblock flow:
+1. If WireGuard/DNS is currently blocked on your workstation, run unblock flow:
 
 ```bash
 # example: bring up WG, set DNS fallback via host IP, then run access gate
@@ -52,7 +52,7 @@ STAGING_HOST_IP=<staging_vpn_ip_or_reachable_ip> UPDATE_HOSTS=1 \
 ./unblock_staging_access.sh <staging_host> <ssh_user>
 ```
 
-3. Provision staging server and secure VPN/API path:
+1. Provision staging server and secure VPN/API path:
 
 ```bash
 # 8.1.1: k3s install (dry-run first)
@@ -65,14 +65,14 @@ DRY_RUN=1 WG_ENDPOINT=<public_host_or_ip> ./setup_wireguard.sh <staging_host> <s
 DRY_RUN=1 VPN_SUBNET=10.88.0.0/24 ./restrict_k3s_api.sh <staging_host> <ssh_user>
 ```
 
-4. Run preflight and generate secrets:
+1. Run preflight and generate secrets:
 
 ```bash
 ./preflight.sh .env
 ./generate-secrets.sh .env manifests/secrets.generated.yaml
 ```
 
-5. Apply manifests on staging server (via WireGuard VPN):
+1. Apply manifests on staging server (via WireGuard VPN):
 
 ```bash
 # offline render validation
@@ -82,7 +82,7 @@ DRY_RUN_MODE=render ./apply_manifests.sh
 ./apply_manifests.sh
 ```
 
-6. Run dev -> staging migration (backup-only rehearsal then full):
+1. Run dev -> staging migration (backup-only rehearsal then full):
 
 ```bash
 # backup-only evidence run
@@ -92,7 +92,7 @@ MODE=backup-only ./migrate_dev_to_staging.sh
 MODE=full STAGING_TARGET=<user@host> STAGING_SITE=<staging_site> ./migrate_dev_to_staging.sh
 ```
 
-7. Execute acceptance bundle on staging bench node:
+1. Execute acceptance bundle on staging bench node:
 
 ```bash
 ./phase8_acceptance.sh localhost

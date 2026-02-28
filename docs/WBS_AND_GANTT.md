@@ -23,7 +23,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: Docker Compose stack starts; Frappe login works; stack uses ≤ 6 GB RAM.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **0** | **Dev Environment Setup** | DevOps | — | — |
 | 0.1 | Docker Compose stack design | DevOps | 1 | — |
 | 0.1.1 | Write `docker-compose.yml` (MariaDB, Redis, Frappe, nginx) | DevOps | 1 | — |
@@ -46,7 +46,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: `yam_agri_core` app installs on dev site; CI pipeline green.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **1** | **Custom App Scaffolding** | Dev | — | Phase 0 |
 | 1.1 | `bench new-app yam_agri_core` | Dev | 0.5 | 0 |
 | 1.2 | Module structure (YAM Agri Core module) | Dev | 0.5 | 1.1 |
@@ -66,7 +66,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: AT-01 (Create Site + StorageBin + Lot) and AT-10 (Site isolation) pass.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **2** | **Core DocTypes** | Dev | — | Phase 1 |
 | 2.1 | **Site DocType** | Dev | 1 | 1 |
 | 2.1.1 | Fields: site_code, name, type, GPS, active | Dev | 0.5 | 2.1 |
@@ -118,7 +118,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: AT-03 (Split Lot), AT-04 (Backward trace), AT-05 (Forward trace) pass.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **3** | **Traceability Engine** | Dev | — | Phase 2 |
 | 3.1 | Transfer Split logic | Dev | 2 | 2 |
 | 3.1.1 | Python controller: `on_submit` splits parent Lot quantity | Dev | 1 | 3.1 |
@@ -146,7 +146,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: AT-02 (QCTest + Certificate), AT-06 (Shipment gate) pass.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **4** | **QA/QC Controls + Season Policy** | Dev + QA | — | Phase 3 |
 | 4.1 | QCTest form validation | Dev | 1 | 3 |
 | 4.1.1 | Pass/fail auto-calculation from thresholds | Dev | 0.5 | 4.1 |
@@ -174,7 +174,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: AT-07 (ScaleTicket import + mismatch NC), AT-08 (Observation quarantine + alert) pass.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **5** | **Scale + Sensor Integrations** | Dev | — | Phase 4 |
 | 5.1 | ScaleTicket CSV import | Dev | 2 | 4 |
 | 5.1.1 | CSV parser: validate columns, reject bad rows | Dev | 0.5 | 5.1 |
@@ -204,7 +204,7 @@ Each WBS element is numbered hierarchically: `Phase.WorkPackage.Task`.
 > Exit criterion: AI suggestions visible in Frappe Desk; no auto-actions execute; AI governance log working.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **6** | **AI Assist Layer** | Dev | — | Phase 5 |
 | 6.1 | AI Gateway FastAPI service | Dev | 2 | 5 |
 | 6.1.1 | POST `/suggest` endpoint (compliance check, CAPA draft, evidence summary) | Dev | 1 | 6.1 |
@@ -247,7 +247,7 @@ All repeated scope text in other sections must reference this section instead of
 #### 2) Canonical module-to-entity mapping (Frappe/ERPNext + YAM custom)
 
 | Module domain | Canonical entities / DocTypes |
-|---------------|-------------------------------|
+| ------------- | ----------------------------- |
 | Organization | Company, Cost Center, Branch/Location |
 | Customer/Supplier | Customer, Supplier, Contact, Address |
 | Product taxonomy (FAO 9 groups) | Item Group (Group 1..9), Item (40 SKUs), Item Attribute, Item Variant, custom field `fao_icc_code` |
@@ -264,7 +264,7 @@ All repeated scope text in other sections must reference this section instead of
 #### ERP↔MES↔WMS↔POS↔CRM↔AI interface contracts
 
 | Interface | Source | Target | Contract payload (minimum) | Control |
-|-----------|--------|--------|----------------------------|---------|
+| --------- | ------ | ------ | -------------------------- | ------- |
 | ERP→MES Production release | ERP (Item/BOM/Work Order) | MES runtime | item, bom/recipe, qty, due_date, site | QA gate before release |
 | MES→WMS Batch output | ProductionBatch/Work Order | Stock Entry/Bin/Batch | production_batch, lot/batch, qty, warehouse | lot/batch traceability required |
 | WMS→POS Availability | Bin/Batch ledger | POS Profile/POS Invoice | item, available_qty, lot/batch, outlet_site | prevent oversell at outlet |
@@ -293,6 +293,7 @@ flowchart LR
 ```
 
 Related architecture diagrams:
+
 - `docs/C4 model Architecture v1.1/04_COMPONENT_AI_LAYER.md`
 - `docs/C4 model Architecture v1.1/07_DYNAMIC_AI_ASSIST.md`
 - `docs/C4 model Architecture v1.1/09_DEPLOYMENT_STAGING.md`
@@ -316,10 +317,10 @@ Related architecture diagrams:
 
 - Keep FAO hierarchy in Item Group with 9 top groups.
 - Keep SKU catalog in Item with required attributes:
-    - `sku_code`, `product_group`, `fao_icc_code`, `cpc_code`
-    - `base_uom`, `pack_uom`, `shelf_life_days`
-    - `quality_grade`, `organic_flag`, `gmo_flag`
-    - `procurement_type`, `processing_stage`, `traceability_required`
+  - `sku_code`, `product_group`, `fao_icc_code`, `cpc_code`
+  - `base_uom`, `pack_uom`, `shelf_life_days`
+  - `quality_grade`, `organic_flag`, `gmo_flag`
+  - `procurement_type`, `processing_stage`, `traceability_required`
 - Enforce master-data validation before transactions (sales, procurement, production, POS).
 
 #### FAO-to-SKU Governance and Contract Farming Canonical Model
@@ -356,7 +357,7 @@ Related architecture diagrams:
 > Exit criterion: AT-09 (EvidencePack for date range + site contains all docs) passes.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **7** | **EvidencePack Generator** | Dev | — | Phase 6 |
 | 7.1 | EvidencePack builder controller | Dev | 2 | 6 |
 | 7.1.1 | Collect QC tests, certs, scale tickets, observations, NCs in scope | Dev | 1 | 7.1 |
@@ -378,7 +379,7 @@ Related architecture diagrams:
 > Exit criterion: All 10 acceptance tests pass on k3s staging node.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **8** | **Staging Environment** | DevOps | — | Phase 7 (all 10 AT pass on dev) |
 | 8.1 | k3s single-node setup | DevOps | 1 | 7 |
 | 8.1.1 | Provision server (VPS/bare-metal); k3s install | DevOps | 0.5 | 8.1 |
@@ -403,7 +404,7 @@ Related architecture diagrams:
 > Exit criterion: Owner sign-off; release notes published; staging is the live system.
 
 | WBS ID | Work Package / Task | Owner | Effort (d) | Depends on |
-|--------|---------------------|-------|-----------|------------|
+| ------ | ------------------- | ----- | --------- | ---------- |
 | **9** | **V1.1 Release** | Owner + DevOps | — | Phase 8 |
 | 9.1 | Release notes (CHANGELOG / 12_RELEASE_NOTES.md) | Dev | 0.5 | 8 |
 | 9.2 | Final documentation review | Dev + QA | 1 | 8 |
@@ -420,7 +421,7 @@ Related architecture diagrams:
 > Runs in parallel with all phases. Each doc must be updated before the relevant phase closes.
 
 | WBS ID | Document | Owner | Phase gate |
-|--------|----------|-------|-----------|
+| ------ | -------- | ----- | --------- |
 | D.1 | 01_PROJECT_CHARTER.md (enhanced with WBS) | Owner | Phase 0 |
 | D.2 | 02_REQUIREMENTS_SPECIFICATION.md (SRS) | Dev + Owner | Phase 1 |
 | D.3 | 03_SYSTEM_ARCHITECTURE.md | Dev | Phase 2 |
@@ -441,7 +442,7 @@ Related architecture diagrams:
 ### Stream B — Post-V1.1 Backlog (Future Releases)
 
 | WBS ID | Release | Backlog Stage | Item Range | Focus |
-|--------|---------|---------------|-----------|-------|
+| ------ | ------- | ------------- | --------- | ----- |
 | B.1 | V1.2 | D, E, F | AGR-CEREAL-028–055 | Storage & Harvest AI |
 | B.2 | V1.3 | A, B, C | AGR-CEREAL-001–027 | Pre-season Planning & Field Ops AI |
 | B.3 | V2.0 | G, H | AGR-CEREAL-056–071 | Logistics, Trading & Processing AI |
@@ -452,7 +453,7 @@ Related architecture diagrams:
 ## 3. WBS Summary (Effort Totals)
 
 | Phase | Work Packages | Est. Effort (dev-days) | Calendar Weeks |
-|-------|--------------|----------------------|----------------|
+| ----- | ------------ | -------------------- | -------------- |
 | 0 — Dev Environment | 6 | 7 | 1–2 |
 | 1 — App Scaffolding | 7 | 5 | 2–3 |
 | 2 — Core DocTypes (12) | 14 | 18 | 3–6 |
@@ -475,7 +476,7 @@ Related architecture diagrams:
 > Timeline: 20 calendar weeks starting Week 1 (2026-02-23).
 > Legend: `█` = active  |  `▒` = buffer / review  |  `░` = parallel doc stream
 
-```
+```text
 Phase / Work Package                    W1  W2  W3  W4  W5  W6  W7  W8  W9  W10 W11 W12 W13 W14 W15 W16 W17 W18 W19 W20
 ─────────────────────────────────────── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ─── ───
 Ph0  Docker Compose + run.sh            ███ ███
@@ -529,7 +530,7 @@ MILESTONE                               M0                  M2              M3  
 ### Milestones
 
 | Milestone | Date (approx.) | Description |
-|-----------|---------------|-------------|
+| --------- | ------------- | ----------- |
 | M0 | Week 2 (2026-03-06) | Dev environment live; Frappe login works |
 | M1 | Week 3 (2026-03-13) | `yam_agri_core` app scaffold installed; CI green |
 | M2 | Week 6 (2026-04-03) | All 12 core DocTypes live; AT-01, AT-10 pass |
@@ -545,7 +546,7 @@ MILESTONE                               M0                  M2              M3  
 
 ## 5. Critical Path
 
-```
+```text
 Ph0 → Ph1 → Ph2 (DocTypes + RBAC) → Ph3 (Traceability)
                                    → Ph4 (QA/QC)
                                              → Ph5 (Scale/Sensor)
@@ -562,7 +563,7 @@ The **critical path** runs through all 10 phases in sequence. Phase 6 and Phase 
 ## 6. Dependency Matrix (Key Dependencies)
 
 | Task | Depends on | Risk if delayed |
-|------|-----------|----------------|
+| ---- | --------- | -------------- |
 | Ph1 app scaffold | Ph0 complete | Blocks all development |
 | Ph2 Lot DocType | Ph1 + Site DocType | Blocks Traceability and QA/QC |
 | Ph3 Traceability | Ph2 all 12 DocTypes | AT-03/04/05 cannot pass |
@@ -579,7 +580,7 @@ The **critical path** runs through all 10 phases in sequence. Phase 6 and Phase 
 ## 7. Resource Plan
 
 | Role | V1.1 Commitment | Primary phases |
-|------|----------------|---------------|
+| ---- | -------------- | ------------- |
 | Developer | 80% (part-time) | Ph1–Ph7 |
 | DevOps (Ibrahim Al-Sana'ani) | 50% | Ph0, Ph1.5, Ph8 |
 | QA Inspector | 30% | Ph4, Ph5, Ph7, Ph8 |
@@ -590,7 +591,7 @@ The **critical path** runs through all 10 phases in sequence. Phase 6 and Phase 
 ## 8. Risk Register (Planning View)
 
 | Risk | Phase exposed | Mitigation task |
-|------|--------------|----------------|
+| ---- | ------------ | -------------- |
 | Power outage during dev | All | `restart: always`; InnoDB recovery tested in Ph0 |
 | Internet unavailable for Docker pull | Ph0 | Offline image tar (WBS 0.3) |
 | Site isolation breach | Ph2 | AT-10 mandatory before Ph3 starts |
@@ -603,6 +604,7 @@ The **critical path** runs through all 10 phases in sequence. Phase 6 and Phase 
 ## 9. Change Control
 
 Any change to scope, timeline, or budget must be:
+
 1. Raised as a GitHub Issue with label `change-request`
 2. Reviewed by the Product Owner
 3. Reflected in this document (version incremented) before work begins
@@ -612,7 +614,7 @@ Any change to scope, timeline, or budget must be:
 ## 10. Document History
 
 | Version | Date | Author | Change |
-|---------|------|--------|--------|
+| ------- | ---- | ------ | ------ |
 | 1.0 | 2026-02-23 | YasserAKareem | Initial WBS + Gantt for V1.1 |
 
 ---
@@ -624,7 +626,7 @@ This snapshot reflects the current workbook-tracked execution status after WBS r
 ### 11.1 Milestone Status
 
 | Milestone | Status |
-|-----------|--------|
+| --------- | ------ |
 | M0 | ✅ Done |
 | M1 | ✅ Done |
 | M2 | ✅ Done |
@@ -639,7 +641,7 @@ This snapshot reflects the current workbook-tracked execution status after WBS r
 ### 11.2 Phase Status (Row-level WBS)
 
 | Phase | Done | Partial | Not Started | Total | Status |
-|------|-----:|--------:|------------:|------:|--------|
+| ----- | ----: | -------: | -----------: | -----: | ------ |
 | Phase 0 | 14 | 0 | 0 | 14 | ✅ Done |
 | Phase 1 | 11 | 0 | 0 | 11 | ✅ Done |
 | Phase 2 | 23 | 0 | 0 | 23 | ✅ Done |
@@ -654,7 +656,7 @@ This snapshot reflects the current workbook-tracked execution status after WBS r
 ### 11.3 Phase 4 Closure Evidence (WBS + Sample Data + Low-code Work)
 
 | Stream | Status | Evidence |
-|--------|--------|----------|
+| ------ | ------ | -------- |
 | WBS execution status | ✅ Done | M4 marked done and all Phase 4 rows are done after category prefill + row refresh |
 | Acceptance gates | ✅ Done | AT-02 and AT-06 pass in repeatable run window (`run_at02_automated_check`, `run_at06_automated_check`) |
 | Cross-site regression guard | ✅ Done | AT-10 remains pass in same cycle (`run_at10_automated_check`) |
@@ -671,27 +673,27 @@ Phase 4 evidence must include two-site data and disruption-aware records aligned
 - QC scenarios: missing test, stale test, fresh valid test.
 - Certificate scenarios: missing cert, expired cert, valid cert.
 - Dispatch outcomes:
-    - blocked when mandatory QC/cert missing,
-    - blocked when QC stale or cert expired,
-    - allowed after evidence refresh.
+  - blocked when mandatory QC/cert missing,
+  - blocked when QC stale or cert expired,
+  - allowed after evidence refresh.
 - Reliability context records:
-    - intermittent/outage windows represented in timestamps,
-    - offline-safe rerun capability (same commands, deterministic output).
+  - intermittent/outage windows represented in timestamps,
+  - offline-safe rerun capability (same commands, deterministic output).
 
 Recommended replay size for Yemen-context full-scenario validation (now validated):
 
 - **250 records** total across **5 governorates** and **5 sites**.
 - Expected generated operational counts after import:
-    - Lots: `250`
-    - QCTest: `184` (records with `qc_state != Missing`)
-    - Certificates: `165` (records with `certificate_state != Missing`)
-    - Transfers: `208` (records with `transfer_type != None`)
-    - Scale Tickets: `250`
-    - Observations: `250`
+  - Lots: `250`
+  - QCTest: `184` (records with `qc_state != Missing`)
+  - Certificates: `165` (records with `certificate_state != Missing`)
+  - Transfers: `208` (records with `transfer_type != None`)
+  - Scale Tickets: `250`
+  - Observations: `250`
 - Yemen-specific scenario axes included:
-    - connectivity: `2G`, `3G`, `Intermittent`, `Offline Queue`
-    - power: `Stable`, `Outage-2h`, `Outage-6h`
-    - dispatch outcomes: `Allowed` + `Blocked`
+  - connectivity: `2G`, `3G`, `Intermittent`, `Offline Queue`
+  - power: `Stable`, `Outage-2h`, `Outage-6h`
+  - dispatch outcomes: `Allowed` + `Blocked`
 
 ### 11.5 Low-code Steps (Operator Runbook)
 
@@ -747,14 +749,14 @@ Run from the repository root via docker wrapper:
 
 - Sites: `5` (same governorate spread used in Phase 4 dataset).
 - ScaleTicket rows: `300` minimum (60/site) with at least:
-    - `70` clean rows,
-    - `70` row-level CSV errors,
-    - `80` tolerance-pass mismatches,
-    - `80` tolerance-fail mismatches (must auto-create NC).
+  - `70` clean rows,
+  - `70` row-level CSV errors,
+  - `80` tolerance-pass mismatches,
+  - `80` tolerance-fail mismatches (must auto-create NC).
 - Observation rows: `480` minimum (96/site) covering:
-    - connectivity states (`2G`, `3G`, `Intermittent`, `Offline Queue`),
-    - power states (`Stable`, `Outage-2h`, `Outage-6h`),
-    - threshold bands (`normal`, `warning`, `quarantine`).
+  - connectivity states (`2G`, `3G`, `Intermittent`, `Offline Queue`),
+  - power states (`Stable`, `Outage-2h`, `Outage-6h`),
+  - threshold bands (`normal`, `warning`, `quarantine`).
 
 #### Phase 5 low-code execution steps (operator)
 
@@ -771,25 +773,25 @@ Run from the repository root via docker wrapper:
 
 - Scope delivered in this cycle: WBS 5.1 to 5.5 runtime foundations and automated acceptance checks.
 - Data and import runtime:
-    - Added Phase 5 Yemen contract seed, verify, and strict gate in dev seed utilities.
-    - Added AT-07 CSV importer API with schema validation, site-safe lot resolution, mismatch tolerance, lot mutation log, and evidence artifact output.
-    - Added Site Tolerance Policy DocType and server-side policy validation.
+  - Added Phase 5 Yemen contract seed, verify, and strict gate in dev seed utilities.
+  - Added AT-07 CSV importer API with schema validation, site-safe lot resolution, mismatch tolerance, lot mutation log, and evidence artifact output.
+  - Added Site Tolerance Policy DocType and server-side policy validation.
 - Compliance runtime:
-    - Added auto-Nonconformance creation path for mismatch-fail rows.
-    - Enforced server-side QA Manager gate for Nonconformance status transition to Closed.
+  - Added auto-Nonconformance creation path for mismatch-fail rows.
+  - Enforced server-side QA Manager gate for Nonconformance status transition to Closed.
 - IoT and monitoring runtime:
-    - Added Dockerized MQTT broker and FastAPI IoT gateway service with health checks and restart-safe compose wiring.
-    - Added Observation Threshold Policy DocType and runtime quarantine/alert tagging flow in Observation validation.
-    - Added executive observation API behavior that excludes Quarantine rows by default.
+  - Added Dockerized MQTT broker and FastAPI IoT gateway service with health checks and restart-safe compose wiring.
+  - Added Observation Threshold Policy DocType and runtime quarantine/alert tagging flow in Observation validation.
+  - Added executive observation API behavior that excludes Quarantine rows by default.
 - Acceptance status:
-    - AT-07 automated check: pass.
-    - AT-08 automated check: pass.
-    - Frappe Skill Agent quality scan: pass (0 findings).
+  - AT-07 automated check: pass.
+  - AT-08 automated check: pass.
+  - Frappe Skill Agent quality scan: pass (0 findings).
 
 ### 11.8 Phase 5 Closure Status (WBS + Sample Data + Low-code)
 
 | Stream | Status | Evidence |
-|--------|--------|----------|
+| ------ | ------ | -------- |
 | WBS 5.1 (CSV Import) | ✅ Done | Runtime API `import_scale_tickets_csv` with schema validation, site-safe lot resolution, and import artifact output |
 | WBS 5.2 (Tolerance + NC) | ✅ Done | `Site Tolerance Policy` active policy lookup + mismatch-fail auto-NC + QA-only NC close gate |
 | WBS 5.3 (IoT Ingest) | ✅ Done | Dockerized `mqtt` + `iot-gateway` services with restart and health checks in compose |
@@ -803,13 +805,13 @@ Run from the repository root via docker wrapper:
 This kickoff section is intentionally de-duplicated.
 
 - Canonical functional scope, module/entity mapping, ER backbone, FAO/SKU governance, and contract model:
-    see **Phase 6 Canonical Integrated Scope (single source of truth)** in this document.
+  see **Phase 6 Canonical Integrated Scope (single source of truth)** in this document.
 - Execution focus for next cycle:
-        1. Implement AI Gateway (`POST /suggest`) with redaction middleware.
-        2. Deliver Compliance/CAPA/Evidence suggestion UX as assistive-only flows.
-        3. Add append-only AI Interaction Log + decision outcomes.
-        4. Run governance tests: no autonomous writes and redaction enforcement.
-        5. Prepare Phase 6 sample-data and low-code runbook evidence.
+  1. Implement AI Gateway (`POST /suggest`) with redaction middleware.
+  2. Deliver Compliance/CAPA/Evidence suggestion UX as assistive-only flows.
+  3. Add append-only AI Interaction Log + decision outcomes.
+  4. Run governance tests: no autonomous writes and redaction enforcement.
+  5. Prepare Phase 6 sample-data and low-code runbook evidence.
 
 ### 11.10 Phase 7 Closure Status (2026-02-27)
 
@@ -817,19 +819,19 @@ This kickoff section is intentionally de-duplicated.
 - EvidencePack generator scope delivered: linked record builder, PDF export, ZIP export, auditor portal stub, AT-09 automation.
 - Execution evidence document: `docs/PHASE7_EXECUTION_LOG_2026-02-27.md`.
 - Acceptance status:
-    - `run_at09_automated_check`: pass
-    - `run_phase7_smoke`: pass
-    - `bench --site localhost run-tests --app yam_agri_core`: pass
+  - `run_at09_automated_check`: pass
+  - `run_phase7_smoke`: pass
+  - `bench --site localhost run-tests --app yam_agri_core`: pass
 
 ### 11.11 Phase 8 Kickoff Status (2026-02-27)
 
 - Phase 8 planning/execution kickoff started with staging baseline assets:
-    - `environments/staging/config.yaml`
-    - `environments/staging/.env.example`
-    - `environments/staging/manifests/*` (modular k3s manifests)
-    - `environments/staging/scripts/preflight.sh`
-    - `environments/staging/scripts/generate-secrets.sh`
-    - `environments/staging/scripts/phase8_acceptance.sh`
+  - `environments/staging/config.yaml`
+  - `environments/staging/.env.example`
+  - `environments/staging/manifests/*` (modular k3s manifests)
+  - `environments/staging/scripts/preflight.sh`
+  - `environments/staging/scripts/generate-secrets.sh`
+  - `environments/staging/scripts/phase8_acceptance.sh`
 - Kickoff execution plan document: `docs/PHASE8_KICKOFF_PLAN_2026-02-27.md`.
 - Next closure target remains M8: all AT-01 through AT-10 pass on staging.
 
@@ -843,12 +845,12 @@ This kickoff section is intentionally de-duplicated.
 ### 11.13 Phase 8 Remaining WBS Progress (2026-02-27)
 
 - Added WBS 8.1.1 operator automation:
-    - `environments/staging/scripts/provision_k3s.sh`
+  - `environments/staging/scripts/provision_k3s.sh`
 - Added WBS 8.2.1/8.2.2 operator automation:
-    - `environments/staging/scripts/setup_wireguard.sh`
-    - `environments/staging/scripts/restrict_k3s_api.sh`
+  - `environments/staging/scripts/setup_wireguard.sh`
+  - `environments/staging/scripts/restrict_k3s_api.sh`
 - Added WBS 8.4 migration automation:
-    - `environments/staging/scripts/migrate_dev_to_staging.sh` (`MODE=backup-only|full`)
+  - `environments/staging/scripts/migrate_dev_to_staging.sh` (`MODE=backup-only|full`)
 - Executed migration backup-only evidence run on dev bench context and captured artifacts under `artifacts/evidence/phase8/migration/`.
 - Executed offline manifest order validation via `DRY_RUN_MODE=render ./scripts/apply_manifests.sh` (pass).
 - Remaining blocker for full WBS 8 closure: execute remote apply + full restore on staging host over WireGuard and rerun AT-01..AT-10 on staging site.
@@ -857,29 +859,29 @@ This kickoff section is intentionally de-duplicated.
 
 - Real remote execution attempt (`DRY_RUN=0`) was performed and failed due unresolved staging DNS from current workstation.
 - Added access precheck script:
-    - `environments/staging/scripts/check_staging_access.sh`
+  - `environments/staging/scripts/check_staging_access.sh`
 - Captured blocker evidence:
-    - `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`
+  - `artifacts/evidence/phase8/connectivity/check_20260227T182011Z.log`
 - Gate for continuing WBS 8.1.1/8.2.x real execution: WireGuard session + DNS resolution to staging host must be active.
 
 ### 11.15 Phase 8 Blocker Remediation (2026-02-27)
 
 - Added workstation unblock automation:
-    - `environments/staging/scripts/unblock_staging_access.sh`
+  - `environments/staging/scripts/unblock_staging_access.sh`
 - Added operator command wrappers in `environments/staging/` to align runbook commands with direct invocation (no `scripts/` prefix required).
 - Hardened remote scripts with DNS-less SSH fallback:
-    - `SSH_HOST_OVERRIDE` support in `provision_k3s.sh`, `setup_wireguard.sh`, `restrict_k3s_api.sh`
-    - `STAGING_HOST_IP` + optional WG auto-up in `check_staging_access.sh`
+  - `SSH_HOST_OVERRIDE` support in `provision_k3s.sh`, `setup_wireguard.sh`, `restrict_k3s_api.sh`
+  - `STAGING_HOST_IP` + optional WG auto-up in `check_staging_access.sh`
 - Remaining external dependency (still required):
-    - valid WireGuard peer config and reachable staging endpoint/IP from operator workstation.
+  - valid WireGuard peer config and reachable staging endpoint/IP from operator workstation.
 
 ### 11.16 Phase 8 Deferred / Phase 9 Provisional Start (2026-02-27)
 
 - Decision: postpone remaining Phase 8 remote operations and continue to next phase.
 - Phase 8 state:
-    - local automation, scripts, and evidence capture path are ready,
-    - remote closure remains blocked on access dependency (VPN/DNS/SSH path).
+  - local automation, scripts, and evidence capture path are ready,
+  - remote closure remains blocked on access dependency (VPN/DNS/SSH path).
 - Phase 9 state:
-    - kickoff started in provisional mode,
-    - WBS 9.1 and 9.2 are executable now (release notes + final doc review),
-    - WBS 9.3–9.5 remain blocked until Phase 8 staging acceptance is complete.
+  - kickoff started in provisional mode,
+  - WBS 9.1 and 9.2 are executable now (release notes + final doc review),
+  - WBS 9.3–9.5 remain blocked until Phase 8 staging acceptance is complete.
