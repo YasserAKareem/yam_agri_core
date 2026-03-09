@@ -44,6 +44,7 @@ doctype_js = {
 	"QCTest": "yam_agri_core/doctype/qc_test/qc_test.js",
 	"Nonconformance": "yam_agri_core/doctype/nonconformance/nonconformance.js",
 	"EvidencePack": "yam_agri_core/doctype/evidence_pack/evidence_pack.js",
+	"Investment Opportunity": "yam_agri_core/doctype/investment_opportunity/investment_opportunity.js",
 }
 
 permission_query_conditions = {
@@ -71,6 +72,7 @@ permission_query_conditions = {
 	"Location": "yam_agri_core.yam_agri_core.site_permissions.location_query_conditions",
 	"Weather": "yam_agri_core.yam_agri_core.site_permissions.weather_query_conditions",
 	"Crop Cycle": "yam_agri_core.yam_agri_core.site_permissions.crop_cycle_query_conditions",
+	"Investment Opportunity": "yam_agri_core.yam_agri_core.site_permissions.investment_opportunity_query_conditions",
 }
 
 
@@ -99,6 +101,7 @@ has_permission = {
 	"YAM Plot Yield": "yam_agri_core.yam_agri_core.site_permissions.yam_plot_yield_has_permission",
 	"YAM Crop Variety": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_has_permission",
 	"YAM Crop Variety Recommendation": "yam_agri_core.yam_agri_core.site_permissions.yam_crop_variety_recommendation_has_permission",
+	"Investment Opportunity": "yam_agri_core.yam_agri_core.site_permissions.investment_opportunity_has_permission",
 }
 
 # ERPNext-style global search registration — lets Desk's global search bar find these records.
@@ -119,6 +122,7 @@ global_search_doctypes = {
 		{"doctype": "Season Policy", "index": 11},
 		{"doctype": "Site Tolerance Policy", "index": 12},
 		{"doctype": "AI Interaction Log", "index": 13},
+		{"doctype": "Investment Opportunity", "index": 14},
 	],
 }
 

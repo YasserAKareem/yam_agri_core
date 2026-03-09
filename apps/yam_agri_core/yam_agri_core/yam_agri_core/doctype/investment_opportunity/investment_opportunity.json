@@ -1,0 +1,271 @@
+{
+  "doctype": "DocType",
+  "name": "Investment Opportunity",
+  "module": "YAM Agri Core",
+  "custom": 1,
+  "track_changes": 1,
+  "autoname": "naming_series:",
+  "title_field": "opportunity_name",
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Naming Series",
+      "options": "YAM-OPP-.YYYY.-",
+      "default": "YAM-OPP-.YYYY.-",
+      "reqd": 1
+    },
+    {
+      "fieldname": "section_basic",
+      "fieldtype": "Section Break",
+      "label": "Basic Information"
+    },
+    {
+      "fieldname": "opportunity_name",
+      "fieldtype": "Data",
+      "label": "Opportunity Name",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "site",
+      "fieldtype": "Link",
+      "options": "Site",
+      "label": "Site/Office",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "sector",
+      "fieldtype": "Select",
+      "label": "Sector",
+      "options": "\nManufacturing\nServices\nAgriculture\nTechnology\nTourism\nMining\nEnergy\nConstruction\nHealthcare\nEducation\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "priority",
+      "fieldtype": "Select",
+      "label": "Priority",
+      "options": "\nLow\nMedium\nHigh",
+      "default": "Medium",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "section_investment",
+      "fieldtype": "Section Break",
+      "label": "Investment Details"
+    },
+    {
+      "fieldname": "investment_size",
+      "fieldtype": "Currency",
+      "label": "Investment Size (USD)",
+      "reqd": 1
+    },
+    {
+      "fieldname": "investor_name",
+      "fieldtype": "Data",
+      "label": "Investor/Company Name"
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "investor_contact",
+      "fieldtype": "Data",
+      "label": "Contact Email/Phone"
+    },
+    {
+      "fieldname": "investor_country",
+      "fieldtype": "Link",
+      "options": "Country",
+      "label": "Investor Country"
+    },
+    {
+      "fieldname": "section_description",
+      "fieldtype": "Section Break",
+      "label": "Description"
+    },
+    {
+      "fieldname": "description",
+      "fieldtype": "Text Editor",
+      "label": "Opportunity Description"
+    },
+    {
+      "fieldname": "section_gtd",
+      "fieldtype": "Section Break",
+      "label": "GTD Workflow"
+    },
+    {
+      "fieldname": "gtd_status",
+      "fieldtype": "Select",
+      "label": "GTD Status",
+      "options": "\nCaptured\nClarified\nNext Action\nWaiting For\nProject\nSomeday-Maybe\nReference\nCompleted",
+      "default": "Captured",
+      "reqd": 1
+    },
+    {
+      "fieldname": "gtd_context",
+      "fieldtype": "Select",
+      "label": "GTD Context",
+      "options": "\n@office\n@calls\n@computer\n@field\n@meetings\n@travel",
+      "depends_on": "eval:doc.gtd_status=='Next Action'"
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "next_action",
+      "fieldtype": "Small Text",
+      "label": "Next Action",
+      "depends_on": "eval:doc.gtd_status=='Next Action' || doc.gtd_status=='Project'"
+    },
+    {
+      "fieldname": "next_action_owner",
+      "fieldtype": "Link",
+      "options": "User",
+      "label": "Next Action Owner",
+      "depends_on": "eval:doc.gtd_status=='Next Action' || doc.gtd_status=='Project'"
+    },
+    {
+      "fieldname": "section_stage",
+      "fieldtype": "Section Break",
+      "label": "Investment Stage"
+    },
+    {
+      "fieldname": "stage",
+      "fieldtype": "Select",
+      "label": "Stage",
+      "options": "\nLead\nQualification\nFeasibility\nApproval\nImplementation\nOperational\nClosed-Won\nClosed-Lost",
+      "default": "Lead",
+      "reqd": 1
+    },
+    {
+      "fieldname": "expected_jobs",
+      "fieldtype": "Int",
+      "label": "Expected Jobs Created"
+    },
+    {
+      "fieldname": "col_break_4",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "expected_exports",
+      "fieldtype": "Currency",
+      "label": "Expected Annual Exports (USD)"
+    },
+    {
+      "fieldname": "timeline_months",
+      "fieldtype": "Int",
+      "label": "Development Timeline (months)"
+    },
+    {
+      "fieldname": "section_risk",
+      "fieldtype": "Section Break",
+      "label": "Risk Assessment"
+    },
+    {
+      "fieldname": "risk_level",
+      "fieldtype": "Select",
+      "label": "Risk Level",
+      "options": "\nLow\nMedium\nHigh\nCritical",
+      "default": "Medium"
+    },
+    {
+      "fieldname": "col_break_5",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "last_reviewed_date",
+      "fieldtype": "Date",
+      "label": "Last Reviewed"
+    },
+    {
+      "fieldname": "section_ai",
+      "fieldtype": "Section Break",
+      "label": "AI Analysis",
+      "collapsible": 1,
+      "collapsible_depends_on": "ai_analysis_summary"
+    },
+    {
+      "fieldname": "ai_analysis_summary",
+      "fieldtype": "Long Text",
+      "label": "AI Analysis Summary",
+      "read_only": 1,
+      "description": "AI-generated analysis and recommendations (assistive only)"
+    },
+    {
+      "fieldname": "section_dates",
+      "fieldtype": "Section Break",
+      "label": "Tracking"
+    },
+    {
+      "fieldname": "creation_date",
+      "fieldtype": "Date",
+      "label": "Created On",
+      "default": "Today",
+      "read_only": 1
+    },
+    {
+      "fieldname": "col_break_6",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "modified_date",
+      "fieldtype": "Date",
+      "label": "Last Modified",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "submit": 0,
+      "cancel": 0,
+      "amend": 0
+    },
+    {
+      "role": "Investment Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0,
+      "submit": 0,
+      "cancel": 0,
+      "amend": 0
+    },
+    {
+      "role": "Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0,
+      "submit": 0,
+      "cancel": 0,
+      "amend": 0
+    },
+    {
+      "role": "CEO",
+      "read": 1,
+      "write": 0,
+      "create": 0,
+      "delete": 0,
+      "submit": 0,
+      "cancel": 0,
+      "amend": 0
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "is_submittable": 0
+}
