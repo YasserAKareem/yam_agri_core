@@ -46,7 +46,19 @@ _STATE: dict[str, Any] = {
 	"recent_tasks": [],
 }
 
-ALLOWED_TASKS = {"compliance-check", "capa-draft", "evidence-summary", "risk-audit", "chat"}
+ALLOWED_TASKS = {
+	"compliance-check",
+	"capa-draft",
+	"evidence-summary",
+	"risk-audit",
+	"chat",
+	"gtd-capture",
+	"gtd-clarify",
+	"gtd-organize",
+	"opportunity-analysis",
+	"risk-assessment",
+	"build-planning",
+}
 
 PROMPT_TEMPLATES: dict[str, dict[str, Any]] = {
 	"general_assistant": {
@@ -111,6 +123,132 @@ PROMPT_TEMPLATES: dict[str, dict[str, Any]] = {
 			"Site: {site}\n"
 			"Context: {context}\n"
 			"Filters (redacted JSON): {filters}\n"
+		),
+	},
+	"gtd_capture": {
+		"name": "GTD Capture",
+		"description": "Capture and categorize incoming items (opportunities, risks, tasks) using GTD methodology.",
+		"required_vars": ["item_type", "source", "content", "context"],
+		"tags": ["gtd", "capture", "inbox"],
+		"template": (
+			"GTD CAPTURE PHASE - Assistive categorization only.\n"
+			"Item Type: {item_type}\n"
+			"Source: {source}\n"
+			"Content: {content}\n"
+			"Context: {context}\n"
+			"Suggested Actions:\n"
+			"1. Categorize (opportunity/risk/task/reference)\n"
+			"2. Identify key stakeholders\n"
+			"3. Suggest initial priority (High/Medium/Low)\n"
+			"4. Recommend next action\n"
+		),
+	},
+	"gtd_clarify": {
+		"name": "GTD Clarify",
+		"description": "Clarify captured items - determine if actionable, what's the desired outcome, next action.",
+		"required_vars": ["item_name", "item_type", "description", "context"],
+		"tags": ["gtd", "clarify", "process"],
+		"template": (
+			"GTD CLARIFY PHASE - Assistive analysis only.\n"
+			"Item: {item_name}\n"
+			"Type: {item_type}\n"
+			"Description: {description}\n"
+			"Context: {context}\n"
+			"Clarification Questions:\n"
+			"1. Is this actionable? (Yes/No)\n"
+			"2. What's the successful outcome?\n"
+			"3. What's the very next physical action?\n"
+			"4. Who should own this?\n"
+			"5. Is this a project (multi-step) or single action?\n"
+			"6. Estimated effort and timeline?\n"
+		),
+	},
+	"gtd_organize": {
+		"name": "GTD Organize",
+		"description": "Organize clarified items into appropriate categories and action lists.",
+		"required_vars": ["item_name", "item_type", "next_action", "context"],
+		"tags": ["gtd", "organize", "categorize"],
+		"template": (
+			"GTD ORGANIZE PHASE - Assistive categorization only.\n"
+			"Item: {item_name}\n"
+			"Type: {item_type}\n"
+			"Next Action: {next_action}\n"
+			"Context: {context}\n"
+			"Organization Suggestions:\n"
+			"1. Recommended GTD list (Next Actions/Waiting For/Projects/Someday-Maybe/Reference)\n"
+			"2. Context tag (@office/@calls/@computer/@field)\n"
+			"3. Time required (<2min/quick/substantial)\n"
+			"4. Energy level (high/medium/low)\n"
+			"5. Related projects or goals\n"
+			"6. Dependencies and blockers\n"
+		),
+	},
+	"opportunity_analysis": {
+		"name": "Investment Opportunity Analysis",
+		"description": "Analyze investment opportunities for promotion agency - sector fit, feasibility, impact.",
+		"required_vars": ["opportunity_name", "sector", "investment_size", "description", "context"],
+		"tags": ["investment", "opportunity", "analysis"],
+		"template": (
+			"INVESTMENT OPPORTUNITY ANALYSIS - Assistive evaluation only.\n"
+			"Opportunity: {opportunity_name}\n"
+			"Sector: {sector}\n"
+			"Investment Size: {investment_size}\n"
+			"Description: {description}\n"
+			"Context: {context}\n"
+			"Analysis Framework:\n"
+			"1. Strategic Fit - alignment with agency priorities\n"
+			"2. Economic Impact - jobs, GDP, exports\n"
+			"3. Feasibility - technical, financial, regulatory\n"
+			"4. Risk Assessment - political, market, execution\n"
+			"5. Timeline - development, construction, operation\n"
+			"6. Stakeholder Map - investors, government, community\n"
+			"7. Next Steps - due diligence, approvals, resources\n"
+			"8. Success Metrics - KPIs for tracking\n"
+		),
+	},
+	"risk_assessment": {
+		"name": "Risk Assessment",
+		"description": "Comprehensive risk assessment for opportunities and ongoing initiatives.",
+		"required_vars": ["initiative_name", "risk_areas", "context"],
+		"tags": ["risk", "assessment", "mitigation"],
+		"template": (
+			"RISK ASSESSMENT - Assistive analysis only.\n"
+			"Initiative: {initiative_name}\n"
+			"Risk Areas: {risk_areas}\n"
+			"Context: {context}\n"
+			"Risk Analysis Framework:\n"
+			"1. Political/Regulatory Risks\n"
+			"2. Market/Demand Risks\n"
+			"3. Financial/Funding Risks\n"
+			"4. Technical/Execution Risks\n"
+			"5. Environmental/Social Risks\n"
+			"6. Likelihood × Impact scoring\n"
+			"7. Mitigation strategies\n"
+			"8. Contingency plans\n"
+			"9. Monitoring indicators\n"
+		),
+	},
+	"build_planning": {
+		"name": "Build Planning Assistant",
+		"description": "AI-assisted build planning for projects and initiatives - timeline, resources, dependencies.",
+		"required_vars": ["project_name", "objectives", "constraints", "context"],
+		"tags": ["planning", "build", "project"],
+		"template": (
+			"BUILD PLANNING ASSISTANT - Assistive planning only.\n"
+			"Project: {project_name}\n"
+			"Objectives: {objectives}\n"
+			"Constraints: {constraints}\n"
+			"Context: {context}\n"
+			"Planning Framework:\n"
+			"1. Work Breakdown Structure (WBS)\n"
+			"2. Critical Path Analysis\n"
+			"3. Resource Requirements (team, budget, tools)\n"
+			"4. Timeline & Milestones\n"
+			"5. Dependencies & Sequencing\n"
+			"6. Risk Mitigation in Plan\n"
+			"7. Success Criteria & KPIs\n"
+			"8. Stakeholder Communication Plan\n"
+			"9. Quality Gates & Reviews\n"
 		),
 	},
 }
