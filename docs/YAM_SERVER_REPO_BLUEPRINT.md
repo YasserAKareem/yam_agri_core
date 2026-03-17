@@ -223,7 +223,86 @@ This is not fragmentation. This is intentional architecture.
 
 ---
 
-### 8. yam-server-apps
+### 8. yam-server-business
+
+This repo owns the business application layer built on Frappe+ERPNext.
+
+**What it owns:**
+- Frappe app definitions (custom DocTypes, forms, workflows)
+- ERPNext customizations for specific business domains
+- Business logic and validation rules
+- Custom reports and dashboards
+- Print formats and templates
+- Business-specific API endpoints
+- Integration connectors to YAM Server AI services
+- Custom Frappe UI components and pages
+- Role profiles and permission rules
+- Fixtures and seed data for business entities
+
+**What it does NOT own:**
+- The Frappe/ERPNext platform itself → yam-server-core
+- AI inference services → yam-server-core
+- Generic UI design system → yam-server-ui-kit
+
+**Ownership:** Business application developers, domain experts
+
+**Release cadence:** Moderate - follows business requirements cycle
+
+**Why separate:**
+- Business logic evolves independently of AI platform
+- Domain experts can work without AI infrastructure knowledge
+- Clear separation between "AI platform" and "business applications"
+- Enables multiple business contexts (agriculture, inventory, manufacturing, etc.)
+- Different testing and deployment cycles than infrastructure
+
+**Integration points:**
+- Calls LiteLLM API for AI-assisted features (document analysis, recommendation, etc.)
+- Uses YAM Server agents for automated workflows
+- Reads from/writes to shared PostgreSQL database
+- Exposes webhooks for n8n workflow triggers
+
+---
+
+### 9. yam-server-ui-kit
+
+This repo owns the UI/UX design system based on Frappe UI.
+
+**What it owns:**
+- Vue 3 component library built on frappe-ui
+- Design tokens (colors, typography, spacing, shadows)
+- UI patterns and templates
+- Storybook documentation
+- Accessibility guidelines
+- Responsive design utilities
+- Theme configurations
+- Icon library and illustrations
+- Component usage guidelines
+- Design-to-code workflow documentation
+
+**What it does NOT own:**
+- Business-specific forms → yam-server-business
+- Open WebUI customizations → yam-server-core
+- Frappe Desk customizations → yam-server-business
+
+**Ownership:** UI/UX designers, frontend engineers
+
+**Release cadence:** Frequent - iterative design improvements
+
+**Why separate:**
+- Design system needs independent versioning
+- Multiple applications can consume the same UI kit
+- Designers can work without understanding business logic
+- Enables consistent UX across all YAM Server touchpoints
+- Clear separation of presentation from business logic
+
+**Based on:**
+- [frappe-ui](https://github.com/frappe/frappe-ui) - Vue 3 component library
+- Follows Frappe design principles and patterns
+- Compatible with Frappe v16 theming
+
+---
+
+### 10. yam-server-apps
 
 **What it owns:**
 - Optional add-on services
@@ -310,6 +389,8 @@ Example in `yam-server-core` README:
 | An n8n workflow | `yam-server-workflows` |
 | A TTS service or image worker | `yam-server-media` |
 | An ADR, runbook, or architecture diagram | `yam-server-docs` |
+| A Frappe DocType, business workflow, or ERP customization | `yam-server-business` |
+| A reusable UI component or design token | `yam-server-ui-kit` |
 | An optional tool or experiment | `yam-server-apps` |
 
 **When in doubt:** Ask "Does the core platform stop working without this?" If yes → core. If no → appropriate specialized repo.
@@ -329,6 +410,8 @@ Different repos need different access policies:
 | `yam-server-workflows` | Automation team + analysts | Business logic owners |
 | `yam-server-media` | Media team | Separate hardware expertise |
 | `yam-server-docs` | All teams (with review) | Shared knowledge |
+| `yam-server-business` | Business developers + domain experts | Business logic and ERPNext |
+| `yam-server-ui-kit` | UI/UX designers + frontend | Design consistency |
 | `yam-server-apps` | Varies by app | Loose coupling |
 
 This enables **parallel development** without stepping on each other.

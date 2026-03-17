@@ -195,6 +195,16 @@ Optional STT, TTS, image-generation, and video-worker infrastructure for YAM Ser
 Architecture notes, runbooks, ADRs, onboarding guides, threat models, and operational playbooks for YAM Server. Docs as infrastructure.
 ```
 
+### yam-server-business
+```
+Frappe/ERPNext business application layer for YAM Server. Custom DocTypes, workflows, reports, and AI-assisted business features. Where AI meets real operational workflows.
+```
+
+### yam-server-ui-kit
+```
+Vue 3 UI/UX design system for YAM Server based on frappe-ui. Reusable components, design tokens, accessibility patterns. Build once, use everywhere.
+```
+
 ### yam-server-apps
 ```
 Optional add-on services, research tools, admin helpers, and line-of-business apps for YAM Server. Experimentation without bloat.

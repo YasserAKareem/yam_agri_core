@@ -1,19 +1,19 @@
 # YAM Server Documentation - Quick Start Guide
 
-> **What is this?** Documentation for creating and understanding YAM Server - a Compose-first AI platform for small teams.
+> **What is this?** Documentation for creating and understanding YAM Server - a Compose-first AI platform for small teams with Frappe/ERPNext business integration.
 
 ---
 
-## Three Essential Documents
+## Core Documentation
 
-This folder contains everything you need to create a new YAM Server repository family:
+This folder contains everything you need to create and integrate the YAM Server platform:
 
 ### 1. [YAM_SERVER_HOW_IT_WORKS.md](YAM_SERVER_HOW_IT_WORKS.md)
 **Read this first** to understand the complete architecture, philosophy, and design decisions behind YAM Server.
 
 **What's inside:**
 - The problem YAM Server solves
-- Core technology stack
+- Core technology stack (including Frappe/ERPNext)
 - The "team in the building" metaphor (each service's role)
 - Request flow diagrams (chat, document upload)
 - Hardware expectations and honest scope
@@ -29,7 +29,7 @@ This folder contains everything you need to create a new YAM Server repository f
 **What's inside:**
 - Exact repository description text (short form)
 - Complete README template (detailed form)
-- Repository-specific prompt variations (for models, observability, agents, etc.)
+- Repository-specific prompt variations (for models, observability, agents, business, ui-kit, etc.)
 - GitHub settings checklist
 - Initial files checklist
 - Topics/tags for discoverability
@@ -43,7 +43,7 @@ This folder contains everything you need to create a new YAM Server repository f
 
 **What's inside:**
 - Why YAM Server is split across multiple repos (not a monolith)
-- Detailed description of each repository's responsibility
+- Detailed description of each repository's responsibility (including yam-server-business and yam-server-ui-kit)
 - What goes where (decision matrix)
 - How repositories reference each other
 - Access control strategy per repo
@@ -51,6 +51,41 @@ This folder contains everything you need to create a new YAM Server repository f
 - Migration path from monorepo
 
 **Who should read this:** Team leads, architects, and anyone making decisions about where new functionality should live.
+
+---
+
+## Integration Documentation
+
+### 4. [YAM_SERVER_FRAPPE_INTEGRATION.md](YAM_SERVER_FRAPPE_INTEGRATION.md)
+**Read this** to understand how Frappe/ERPNext integrates with YAM Server AI infrastructure.
+
+**What's inside:**
+- Integration architecture (side-by-side, not nested)
+- Three key integration patterns (document processing, recommendations, report generation)
+- Deployment options (separate containers vs. integrated)
+- Security considerations (API keys, PII redaction, rate limiting)
+- Testing strategy
+- Example: YAM Agri use cases
+
+**Who should read this:** Business application developers, Frappe developers, integration engineers.
+
+---
+
+### 5. [YAM_SERVER_UI_DESIGN_SYSTEM.md](YAM_SERVER_UI_DESIGN_SYSTEM.md)
+**Read this** to understand the UI/UX design system based on Frappe UI.
+
+**What's inside:**
+- Design philosophy and principles
+- Technology foundation (Vue 3, Tailwind CSS, Frappe UI)
+- Design tokens (colors, typography, spacing)
+- Component library (base + YAM-specific components)
+- Layout patterns (desktop, mobile PWA)
+- Accessibility guidelines (WCAG 2.1 AA)
+- RTL support for Arabic
+- Dark mode support
+- Storybook documentation
+
+**Who should read this:** UI/UX designers, frontend developers, anyone building YAM Server user interfaces.
 
 ---
 
@@ -112,6 +147,8 @@ When complete, the YAM Server ecosystem will consist of:
 | `yam-server-workflows` | n8n flows, automation | Automation team |
 | `yam-server-media` | STT, TTS, image/video workers | Media team |
 | `yam-server-docs` | Runbooks, ADRs, architecture | Shared (curated) |
+| `yam-server-business` | Frappe/ERPNext business apps, AI-assisted features | Business developers |
+| `yam-server-ui-kit` | Vue 3 design system (frappe-ui based) | UI/UX team |
 | `yam-server-apps` | Optional add-ons, experiments | App teams |
 
 See [YAM_SERVER_REPO_BLUEPRINT.md](YAM_SERVER_REPO_BLUEPRINT.md) for complete details.
@@ -159,6 +196,9 @@ These documents reference:
 - [vLLM Semantic Router](https://vllm-semantic-router.com/) - Routing layer
 - [LiteLLM](https://docs.litellm.ai/) - Gateway and model catalog
 - [Open WebUI](https://docs.openwebui.com/) - User interface
+- [Frappe Framework](https://frappeframework.com/docs) - Business application framework
+- [Frappe UI](https://github.com/frappe/frappe-ui) - Vue 3 component library
+- [ERPNext](https://docs.erpnext.com/) - Open source ERP
 
 ---
 
@@ -169,6 +209,13 @@ These documents reference:
   - Created NEW_REPO_PROMPT.md (8K)
   - Created REPO_BLUEPRINT.md (14K)
   - Created this README
+- **2026-03-17**: Added Frappe/ERPNext integration and UI design system
+  - Updated HOW_IT_WORKS.md with Frappe integration section
+  - Updated REPO_BLUEPRINT.md with yam-server-business and yam-server-ui-kit repos
+  - Created FRAPPE_INTEGRATION.md (25K) - Complete integration guide
+  - Created UI_DESIGN_SYSTEM.md (18K) - UI/UX design system based on frappe-ui
+  - Updated NEW_REPO_PROMPT.md with new repo prompts
+  - Updated this README with new documentation links
 
 ---
 

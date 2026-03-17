@@ -103,6 +103,16 @@ And watching the whole place is the **observability stack**.
 
 Call it the watchtower. Whether it is Grafana LGTM or an equivalent stack, this is how you know what happened, why it happened, who triggered it, how slow it was, and what is quietly breaking before the users notice. A local AI platform without observability is not a platform. It is a guess.
 
+But there is one more member of the team that becomes critical when YAM Server connects to real business context: **Frappe + ERPNext**.
+
+Frappe + ERPNext is the business application layer. While the AI core handles inference, routing, and document memory, Frappe provides the structured business logic, workflows, forms, and data models that real organizations need. Think inventory management, purchase orders, invoices, HR records, project tracking, and custom business workflows.
+
+This is where AI meets reality.
+
+Frappe sits alongside the AI stack, using the same PostgreSQL database for transactional data while the AI services handle inference and vector search. When a user needs AI assistance with a business task—analyzing an invoice, recommending inventory levels, drafting a compliance report—the Frappe application calls LiteLLM's API, receives AI-generated suggestions, and presents them within the familiar ERP interface.
+
+The integration is assistive, not autonomous. The AI never writes directly to business tables. It suggests. The human approves. The Frappe workflow enforces the business rules.
+
 That is the core team.
 
 Not enormous. Not theatrical. Just disciplined.
@@ -386,6 +396,12 @@ If someone wanted to go read the foundations for this architecture, these are th
   [main docs](https://docs.litellm.ai/) and [Open WebUI integration guide](https://docs.litellm.ai/docs/tutorials/openweb_ui)
 - Open WebUI:
   [advanced scaling guidance](https://docs.openwebui.com/getting-started/advanced-topics/scaling/) and [starting with vLLM](https://docs.openwebui.com/getting-started/quick-start/starting-with-vllm/)
+- Frappe Framework:
+  [main docs](https://frappeframework.com/docs) and [Frappe v16 release notes](https://github.com/frappe/frappe)
+- Frappe UI:
+  [component library](https://github.com/frappe/frappe-ui) - Vue 3 components for building modern web apps
+- ERPNext:
+  [main docs](https://docs.erpnext.com/) and [v16 features](https://github.com/frappe/erpnext)
 
 ---
 
