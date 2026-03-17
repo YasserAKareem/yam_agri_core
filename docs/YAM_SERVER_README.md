@@ -1,6 +1,8 @@
 # YAM Server Documentation - Quick Start Guide
 
 > **What is this?** Documentation for creating and understanding YAM Server - a Compose-first AI platform for small teams with Frappe/ERPNext business integration.
+>
+> **Core Promise:** One command (`./start.sh`) detects your GPU, picks the right model, generates credentials, and launches everything. From clone to working platform in under 5 minutes.
 
 ---
 
@@ -93,15 +95,66 @@ This folder contains everything you need to create and integrate the YAM Server 
 
 ### "I want to create the main YAM Server repo. What do I do?"
 
-1. Read [YAM_SERVER_HOW_IT_WORKS.md](YAM_SERVER_HOW_IT_WORKS.md) to understand the platform (30 min)
-2. Open [YAM_SERVER_NEW_REPO_PROMPT.md](YAM_SERVER_NEW_REPO_PROMPT.md)
-3. Copy the "Initial README Prompt (Detailed Form)" section
-4. Create a new GitHub repo named `yam-server-core`
-5. Use the short description for the GitHub repo description field
-6. Paste the detailed README as your initial `README.md`
-7. Follow the "Initial Files" and "GitHub Repository Settings" checklists
+**See the complete guide:** [YAM_SERVER_GITHUB_REPO_FORM_GUIDE.md](YAM_SERVER_GITHUB_REPO_FORM_GUIDE.md)
 
-**Time required:** 15-20 minutes for initial setup
+**Quick summary:**
+1. Create repo named `yam-server-core`
+2. Description: `One command to launch your AI platform. Local LLM with Open WebUI, LiteLLM, vLLM. Detects GPU, picks model, generates credentials automatically.`
+3. Use the README template from [YAM_SERVER_NEW_REPO_PROMPT.md](YAM_SERVER_NEW_REPO_PROMPT.md)
+4. Add topics: `local-llm`, `self-hosted`, `docker-compose`, `one-command-setup`, `ai-platform`
+5. License: MIT or Apache 2.0
+
+**Time required:** 10 minutes for repo setup, then start building `./start.sh`
+
+---
+
+### "What do I write in the GitHub repo form?"
+
+**Three critical fields:**
+
+1. **Repository name:** `yam-server-core`
+
+2. **Description (160 char max):**
+   ```
+   One command to launch your AI platform. Local LLM with Open WebUI, LiteLLM, vLLM. Detects GPU, picks model, generates credentials automatically.
+   ```
+
+3. **Topics (keywords):**
+   - `local-llm`
+   - `self-hosted`
+   - `docker-compose`
+   - `one-command-setup`
+   - `ai-platform`
+
+**Full details:** See [YAM_SERVER_GITHUB_REPO_FORM_GUIDE.md](YAM_SERVER_GITHUB_REPO_FORM_GUIDE.md) for complete form field instructions, README template, and first commit message.
+
+---
+
+### "How do I emphasize the 'one command' promise?"
+
+**In every document:**
+- Lead with `./start.sh` as the first code example
+- Show the automatic detection and configuration
+- Emphasize "5 minutes from clone to working platform"
+- List what the script does automatically (GPU detection, model selection, credential generation)
+- Contrast with "most AI demos" that require manual setup
+
+**Example opening:**
+```bash
+./start.sh
+# That's it. No config files. No manual downloads.
+# GPU detected → Model selected → Credentials generated → Platform launched
+```
+
+See [YAM_SERVER_GITHUB_REPO_FORM_GUIDE.md](YAM_SERVER_GITHUB_REPO_FORM_GUIDE.md) for the complete README template that emphasizes this promise.
+
+---
+
+### "Should I use a GitHub template?"
+
+**No.** Select "No template" when creating the repository.
+
+**Why:** YAM Server has custom Docker Compose structure and bootstrap logic that doesn't fit standard templates. The one-command promise requires a custom setup approach.
 
 ---
 
@@ -136,20 +189,22 @@ They are separate projects with different purposes. YAM Server could potentially
 
 ## Repository Family Overview
 
-When complete, the YAM Server ecosystem will consist of:
+When complete, the YAM Server ecosystem will consist of 10 specialized repositories, each owning a clear surface area:
 
-| Repository | Purpose | Owner |
-|------------|---------|-------|
-| `yam-server-core` | Platform (Compose files, services, bootstrap) | Platform engineering |
-| `yam-server-models` | Model profiles, routing policies | ML runtime team |
-| `yam-server-observability` | Dashboards, alerts, SLO definitions | SRE |
-| `yam-server-agents` | A2A agents, tool wrappers | Agent platform team |
-| `yam-server-workflows` | n8n flows, automation | Automation team |
-| `yam-server-media` | STT, TTS, image/video workers | Media team |
-| `yam-server-docs` | Runbooks, ADRs, architecture | Shared (curated) |
-| `yam-server-business` | Frappe/ERPNext business apps, AI-assisted features | Business developers |
-| `yam-server-ui-kit` | Vue 3 design system (frappe-ui based) | UI/UX team |
-| `yam-server-apps` | Optional add-ons, experiments | App teams |
+| Repository | Purpose | Owner | First Question |
+|------------|---------|-------|----------------|
+| `yam-server-core` | Platform (Compose files, `./start.sh`, bootstrap) | Platform engineering | Does it break the one-command promise? |
+| `yam-server-models` | Model profiles, routing policies | ML runtime team | Which model for which GPU? |
+| `yam-server-observability` | Dashboards, alerts, SLO definitions | SRE | How do we know it's working? |
+| `yam-server-agents` | A2A agents, tool wrappers | Agent platform team | Can an agent do this? |
+| `yam-server-workflows` | n8n flows, automation | Automation team | Should this be automated? |
+| `yam-server-media` | STT, TTS, image/video workers | Media team | Does this need a separate GPU? |
+| `yam-server-docs` | Runbooks, ADRs, architecture | Shared (curated) | Is this documented? |
+| `yam-server-business` | Frappe/ERPNext business apps, AI-assisted features | Business developers | How does AI help the business? |
+| `yam-server-ui-kit` | Vue 3 design system (frappe-ui based) | UI/UX team | Is this reusable? |
+| `yam-server-apps` | Optional add-ons, experiments | App teams | Does this belong in core? |
+
+**Key principle:** `yam-server-core` must maintain the "one command" promise. Everything else is optional and can fail without breaking the basic platform.
 
 See [YAM_SERVER_REPO_BLUEPRINT.md](YAM_SERVER_REPO_BLUEPRINT.md) for complete details.
 
@@ -216,6 +271,12 @@ These documents reference:
   - Created UI_DESIGN_SYSTEM.md (18K) - UI/UX design system based on frappe-ui
   - Updated NEW_REPO_PROMPT.md with new repo prompts
   - Updated this README with new documentation links
+- **2026-03-17**: Emphasized "one command" promise throughout documentation
+  - Created GITHUB_REPO_FORM_GUIDE.md (15K) - Complete guide for repo creation
+  - Updated README with quick answers about repo form fields
+  - Enhanced NEW_REPO_PROMPT.md to highlight `./start.sh` as primary entry point
+  - Added "Core Promise" to README header
+  - Updated repository family table with "First Question" column to guide decisions
 
 ---
 

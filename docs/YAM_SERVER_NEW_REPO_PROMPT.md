@@ -49,18 +49,23 @@ YAM Server bridges the gap between "I have a chat window" and "I have a platform
 
 ## Getting Started
 
-One command launches everything:
+### One Command. Complete Platform.
 
 ```bash
-docker compose up
+./start.sh
 ```
 
-The bootstrap script:
-- Detects your GPU
-- Picks the right model for your hardware
-- Generates secure credentials
-- Starts all services
-- Provides health checks
+That's the entire setup. No configuration files. No manual downloads. No credential management.
+
+The bootstrap script automatically:
+- **Detects your GPU** (NVIDIA, AMD, or CPU-only)
+- **Picks the right model** for your VRAM (8GB → Llama 3.2 3B, 16GB → Llama 3.1 8B)
+- **Generates secure credentials** (API keys, passwords, tokens)
+- **Starts all services** (Open WebUI, LiteLLM, vLLM, PostgreSQL, Redis, Traefik)
+- **Runs health checks** until everything is ready
+- **Opens your browser** to http://localhost
+
+From clone to working AI platform in under 5 minutes.
 
 ## Design Philosophy
 
